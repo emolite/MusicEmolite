@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "dist/MusicEmolite",
+  "outputDirectory": "dist/MusicEmolite/browser",
   "routes": [
     {
       "src": "/(.*)",
