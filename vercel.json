@@ -1,11 +1,9 @@
 {
   "outputDirectory": "dist/MusicEmolite",
-  "buildCommand": "npm run build -- --configuration production",
-  "installCommand": "npm install",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
