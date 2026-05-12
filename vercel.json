@@ -1,4 +1,7 @@
 {
+  "outputDirectory": "dist/MusicEmolite",
+  "buildCommand": "npm run build -- --configuration production",
+  "installCommand": "npm install",
   "rewrites": [
     {
       "source": "/(.*)",
