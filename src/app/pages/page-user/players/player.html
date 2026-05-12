@@ -1,0 +1,235 @@
+<div class="min-h-screen bg-[#0f0d1a] text-white font-sans overflow-x-hidden">
+
+  <!-- Sidebar (queue view) -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-[#130f21] border-r border-white/5 flex flex-col z-40">
+    <div class="px-6 py-8">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center shadow-lg shadow-violet-600/30">
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+        <div>
+          <p class="text-base font-bold tracking-tight leading-none text-white">Song</p>
+          <p class="text-xs text-violet-400 font-medium tracking-widest uppercase">with me</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="px-3 flex-1">
+      <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Menu</p>
+      <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+        <span class="text-sm font-medium">Home</span>
+      </a>
+      <a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <span class="text-sm font-medium">Discover</span>
+      </a>
+
+      <div class="my-4 border-t border-white/5"></div>
+      <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Đang phát</p>
+
+      <!-- Queue list -->
+      <div class="space-y-1 overflow-y-auto max-h-[400px]" style="scrollbar-width: none;">
+        <div *ngFor="let song of queue; let i = index"
+             class="flex items-center gap-3 px-3 py-2 rounded-xl cursor-pointer transition-all duration-200"
+             [class.bg-violet-600]="i === currentIndex"
+             [class.text-white]="i === currentIndex"
+             [class.hover:bg-white/5]="i !== currentIndex">
+          <span class="text-xs w-4 shrink-0 text-center"
+                [class.text-white/60]="i === currentIndex"
+                [class.text-white/30]="i !== currentIndex">
+            {{ i === currentIndex ? '▶' : i + 1 }}
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-semibold truncate"
+               [class.text-white]="i === currentIndex"
+               [class.text-white/70]="i !== currentIndex">{{ song.name }}</p>
+            <p class="text-[10px] truncate"
+               [class.text-white/60]="i === currentIndex"
+               [class.text-white/40]="i !== currentIndex">{{ song.artist }}</p>
+          </div>
+          <span class="text-[10px] shrink-0"
+                [class.text-white/50]="i === currentIndex"
+                [class.text-white/30]="i !== currentIndex">{{ song.duration }}</span>
+        </div>
+      </div>
+    </nav>
+
+    <div class="px-4 py-5 border-t border-white/5">
+      <div class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-white/5 cursor-pointer transition-all">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold shrink-0">AN</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-white truncate">Anh Nguyen</p>
+          <p class="text-xs text-white/40 truncate">Free Plan</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Player -->
+  <main class="ml-64 min-h-screen flex flex-col">
+
+    <!-- Background glow -->
+    <div class="fixed inset-0 ml-64 pointer-events-none overflow-hidden z-0">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10 blur-[120px]"
+           style="background: radial-gradient(circle, #7c3aed 0%, transparent 70%);"></div>
+    </div>
+
+    <div class="relative z-10 flex flex-col flex-1">
+      <!-- Top bar -->
+      <header class="px-8 py-5 flex items-center justify-between border-b border-white/5 bg-[#0f0d1a]/50 backdrop-blur-sm">
+        <div class="flex items-center gap-2">
+          <button class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all">
+            <svg class="w-4 h-4 text-white/60" fill="currentColor" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+          </button>
+          <span class="text-sm text-white/40 ml-1">Đang phát</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+          </button>
+          <button class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-all text-white/50 hover:text-white">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Player content -->
+      <div class="flex-1 flex items-center justify-center px-8 py-8">
+        <div class="flex gap-16 items-center max-w-5xl w-full">
+
+          <!-- Album Art + Controls -->
+          <div class="flex flex-col items-center flex-1">
+
+            <!-- Album Art -->
+            <div class="relative mb-10">
+              <div class="absolute inset-0 rounded-3xl blur-2xl opacity-30 scale-105"
+                   style="background: linear-gradient(135deg, #6d28d9, #4c1d95);"></div>
+              <div class="relative w-72 h-72 rounded-3xl overflow-hidden shadow-2xl shadow-black/60"
+                   style="background: linear-gradient(135deg, #3b0764 0%, #1a0a2e 100%); border: 1px solid rgba(255,255,255,0.08);">
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <svg class="w-24 h-24 text-violet-400/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                </div>
+                <div class="absolute inset-0 rounded-3xl" style="background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.04), transparent 60%);"></div>
+              </div>
+            </div>
+
+            <!-- Song Info -->
+            <div class="text-center mb-8 w-full max-w-sm">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h1 class="text-2xl font-bold text-white mb-1">Chờ Một Giấc Mơ</h1>
+                  <p class="text-white/50 text-sm">Sơn Tùng M-TP &bull; Chờ Một Giấc Mơ (Single)</p>
+                </div>
+                <button class="text-white/30 hover:text-violet-400 transition-colors ml-4 mt-1">
+                  <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full max-w-sm mb-5">
+              <div class="relative h-1.5 bg-white/10 rounded-full cursor-pointer group mb-2">
+                <div class="h-full rounded-full transition-all" style="width: 36%; background: linear-gradient(90deg, #8b5cf6, #6d28d9);">
+                  <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity -translate-x-1/2 border-2 border-violet-500"></div>
+                </div>
+              </div>
+              <div class="flex justify-between text-xs text-white/30">
+                <span>1:23</span>
+                <span>3:48</span>
+              </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="flex items-center gap-6 mb-6">
+              <button class="text-white/40 hover:text-white transition-colors hover:scale-110 active:scale-95">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+              </button>
+              <button class="text-white/60 hover:text-white transition-colors hover:scale-110 active:scale-95">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+              </button>
+              <button class="w-16 h-16 bg-violet-600 hover:bg-violet-500 rounded-full flex items-center justify-center shadow-2xl shadow-violet-600/40 transition-all hover:scale-105 active:scale-95">
+                <svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+              </button>
+              <button class="text-white/60 hover:text-white transition-colors hover:scale-110 active:scale-95">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+              </button>
+              <button class="text-white/40 hover:text-white transition-colors hover:scale-110 active:scale-95">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+              </button>
+            </div>
+
+            <!-- Volume -->
+            <div class="flex items-center gap-3 w-full max-w-xs">
+              <button class="text-white/40 hover:text-white transition-colors shrink-0">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/></svg>
+              </button>
+              <div class="flex-1 h-1.5 bg-white/10 rounded-full cursor-pointer group relative">
+                <div class="h-full bg-white/40 group-hover:bg-violet-400 rounded-full transition-colors w-[70%]"></div>
+              </div>
+              <button class="text-white/40 hover:text-white transition-colors shrink-0">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lyrics Panel -->
+          <div class="w-80 h-[560px] flex flex-col">
+            <!-- Tabs -->
+            <div class="flex gap-1 mb-5 bg-white/5 rounded-xl p-1">
+              <button class="flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                      [class.bg-violet-600]="activeTab === 'lyrics'"
+                      [class.text-white]="activeTab === 'lyrics'"
+                      [class.text-white/50]="activeTab !== 'lyrics'"
+                      (click)="activeTab = 'lyrics'">
+                Lời bài hát
+              </button>
+              <button class="flex-1 py-1.5 rounded-lg text-sm font-semibold transition-all"
+                      [class.bg-violet-600]="activeTab === 'related'"
+                      [class.text-white]="activeTab === 'related'"
+                      [class.text-white/50]="activeTab !== 'related'"
+                      (click)="activeTab = 'related'">
+                Bài tương tự
+              </button>
+            </div>
+
+            <!-- Lyrics Tab -->
+            <div *ngIf="activeTab === 'lyrics'" class="flex-1 overflow-y-auto space-y-5 pr-2" style="scrollbar-width: thin; scrollbar-color: rgba(139,92,246,0.3) transparent;">
+              <div *ngFor="let line of lyrics; let i = index"
+                   class="transition-all duration-300"
+                   [class.opacity-100]="i === activeLyricLine"
+                   [class.opacity-20]="i !== activeLyricLine">
+                <p class="text-base font-medium leading-relaxed"
+                   [class.text-violet-300]="i === activeLyricLine"
+                   [class.text-white]="i !== activeLyricLine"
+                   [class.text-lg]="i === activeLyricLine"
+                   [class.font-bold]="i === activeLyricLine">{{ line }}</p>
+              </div>
+            </div>
+
+            <!-- Related Tab -->
+            <div *ngIf="activeTab === 'related'" class="flex-1 overflow-y-auto space-y-2 pr-1" style="scrollbar-width: thin; scrollbar-color: rgba(139,92,246,0.3) transparent;">
+              <div *ngFor="let song of relatedSongs; let i = index"
+                   class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all duration-200 hover:bg-white/5 group border border-transparent hover:border-white/5">
+                <div class="w-11 h-11 rounded-xl shrink-0 flex items-center justify-center overflow-hidden" [style.background]="song.color">
+                  <svg class="w-5 h-5 text-white/40 group-hover:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                  <svg class="w-5 h-5 text-white hidden group-hover:block" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-semibold text-white truncate">{{ song.name }}</p>
+                  <p class="text-xs text-white/40 truncate">{{ song.artist }}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-white/30">{{ song.duration }}</span>
+                  <button class="w-7 h-7 rounded-full bg-transparent hover:bg-violet-500/20 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100">
+                    <svg class="w-4 h-4 text-white/60 hover:text-violet-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

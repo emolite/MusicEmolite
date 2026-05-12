@@ -1,0 +1,74 @@
+<div class="min-h-screen w-full flex bg-cover bg-center text-white"
+    style="background-image: url('/background-login.jpeg');">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div
+        class="relative ml-auto w-full max-w-lg h-screen flex items-center bg-black/30 backdrop-blur-xl border-l border-white/10">
+        <a href="/users/home"
+            class="absolute top-6 left-6 flex items-center gap-2 text-white/60 hover:text-white transition cursor-pointer">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+            </svg>
+            <span class="text-sm">Quay lại</span>
+        </a>
+        <div class="w-full px-14">
+            <h1 class="text-4xl font-bold mb-2">
+                Đăng nhập
+            </h1>
+            <p class="text-white/60 mb-10 text-base">
+                Chào mừng bạn quay trở lại
+            </p>
+            <form class="space-y-5" (ngSubmit)="login()">
+
+                <input type="text" [(ngModel)]="form.userName" name="userName" placeholder="Tên đăng nhập" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+                focus:border-violet-500 outline-none text-lg">
+
+                <div class="relative">
+
+                    <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" name="password"
+                        placeholder="Mật khẩu" class="w-full px-4 py-4 pr-12 rounded-xl bg-white/5 border border-white/10
+                  focus:border-violet-500 outline-none text-lg">
+
+                    <button type="button" (click)="togglePassword()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer">
+
+                        @if (!showPassword()) {
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+                        </svg>
+                        } @else {
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M2 4l18 18 1.5-1.5-2.3-2.3C21 16 22 12 22 12s-3-7-10-7c-1.6 0-3 .3-4.2.8L3.5 3.5 2 4z" />
+                        </svg>
+                        }
+                    </button>
+
+                </div>
+
+                <button type="submit" [disabled]="loading()" class="w-full py-4 rounded-xl bg-violet-600 hover:bg-violet-500
+    disabled:opacity-60 disabled:cursor-not-allowed
+    font-semibold text-lg transition cursor-pointer
+    flex items-center justify-center gap-3">
+                    @if(loading()) {
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                        </circle>
+
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
+                        </path>
+                    </svg>
+                    <span>Đang đăng nhập...</span>
+                    } @else {
+                    <span>Đăng nhập</span>
+                    }
+                </button>
+
+            </form>
+            <p class="text-sm text-center text-white/50 mt-8">
+                Chưa có tài khoản?
+                <a href="/auth/register" class="text-violet-400 hover:text-violet-300 cursor-pointer">Đăng ký</a>
+            </p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,172 @@
+<div class="ml-64 pb-28 min-h-screen bg-[#0f0d1a] text-white font-sans">
+  <div class="px-8 py-8">
+
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-white mb-1">Khám phá</h1>
+      <p class="text-white/40 text-sm">Tìm kiếm và khám phá âm nhạc mới mỗi ngày</p>
+    </div>
+
+    <div class="flex items-center gap-2 mb-8 flex-wrap">
+      <button *ngFor="let genre of genres"
+              class="px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200 border"
+              [class.bg-violet-600]="selectedGenre === genre"
+              [class.text-white]="selectedGenre === genre"
+              [class.border-violet-600]="selectedGenre === genre"
+              [class.bg-transparent]="selectedGenre !== genre"
+              [class.text-white/50]="selectedGenre !== genre"
+              [class.border-white/10]="selectedGenre !== genre"
+              (click)="selectedGenre = genre">
+        {{ genre }}
+      </button>
+    </div>
+
+    <!-- New Releases -->
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Mới phát hành</h2>
+        <a href="#" class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+      </div>
+      <div class="grid grid-cols-4 gap-4">
+        <div *ngFor="let track of newReleases"
+             class="bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-4 cursor-pointer transition-all duration-200 group">
+          <div class="relative mb-4">
+            <div class="w-full aspect-square rounded-xl flex items-center justify-center overflow-hidden" [style.background]="track.color">
+              <svg class="w-12 h-12 text-white/20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </div>
+            <span class="absolute top-2 left-2 text-[10px] font-semibold bg-violet-600 text-white px-2 py-0.5 rounded-full">MỚI</span>
+            <button class="absolute bottom-2 right-2 w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+              <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+          <p class="text-sm font-semibold text-white truncate mb-0.5">{{ track.name }}</p>
+          <p class="text-xs text-white/40 truncate">{{ track.artist }}</p>
+          <p class="text-xs text-violet-400/60 mt-1.5">{{ track.releaseDate }}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Browse by Mood -->
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Theo tâm trạng</h2>
+      </div>
+      <div class="grid grid-cols-4 gap-3">
+        <div *ngFor="let mood of moods"
+             class="relative rounded-2xl overflow-hidden h-28 cursor-pointer group"
+             [style.background]="mood.color">
+          <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all duration-200"></div>
+          <div class="relative z-10 p-4 h-full flex flex-col justify-between">
+            <span class="text-2xl">{{ mood.emoji }}</span>
+            <div>
+              <p class="text-sm font-bold text-white">{{ mood.name }}</p>
+              <p class="text-xs text-white/60">{{ mood.count }} playlist</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Top Charts -->
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Bảng xếp hạng</h2>
+        <a href="#" class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white/3 border border-white/5 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-bold text-white">V-Pop Hot 100</p>
+              <p class="text-xs text-white/40">Cập nhật hàng tuần</p>
+            </div>
+            <svg class="w-5 h-5 text-violet-400" fill="currentColor" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg>
+          </div>
+          <div class="divide-y divide-white/5">
+            <div *ngFor="let track of chartTracks; let i = index"
+                 class="flex items-center gap-4 px-5 py-3 hover:bg-white/5 cursor-pointer transition-all group">
+              <span class="text-sm font-bold w-5 text-center"
+                    [class.text-violet-400]="i === 0"
+                    [class.text-white/30]="i !== 0">{{ i + 1 }}</span>
+              <div class="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center" [style.background]="track.color">
+                <svg class="w-5 h-5 text-white/40 group-hover:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                <svg class="w-5 h-5 text-white hidden group-hover:block" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-white truncate">{{ track.name }}</p>
+                <p class="text-xs text-white/40 truncate">{{ track.artist }}</p>
+              </div>
+              <div class="flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"
+                     [class.text-green-400]="track.trend === 'up'"
+                     [class.text-red-400]="track.trend === 'down'"
+                     [class.text-white/20]="track.trend === 'same'">
+                  <path *ngIf="track.trend === 'up'" d="M7 14l5-5 5 5H7z"/>
+                  <path *ngIf="track.trend === 'down'" d="M7 10l5 5 5-5H7z"/>
+                  <path *ngIf="track.trend === 'same'" d="M4 12h16"/>
+                </svg>
+                <span class="text-xs text-white/30">{{ track.duration }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/3 border border-white/5 rounded-2xl overflow-hidden">
+          <div class="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-bold text-white">International Hot</p>
+              <p class="text-xs text-white/40">Cập nhật hàng tuần</p>
+            </div>
+            <svg class="w-5 h-5 text-violet-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+          </div>
+          <div class="divide-y divide-white/5">
+            <div *ngFor="let track of chartTracks; let i = index"
+                 class="flex items-center gap-4 px-5 py-3 hover:bg-white/5 cursor-pointer transition-all group">
+              <span class="text-sm font-bold w-5 text-center"
+                    [class.text-violet-400]="i === 0"
+                    [class.text-white/30]="i !== 0">{{ i + 1 }}</span>
+              <div class="w-10 h-10 rounded-lg shrink-0 flex items-center justify-center" [style.background]="track.color">
+                <svg class="w-5 h-5 text-white/40 group-hover:hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+                <svg class="w-5 h-5 text-white hidden group-hover:block" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-white truncate">{{ track.name }}</p>
+                <p class="text-xs text-white/40 truncate">{{ track.artist }}</p>
+              </div>
+              <div class="flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"
+                     [class.text-green-400]="track.trend === 'up'"
+                     [class.text-red-400]="track.trend === 'down'"
+                     [class.text-white/20]="track.trend === 'same'">
+                  <path *ngIf="track.trend === 'up'" d="M7 14l5-5 5 5H7z"/>
+                  <path *ngIf="track.trend === 'down'" d="M7 10l5 5 5-5H7z"/>
+                  <path *ngIf="track.trend === 'same'" d="M4 12h16"/>
+                </svg>
+                <span class="text-xs text-white/30">{{ track.duration }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Artists -->
+    <section class="mb-10">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xl font-bold text-white">Nghệ sĩ nổi bật</h2>
+        <a href="#" class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+      </div>
+      <div class="grid grid-cols-6 gap-4">
+        <div *ngFor="let artist of featuredArtists"
+             class="flex flex-col items-center gap-2 cursor-pointer group">
+          <div class="w-full aspect-square rounded-full overflow-hidden border-2 border-transparent group-hover:border-violet-500/50 transition-all duration-200 flex items-center justify-center"
+               [style.background]="artist.color">
+            <svg class="w-10 h-10 text-white/30" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <p class="text-xs font-semibold text-white text-center truncate w-full">{{ artist.name }}</p>
+          <p class="text-[10px] text-white/40 text-center">{{ artist.followers }}</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

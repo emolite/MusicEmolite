@@ -1,0 +1,60 @@
+<div class="min-h-screen w-full flex bg-cover bg-center text-white"
+  style="background-image: url('/background-login.jpeg');">
+
+  <div class="absolute inset-0 bg-black/40"></div>
+
+  <div class="relative ml-auto w-full max-w-lg h-screen flex items-center
+              bg-black/30 backdrop-blur-xl border-l border-white/10">
+
+    <button type="button" (click)="goLogin()"
+      class="absolute top-6 left-6 flex items-center gap-2 text-white/60 hover:text-white transition">
+      <span class="text-sm">← Đăng nhập</span>
+    </button>
+
+    <div class="w-full px-14">
+      <h1 class="text-4xl font-bold mb-2">Đăng ký</h1>
+      <p class="text-white/60 mb-10 text-base">Tạo tài khoản mới</p>
+      <form class="space-y-5" (ngSubmit)="register()">
+        <input type="text" [(ngModel)]="form.fullName" name="fullName" placeholder="Họ và tên" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+              focus:border-violet-500 outline-none text-lg">
+
+        <input type="text" [(ngModel)]="form.userName" name="userName" placeholder="Tên đăng nhập" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+                      focus:border-violet-500 outline-none text-lg">
+
+        <input type="email" [(ngModel)]="form.email" name="email" placeholder="Email" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+                      focus:border-violet-500 outline-none text-lg">
+
+        <div class="relative">
+          <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" name="password"
+            placeholder="Mật khẩu" class="w-full px-4 py-4 pr-12 rounded-xl bg-white/5 border border-white/10
+                        focus:border-violet-500 outline-none text-lg">
+
+          <button type="button" (click)="togglePassword()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer">
+
+            @if (!showPassword()) {
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z" />
+            </svg>
+            } @else {
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M2 4l18 18 1.5-1.5-2.3-2.3C21 16 22 12 22 12s-3-7-10-7c-1.6 0-3 .3-4.2.8L3.5 3.5 2 4z" />
+            </svg>
+            }
+          </button>
+        </div>
+
+        <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Nhập lại mật khẩu"
+          class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+                      focus:border-violet-500 outline-none text-lg">
+
+        <button type="submit" class="w-full py-4 rounded-xl bg-violet-600 hover:bg-violet-500
+                       font-semibold text-lg transition">
+          Đăng ký
+        </button>
+
+      </form>
+
+    </div>
+  </div>
+</div>

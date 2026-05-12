@@ -1,0 +1,76 @@
+<div class="w-full">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-white">Thông tin cá nhân</h1>
+    <p class="text-white/50 mt-2">Quản lý thông tin hồ sơ của bạn</p>
+  </div>
+
+  <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
+    <div class="flex items-center gap-6 mb-10">
+      <div class="relative group">
+        <div
+          class="w-24 h-24 rounded-full overflow-hidden bg-violet-600 flex items-center justify-center text-3xl font-bold text-white">
+          @if (previewImage()) {
+          <img [src]="previewImage()!" class="w-full h-full object-cover">
+          } @else {
+          {{ form.fullName.charAt(0) || 'U' }}
+          }
+        </div>
+
+        <label
+          class="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center text-white text-sm cursor-pointer">
+          Đổi ảnh
+          <input type="file" accept="image/*" hidden (change)="onSelectImage($event)">
+        </label>
+      </div>
+      <div>
+        <h2 class="text-xl font-semibold text-white">
+          {{ form.fullName || 'Chưa cập nhật tên' }}
+        </h2>
+
+        <p class="text-white/50">
+          {{ user?.email }}
+        </p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <label class="block text-sm text-white/60 mb-2">Họ và tên</label>
+        <input type="text" [(ngModel)]="form.fullName"
+          class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500">
+      </div>
+
+      <div>
+        <label class="block text-sm text-white/60 mb-2">Số điện thoại</label>
+        <input type="text" [(ngModel)]="form.phone"
+          class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500">
+      </div>
+
+      <div>
+        <label class="block text-sm text-white/60 mb-2">Ngày sinh</label>
+        <input type="date" [(ngModel)]="form.dateOfBirth"
+          class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500">
+      </div>
+
+      <div>
+        <label class="block text-sm text-white/60 mb-2">Giới tính</label>
+        <app-dropdown [options]="genderOptions" placeholder="Chọn giới tính" [(ngModel)]="form.gender">
+        </app-dropdown>
+      </div>
+
+      <div class="col-span-2">
+        <label class="block text-sm text-white/60 mb-2">Giới thiệu</label>
+        <textarea rows="5" [(ngModel)]="form.bio"
+          class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500 resize-none">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-8">
+      <button (click)="saveProfile()"
+        class="px-6 py-3 rounded-xl bg-violet-600 hover:bg-violet-500 text-white font-semibold transition-all cursor-pointer">
+        Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<div class="fixed top-5 right-5 z-[9999] space-y-3">
+  @for(toast of toastService.toasts(); track toast.id) {
+  <div
+    class="min-w-[320px] rounded-2xl border px-5 py-4 shadow-2xl backdrop-blur-xl animate-in slide-in-from-right duration-300"
+    [class.bg-emerald-500/10]="toast.type === 'success'"
+    [class.border-emerald-500/20]="toast.type === 'success'"
+    [class.bg-red-500/10]="toast.type === 'error'"
+    [class.border-red-500/20]="toast.type === 'error'">
+    <p
+      class="text-sm font-medium"
+      [class.text-emerald-300]="toast.type === 'success'"
+      [class.text-red-300]="toast.type === 'error'">
+      {{ toast.message }}
+    </p>
+  </div>
+  }
+</div>

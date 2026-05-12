@@ -1,0 +1,65 @@
+import { inject, Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { API_SERVICE } from "./commons/api.service";
+import { API_END } from "../constants/api-end.constants";
+import { BaseTableResponse } from "../models/base/base-table-res.model";
+import { SongResponse } from "../models/song/res-song.model";
+import { SongCreateRequest, SongRequest } from "../models/song/req-song.model";
+import { BaseSearchDto } from "../models/base/base-search.model";
+import { BaseResponse } from "../models/base/base-res.model";
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SongService {
+
+  private api = inject(API_SERVICE);
+
+  searchSongs(data: BaseSearchDto<SongRequest>)
+    : Observable<BaseTableResponse<SongResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<SongResponse>,
+      BaseSearchDto<SongRequest>
+    >(
+      API_END.SONG.SEARCH,
+      data
+    );
+  }
+
+  createSong(
+    data: SongCreateRequest
+  ): Observable<BaseResponse<SongResponse>> {
+
+    const formData = new FormData();
+
+    formData.append('title', data.title);
+    formData.append('releaseDate', data.releaseDate);
+    formData.append('albumId', data.albumId.toString());
+    formData.append('artistId', data.artistId.toString());
+
+    formData.append('fileUrl', data.fileUrl);
+    formData.append('imgUrl', data.imgUrl);
+
+    return this.api.postData<
+      BaseResponse<SongResponse>,
+      FormData
+    >(
+      API_END.SONG.BASE,
+      formData
+    );
+
+  }
+
+  getSongDetail(id: number): Observable<BaseResponse<SongResponse>> {
+    return this.api.getData<BaseResponse<SongResponse>>(API_END.SONG.DETAIL(id));
+  }
+
+  incrementView(id: number): Observable<BaseResponse<SongResponse>> {
+    return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.VIEW(id), {});
+  }
+
+  toggleLike(id: number): Observable<BaseResponse<SongResponse>> {
+    return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.LIKE(id), {});
+  }
+}
