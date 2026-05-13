@@ -1,4 +1,4 @@
 export const ENVI = {
     production: true,
-    apiUrl: 'https://musicemolite.runasp.net/api/'
+    apiUrl: 'http://musicemolite.runasp.net/api/'
 }
