@@ -2,7 +2,8 @@ export const URL_END = {
   USER: {
     BASE: 'users',
     HOME: 'home',
-    PLAYER: 'player',
+    ALBUM: 'album',
+    PLAYER_DETAIL: 'detail',
     DISCOVER: 'discover',
     SETTING: 'setting'
   },

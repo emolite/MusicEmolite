@@ -19,7 +19,11 @@ export class AuthService {
   user = signal<CurrentUserResponse | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
+  isLoggedIn(): boolean {
+    const token = localStorage.getItem('token');
 
+    return !!token;
+  }
   getCurrentUser() {
     return this.api.getData<BaseResponse<CurrentUserResponse>>(
       API_END.AUTH.CURRENT_USER

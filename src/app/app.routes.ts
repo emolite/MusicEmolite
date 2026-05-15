@@ -7,6 +7,8 @@ import { LayoutUserComponent } from './layout/layout-user';
 import { LayoutAdminComponent } from './layout/layout-login/layout-login';
 import { LoginComponent } from './pages/page-login/login/login';
 import { RegisterComponent } from './pages/page-login/register/register';
+import { AlbumComponent } from './pages/page-user/album/album';
+import { PlayerBarDetailComponent } from './pages/page-user/player-bar/player-bar-detail/player-bar-detail';
 
 export const routes: Routes = [
     {
@@ -37,8 +39,8 @@ export const routes: Routes = [
                 component: HomeComponent
             },
             {
-                path: URL_END.USER.PLAYER,
-                component: PlayerComponent
+                path: URL_END.USER.ALBUM,
+                component: AlbumComponent
             },
             {
                 path: URL_END.USER.DISCOVER,

@@ -27,6 +27,18 @@ export class SongService {
     );
   }
 
+  searchPublicSongs(data: BaseSearchDto<SongRequest>)
+    : Observable<BaseTableResponse<SongResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<SongResponse>,
+      BaseSearchDto<SongRequest>
+    >(
+      API_END.SONG.SEARCH_PUBLIC,
+      data
+    );
+  }
+
   createSong(
     data: SongCreateRequest
   ): Observable<BaseResponse<SongResponse>> {

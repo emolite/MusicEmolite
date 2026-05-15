@@ -1,35 +1,57 @@
 <div class="min-h-screen bg-[#0f0d1a] text-white flex">
-    <aside class="w-72 border-r border-white/10 p-6">
-        <a routerLink="/users/home"
-            class="flex items-center gap-2 text-white/40 hover:text-white text-sm mb-6 transition-colors cursor-pointer w-fit">
-            <lucide-icon [img]="ArrowLeftIcon" class="w-4 h-4"></lucide-icon>
-            Quay lại
-        </a>
-        <div class="flex items-center gap-3 mb-6">
-            <lucide-icon [img]="Setting" class="w-6 h-6 transition-all"></lucide-icon>
-            <h2 class="text-2xl font-bold">Cài đặt</h2>
+    <aside class="w-72 border-r border-white/5 bg-[#12101d] flex flex-col">
+        <div class="h-20 px-6 border-b border-white/5 flex items-center gap-4">
+            <button routerLink="/users/home" class="w-10 h-10 rounded-lg
+                       hover:bg-white/5
+                       flex items-center justify-center
+                       text-white/60 hover:text-white
+                       transition-all">
+                <lucide-icon [img]="ArrowLeftIcon" class="w-5 h-5"></lucide-icon>
+            </button>
+            <div class="flex items-center gap-3">
+                <lucide-icon [img]="Setting" class="w-5 h-5 text-violet-400"></lucide-icon>
+                <h2 class="text-xl font-bold tracking-tight">
+                    Cài đặt
+                </h2>
+            </div>
         </div>
 
-        <ul class="space-y-2">
-            <li>
-                <a routerLink="profile" routerLinkActive="bg-violet-600 text-white"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/5 transition-all">
-                    <lucide-icon [img]="UserIcon" class="w-4 h-4"></lucide-icon>
-                    Thông tin
-                </a>
-            </li>
-            <li>
-                <a routerLink="add-music" routerLinkActive="bg-violet-600 text-white"
-                    class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/5 transition-all">
-                    <lucide-icon [img]="MusicIcon" class="w-4 h-4"></lucide-icon>
-                    Sáng tác
-                </a>
-            </li>
-        </ul>
-
+        <div class="py-4">
+            <p class="px-6 mb-3 text-[11px]
+                       uppercase tracking-[0.2em]
+                       text-white/30 font-medium">
+                Tài khoản
+            </p>
+            <ul class="space-y-1">
+                <li>
+                    <a routerLink="profile" routerLinkActive="bg-white/8 text-white border-l-2 border-violet-500" class="h-12 px-6
+                               flex items-center gap-3
+                               text-white/60 hover:text-white
+                               hover:bg-white/[0.03]
+                               transition-all">
+                        <lucide-icon [img]="UserIcon" class="w-4 h-4"></lucide-icon>
+                        <span class="text-sm font-medium">
+                            Thông tin
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="add-music" routerLinkActive="bg-white/8 text-white border-l-2 border-violet-500"
+                        class="h-12 px-6
+                               flex items-center gap-3
+                               text-white/60 hover:text-white
+                               hover:bg-white/[0.03]
+                               transition-all">
+                        <lucide-icon [img]="MusicIcon" class="w-4 h-4"></lucide-icon>
+                        <span class="text-sm font-medium">
+                            Sáng tác
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </aside>
-
-    <main class="flex-1 p-8">
+    <main class="flex-1 p-8 overflow-y-auto">
         <router-outlet></router-outlet>
     </main>
 </div>

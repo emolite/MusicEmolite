@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Settings
 } from 'lucide-angular';
+import { PlayerService } from '../../core/services/player.service';
 
 @Component({
   selector: 'app-topbar',
@@ -19,6 +20,7 @@ export class TopbarComponent {
 
   private router = inject(Router);
   public authService = inject(AuthService);
+  private player = inject(PlayerService)
 
   readonly UserIcon = User;
   readonly LogoutIcon = LogOut;
@@ -81,6 +83,7 @@ export class TopbarComponent {
   logout() {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('currentUser');
+    this.player.stop();
     this.authService.user.set(null);
     this.router.navigate(['/auth/login']);
   }

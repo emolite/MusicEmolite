@@ -16,14 +16,27 @@ export class PlayerService {
   isShuffle = signal(false);
   isRepeat = signal(false);
   isLiked = signal(false);
+  isDetailOpen = signal(false);
   currentTime = signal('0:00');
   duration = signal('0:00');
   progressPercent = signal(0);
   volume = signal(100);
   isMuted = signal(false);
+  isPlayerHidden = signal(false);
 
   constructor() {
     this.initAudioEvents();
+  }
+
+  togglePlayerBar() {
+    this.isPlayerHidden.update(v => !v);
+  }
+  openDetail() {
+    this.isDetailOpen.set(true);
+  }
+
+  closeDetail() {
+    this.isDetailOpen.set(false);
   }
 
   startVolumeDrag(event: MouseEvent) {
@@ -64,6 +77,14 @@ export class PlayerService {
     this.queue = queue;
   }
 
+  stop() {
+    this.audio.pause();
+    this.audio.currentTime = 0;
+    this.currentTrack.set(null);
+    this.queue = [];
+    this.currentIndex = -1;
+  }
+
   playSong(id: number) {
     const index = this.queue.findIndex(x => x.id === id);
     if (index === -1) return;
@@ -74,7 +95,7 @@ export class PlayerService {
   private startTrack(track: any) {
     this.songService.getSongDetail(track.id).subscribe(res => {
       const detail = res.data;
-      this.currentTrack.set({ ...track, isLiked: detail?.isLiked, imgUrl: detail?.imgUrl });
+      this.currentTrack.set({ ...track, isLiked: detail?.isLiked, imgUrl: detail?.imgUrl, releaseDate: detail?.releaseDate });
       this.isLiked.set(detail?.isLiked ?? false);
       this.audio.src = track.url;
       this.audio.load();

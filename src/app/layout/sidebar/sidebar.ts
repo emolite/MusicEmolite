@@ -2,6 +2,7 @@ import { Component, HostListener, inject, signal } from "@angular/core";
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { LucideAngularModule, LogOut, HomeIcon, ChevronDown, Settings } from "lucide-angular";
 import { AuthService } from "../../core/services/auth.service";
+import { PlayerService } from "../../core/services/player.service";
 
 @Component({
     selector: 'app-sidebar',
@@ -13,9 +14,12 @@ export class SidebarComponent {
     readonly HomeIcon = HomeIcon;
     readonly ChevronDownIcon = ChevronDown;
     readonly SettingsIcon = Settings
+
     private router = inject(Router);
     public authService = inject(AuthService)
+    private player = inject(PlayerService);
 
+    user = this.authService.user;
     openMenu = signal(false);
 
     get displayName(): string {
@@ -41,8 +45,9 @@ export class SidebarComponent {
     }
 
     logout() {
-        sessionStorage.removeItem('token');
-        sessionStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        localStorage.removeItem('currentUser');
+        this.player.stop();
         this.authService.user.set(null);
         this.router.navigate(['/auth/login']);
     }

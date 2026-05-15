@@ -17,6 +17,7 @@ export const API_END = {
   SONG: {
     BASE: `${BASE_URL}songs`,
     SEARCH: `${BASE_URL}songs/search`,
+    SEARCH_PUBLIC: `${BASE_URL}songs/public/search`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,
     LIKE: (id: number) => `${BASE_URL}songs/${id}/like`,
@@ -24,7 +25,8 @@ export const API_END = {
 
   ALBUM: {
     BASE: `${BASE_URL}albums`,
-    SEARCH: `${BASE_URL}albums/search`
+    SEARCH: `${BASE_URL}albums/search`,
+    SEARCH_PUBLIC: `${BASE_URL}albums/public/search`
   },
 
   ARTIST: {

@@ -36,7 +36,7 @@
     <div class="my-4 border-t border-white/5"></div>
     <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Thư viện</p>
 
-    <a routerLink="/playlists" routerLinkActive="bg-violet-500/15 text-violet-300"
+    <a routerLink="/users/playlists" routerLinkActive="bg-violet-500/15 text-violet-300"
       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
       <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
@@ -53,7 +53,7 @@
       <span class="text-sm font-medium">Nghệ sĩ</span>
     </a>
 
-    <a routerLink="/albums" routerLinkActive="bg-violet-500/15 text-violet-300"
+    <a routerLink="/users/album" routerLinkActive="bg-violet-500/15 text-violet-300"
       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
       <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
@@ -80,7 +80,7 @@
         </div>
         <div class="flex-1 min-w-0 text-left">
           <p class="text-sm font-medium text-white truncate">{{ displayName }}</p>
-          <p class="text-xs text-white/40 truncate">Free Plan</p>
+          <p class="text-xs text-white/40 truncate">{{ user()?.userType }}</p>
         </div>
       </button>
     </div>

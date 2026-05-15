@@ -4,6 +4,7 @@ export interface CurrentUserResponse {
   username: string;
   email: string;
   roleCode: string;
+  userType: string;
   profile: CurrentUserProfile | null;
 }
 

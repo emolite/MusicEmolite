@@ -26,4 +26,17 @@ export class AlbumService {
       data
     );
   }
+
+  searchPublicAlbums(
+    data: BaseSearchDto<AlbumRequest>
+  ): Observable<BaseTableResponse<AlbumResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<AlbumResponse>,
+      BaseSearchDto<AlbumRequest>
+    >(
+      API_END.ALBUM.SEARCH_PUBLIC,
+      data
+    );
+  }
 }

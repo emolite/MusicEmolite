@@ -1,11 +1,14 @@
-<app-sidebar></app-sidebar>
+<div class="h-screen overflow-hidden bg-[#0f0d1a] text-white">
+  <app-sidebar></app-sidebar>
 
-<div class="min-h-screen bg-[#0f0d1a] text-white">
-  <app-topbar></app-topbar>
+  <div class="ml-64 h-full flex flex-col">
+    <app-topbar></app-topbar>
 
-  <main class="app-content">
-    <router-outlet></router-outlet>
-  </main>
+    <main class="flex-1 overflow-y-auto app-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+
+  <app-player-bar></app-player-bar>
+  <app-player-bar-detail></app-player-bar-detail>
 </div>
-
-<app-player-bar></app-player-bar>

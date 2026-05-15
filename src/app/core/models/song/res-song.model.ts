@@ -5,10 +5,12 @@ export interface SongResponse {
   fileUrl: string;
   imgUrl: string;
   albumId?: number;
+  releaseDate?: string;
   artistName?: string;
   isLiked: boolean;
   likes: number;
   views: number;
+  typeSong: string;
   createdAt?: string;
   createdBy?: number;
   isActived?: boolean;

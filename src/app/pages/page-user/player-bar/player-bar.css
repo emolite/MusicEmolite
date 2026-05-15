@@ -1,0 +1,30 @@
+.player-bar-visible {
+  transform: translateY(0);
+  opacity: 1;
+  transition:
+    transform .38s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity .25s ease;
+}
+
+.player-bar-hidden {
+  transform: translateY(calc(100% - 1px));
+  opacity: 1;
+  transition:
+    transform .34s cubic-bezier(0.4, 0, 1, 1);
+}
+
+@keyframes playerBarHideBtn {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.player-toggle-show {
+  animation: playerBarHideBtn .28s ease-out;
+}
