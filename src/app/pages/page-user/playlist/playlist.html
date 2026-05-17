@@ -1,0 +1,156 @@
+<div class="playlist-page pb-28 min-h-screen bg-[#0f0d1a] text-white">
+
+  <div class="flex min-h-screen">
+
+    <div class="sticky top-0 h-screen w-[280px] min-w-[280px] shrink-0 flex items-center justify-center pt-16">
+      <div class="vinyl-wrapper">
+        <div class="vinyl-ring" [class.spinning]="player.isPlaying()">
+          <div class="vinyl-img">
+            @if(player.currentTrack()?.imgUrl) {  
+            <img [src]="player.currentTrack()!.imgUrl" class="w-full h-full object-cover rounded-full"
+              draggable="false">
+            } @else {
+            <div
+              class="w-full h-full rounded-full bg-gradient-to-br from-violet-900/60 to-[#0f0d1a] flex items-center justify-center">
+              <svg class="w-16 h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+            }
+          </div>
+          <div class="vinyl-center-dot"></div>
+        </div>
+
+        @if(player.currentTrack()) {
+        <div class="mt-6 text-center w-full">
+          <p class="text-white font-semibold text-sm truncate">{{ player.currentTrack()?.name }}</p>
+          <p class="text-white/40 text-xs mt-1 truncate">{{ player.currentTrack()?.artist }}</p>
+          <div class="mt-4 w-full">
+            <div class="h-0.5 w-full bg-white/10 rounded-full cursor-pointer overflow-hidden"
+              (click)="player.seek($event)">
+              <div class="h-full bg-violet-500 rounded-full transition-all duration-150"
+                [style.width]="player.progressPercent() + '%'"></div>
+            </div>
+            <div class="flex justify-between mt-1">
+              <span class="text-[10px] text-white/30">{{ player.currentTime() }}</span>
+              <span class="text-[10px] text-white/30">{{ player.duration() }}</span>
+            </div>
+          </div>
+          <div class="mt-4 flex items-center justify-center gap-4">
+            <button class="text-white/40 hover:text-white transition-colors cursor-pointer"
+              (click)="player.prevTrack()">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+              </svg>
+            </button>
+            <button
+              class="w-10 h-10 bg-violet-600 hover:bg-violet-500 rounded-full flex items-center justify-center transition-all hover:scale-105 cursor-pointer"
+              (click)="player.togglePlay()">
+              @if(player.isPlaying()) {
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+              </svg>
+              } @else {
+              <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+              }
+            </button>
+            <button class="text-white/40 hover:text-white transition-colors cursor-pointer"
+              (click)="player.nextTrack()">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <div class="flex-1 px-10 py-16 overflow-y-auto">
+
+      <div class="mb-10">
+        <p class="text-[11px] uppercase tracking-[6px] text-violet-400/60 mb-2 font-medium">Thư viện</p>
+        <h1 class="text-4xl font-black text-white tracking-tight">Danh sách nhạc</h1>
+        <p class="text-white/30 text-sm mt-2">{{ songs().length }} bài hát</p>
+      </div>
+
+      @if(isLoading()) {
+      <div class="flex items-center justify-center py-20">
+        <div class="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+      } @else {
+
+      <div class="flex flex-col gap-1">
+
+        <div class="grid gap-4 px-4 py-2 mb-2" style="grid-template-columns: 2rem 1fr 1fr 5rem 4rem">
+          <span class="text-white/20 text-xs uppercase tracking-widest">#</span>
+          <span class="text-white/20 text-xs uppercase tracking-widest">Bài hát</span>
+          <span class="text-white/20 text-xs uppercase tracking-widest">Nghệ sĩ</span>
+          <span class="text-white/20 text-xs uppercase tracking-widest text-center">Lượt nghe</span>
+          <span class="text-white/20 text-xs uppercase tracking-widest text-right">Thời lượng</span>
+        </div>
+
+        <div class="w-full h-px bg-white/5 mb-2"></div>
+
+        @for(song of songs(); track song.id; let i = $index) {
+        <div (click)="playSong(song.id)"
+          class="song-row grid gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-200 group items-center"
+          style="grid-template-columns: 2rem 1fr 1fr 5rem 4rem" [class.active-row]="song.id === currentTrackId()">
+
+          <div class="flex items-center justify-start">
+            @if(song.id === currentTrackId() && player.isPlaying()) {
+            <div class="bars-anim">
+              <span></span><span></span><span></span>
+            </div>
+            } @else {
+            <span class="text-white/25 text-sm group-hover:hidden" [class.!hidden]="song.id === currentTrackId()">{{ i +
+              1 }}</span>
+            <svg class="w-4 h-4 text-white hidden group-hover:block"
+              [class.!block]="song.id === currentTrackId() && !player.isPlaying()" fill="currentColor"
+              viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+            }
+          </div>
+
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-lg shrink-0 overflow-hidden bg-white/5">
+              @if(song.imgUrl) {
+              <img [src]="song.imgUrl" class="w-full h-full object-cover">
+              } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                </svg>
+              </div>
+              }
+            </div>
+            <p class="text-sm font-semibold truncate" [class.text-violet-400]="song.id === currentTrackId()"
+              [class.text-white]="song.id !== currentTrackId()">
+              {{ song.name }}
+            </p>
+          </div>
+
+          <p class="text-sm text-white/40 truncate group-hover:text-white/60 transition-colors">{{ song.artist }}</p>
+
+          <div class="flex items-center justify-center gap-1">
+            <svg class="w-3 h-3 text-violet-400/60" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.28L13 17v5c5.52-.55 9-4.57 9-9 0-4.79-3.44-8.77-9-9.95zM11 2.05C5.95 2.78 3 6.73 3 12c0 4.43 3.48 8.45 8 9v-2.02c-3.45-.5-6-3.32-6-6.98 0-3.43 2.55-6.29 6-6.93V2.05z" />
+            </svg>
+            <span class="text-xs text-white/30">{{ song.views }}</span>
+          </div>
+
+          <p class="text-sm text-white/30 text-right">{{ formatDuration(song.duration) }}</p>
+
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+<app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="onPageChange($event)">
+</app-pagination>

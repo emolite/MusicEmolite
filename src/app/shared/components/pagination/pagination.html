@@ -1,0 +1,40 @@
+@if(totalPages() > 1) {
+<div class="flex items-center justify-center gap-1 py-6">
+
+  <button
+    (click)="prev()"
+    [disabled]="currentPage() === 1"
+    class="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed text-white/50 hover:text-white hover:bg-white/8">
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+    </svg>
+  </button>
+
+  @for(page of pages(); track $index) {
+    @if(page === '...') {
+    <span class="w-9 h-9 flex items-center justify-center text-white/25 text-sm">···</span>
+    } @else {
+    <button
+      (click)="go(page)"
+      class="w-9 h-9 rounded-lg text-sm font-semibold transition-all duration-200 cursor-pointer"
+      [class.bg-violet-600]="page === currentPage()"
+      [class.text-white]="page === currentPage()"
+      [class.text-white\/40]="page !== currentPage()"
+      [class.hover\:bg-white\/8]="page !== currentPage()"
+      [class.hover\:text-white]="page !== currentPage()">
+      {{ page }}
+    </button>
+    }
+  }
+
+  <button
+    (click)="next()"
+    [disabled]="currentPage() === totalPages()"
+    class="w-9 h-9 rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-25 disabled:cursor-not-allowed text-white/50 hover:text-white hover:bg-white/8">
+    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+    </svg>
+  </button>
+
+</div>
+}

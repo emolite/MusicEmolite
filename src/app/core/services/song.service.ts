@@ -7,6 +7,8 @@ import { SongResponse } from "../models/song/res-song.model";
 import { SongCreateRequest, SongRequest } from "../models/song/req-song.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
 import { BaseResponse } from "../models/base/base-res.model";
+import { LyricsResponseDto } from "../models/song/res-lyrics.model";
+import { LyricsRequestDto } from "../models/song/req-lyrics.model";
 
 @Injectable({
   providedIn: 'root'
@@ -39,19 +41,23 @@ export class SongService {
     );
   }
 
-  createSong(
-    data: SongCreateRequest
-  ): Observable<BaseResponse<SongResponse>> {
-
+  createSong(data: SongCreateRequest): Observable<BaseResponse<SongResponse>> {
     const formData = new FormData();
 
     formData.append('title', data.title);
     formData.append('releaseDate', data.releaseDate);
     formData.append('albumId', data.albumId.toString());
     formData.append('artistId', data.artistId.toString());
-
     formData.append('fileUrl', data.fileUrl);
     formData.append('imgUrl', data.imgUrl);
+    formData.append('type', data.type.toString());
+
+    if (data.lyrics) {
+      formData.append('lyrics', JSON.stringify({
+        lyrics: data.lyrics.lyrics ?? '',
+        syncedLyrics: data.lyrics.syncedLyrics ?? []
+      }));
+    }
 
     return this.api.postData<
       BaseResponse<SongResponse>,
@@ -60,13 +66,17 @@ export class SongService {
       API_END.SONG.BASE,
       formData
     );
-
   }
 
   getSongDetail(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.getData<BaseResponse<SongResponse>>(API_END.SONG.DETAIL(id));
   }
 
+  getLyrics(params: LyricsRequestDto): Observable<BaseResponse<LyricsResponseDto>> {
+    return this.api.getData<BaseResponse<LyricsResponseDto>>(
+      `${API_END.SONG.LYRICS}?title=${encodeURIComponent(params.title ?? '')}&artist=${encodeURIComponent(params.artist ?? '')}`
+    );
+  }
   incrementView(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.VIEW(id), {});
   }

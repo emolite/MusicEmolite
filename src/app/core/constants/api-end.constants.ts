@@ -21,6 +21,7 @@ export const API_END = {
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,
     LIKE: (id: number) => `${BASE_URL}songs/${id}/like`,
+    LYRICS: `${BASE_URL}songs/lyrics`
   },
 
   ALBUM: {

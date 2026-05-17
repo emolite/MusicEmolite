@@ -5,6 +5,7 @@ export const URL_END = {
     ALBUM: 'album',
     PLAYER_DETAIL: 'detail',
     DISCOVER: 'discover',
+    PLAYLIST: 'playlist',
     SETTING: 'setting'
   },
 

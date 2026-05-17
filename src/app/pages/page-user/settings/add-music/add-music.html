@@ -1,37 +1,26 @@
 <div class="w-full mx-auto space-y-6">
     <div>
-        <h1 class="text-3xl font-bold">
-            Tạo bài hát
-        </h1>
-        <p class="text-white/40 text-sm mt-1">
-            Phát hành bài hát mới của bạn
-        </p>
+        <h1 class="text-3xl font-bold">Tạo bài hát</h1>
+        <p class="text-white/40 text-sm mt-1">Phát hành bài hát mới của bạn</p>
     </div>
+
     <div class="space-y-2">
-        <label class="text-sm text-white/60">
-            Tên bài hát
-        </label>
+        <label class="text-sm text-white/60">Tên bài hát</label>
         <input [(ngModel)]="model.title" placeholder="Nhập tên bài hát"
             class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500 transition-all">
-
     </div>
+
     <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
-            <label class="text-sm text-white/60">
-                Ngày phát hành
-            </label>
+            <label class="text-sm text-white/60">Ngày phát hành</label>
             <input type="date" [(ngModel)]="model.releaseDate"
                 class="w-full px-4 py-3 mt-1 rounded-xl bg-white/5 border border-white/10 text-white outline-none focus:border-violet-500 transition-all">
         </div>
-
         <div class="space-y-2">
             <div class="flex items-center justify-between">
-                <label class="text-sm text-white/60">
-                    Nghệ sĩ
-                </label>
+                <label class="text-sm text-white/60">Nghệ sĩ</label>
                 <button type="button" (click)="openArtistModal()"
                     class="text-sm text-violet-400 hover:text-violet-300 transition-colors cursor-pointer">
-
                     + Thêm nghệ sĩ
                 </button>
             </div>
@@ -42,137 +31,197 @@
     </div>
 
     <div class="space-y-2">
-
-        <label class="text-sm text-white/60">
-            Album
-        </label>
-
+        <label class="text-sm text-white/60">Album</label>
         <app-dropdown [options]="albumOptions" [searchable]="true" placeholder="Chọn album"
             searchPlaceholder="Tìm album..." (changed)="onAlbumSelect($event)">
         </app-dropdown>
-
     </div>
 
     <div class="space-y-2">
-        <label class="text-sm text-white/60">
-            File nhạc
-        </label>
+        <label class="text-sm text-white/60">File nhạc</label>
         <div class="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-4">
-
             <div class="relative w-24 h-24 rounded-2xl overflow-hidden shrink-0">
-
                 @if(imagePreview) {
-
                 <img [src]="imagePreview" class="absolute inset-0 w-full h-full object-cover">
-
                 } @else {
-
                 <div
                     class="w-full h-full bg-gradient-to-br from-violet-900/60 via-purple-800/40 to-black flex items-center justify-center">
-
                     <svg class="w-10 h-10 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
-
                         <path
                             d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-
                     </svg>
-
                 </div>
-
                 }
-
             </div>
-
             <div class="flex-1 min-w-0">
-
-                <p class="text-white font-semibold truncate">
-                    {{ model.title || 'Tên bài hát' }}
-                </p>
-
+                <p class="text-white font-semibold truncate">{{ model.title || 'Tên bài hát' }}</p>
                 @if(audioName) {
-
                 <div class="mt-2 flex items-center gap-2">
-
-                    <p class="text-xs text-violet-300 truncate">
-                        {{ audioName }}
-                    </p>
-
+                    <p class="text-xs text-violet-300 truncate">{{ audioName }}</p>
                     <button type="button" (click)="removeAudio()"
                         class="w-5 h-5 rounded-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 flex items-center justify-center transition-all cursor-pointer">
-
                         <svg class="w-3 h-3 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M6 18L18 6M6 6l12 12" />
-
                         </svg>
-
                     </button>
-
                 </div>
-
                 } @else {
-
                 <label
                     class="inline-flex mt-2 px-3 py-1.5 rounded-full bg-violet-500/10 hover:bg-violet-500/20 border border-violet-500/20 text-violet-300 text-xs cursor-pointer transition-all">
-
                     <input type="file" accept="audio/*" (change)="onAudioChange($event)" class="hidden">
-
                     Chọn file nhạc
-
                 </label>
-
                 }
-
             </div>
-
         </div>
-
     </div>
 
     <div class="space-y-3">
-
-        <label class="text-sm text-white/60">
-            Ảnh bài hát
-        </label>
-
+        <label class="text-sm text-white/60">Ảnh bài hát</label>
         <label
             class="flex items-center justify-center w-full min-h-[260px] rounded-2xl border border-dashed border-white/10 bg-white/5 hover:bg-white/8 transition-all cursor-pointer overflow-hidden">
-
             <input type="file" accept="image/*" (change)="onImageChange($event)" class="hidden">
-
             @if(imagePreview) {
-
             <img [src]="imagePreview" class="w-full h-[260px] object-cover">
-
             } @else {
-
             <div class="text-center">
-
-                <p class="text-white font-medium">
-                    Chọn ảnh bài hát
-                </p>
-
-                <p class="text-sm text-white/40 mt-1">
-                    PNG, JPG, WEBP...
-                </p>
-
+                <p class="text-white font-medium">Chọn ảnh bài hát</p>
+                <p class="text-sm text-white/40 mt-1">PNG, JPG, WEBP...</p>
             </div>
             }
         </label>
-
     </div>
 
-    <button (click)="submit()" [disabled]="isSubmitting"
-        class="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed py-3 rounded-xl font-semibold transition-all cursor-pointer">
+    <!-- LYRICS SECTION -->
+    <div class="space-y-3">
+        <div class="flex items-center justify-between">
+            <label class="text-sm text-white/60">Lời bài hát</label>
+            @if(lyricsMode !== 'none') {
+            <button type="button" (click)="setLyricsMode('none')"
+                class="text-xs text-white/30 hover:text-white/60 transition-colors cursor-pointer">
+                Bỏ qua
+            </button>
+            }
+        </div>
 
-        @if(isSubmitting) {
-        Đang tải lên...
-        } @else {
-        Tạo bài hát
+        @if(lyricsMode === 'none') {
+        <div class="flex gap-3">
+            <button type="button" (click)="setLyricsMode('auto')"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-violet-600/20 hover:bg-violet-600/30 border border-violet-500/30 text-violet-300 text-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Tạo tự động
+            </button>
+            <button type="button" (click)="setLyricsMode('manual')"
+                class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Nhập thủ công
+            </button>
+        </div>
         }
+
+        @if(lyricsMode === 'auto') {
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-sm text-white/60">Tự động tìm lyrics theo tên bài hát & nghệ sĩ</span>
+                <button type="button" (click)="fetchLyricsAuto()" [disabled]="isLoadingLyrics()"
+                    class="px-3 py-1.5 rounded-lg bg-violet-600/30 hover:bg-violet-600/50 border border-violet-500/30 text-violet-300 text-xs transition-all cursor-pointer disabled:opacity-50">
+                    @if(isLoadingLyrics()) { Đang tải... } @else { Tải lại }
+                </button>
+            </div>
+
+            @if(isLoadingLyrics()) {
+            <div class="flex items-center justify-center py-8 gap-3">
+                <svg class="w-5 h-5 text-violet-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                </svg>
+                <span class="text-sm text-white/40">Đang tìm lyrics...</span>
+            </div>
+            }
+
+            @if(lyricsError) {
+            <p class="text-sm text-red-400">{{ lyricsError }}</p>
+            }
+
+            @if(!isLoadingLyrics() && (plainLyrics || syncedLyricsRaw)) {
+            <div class="space-y-3">
+                <div class="space-y-1">
+                    <label class="text-xs text-white/40">Lời thường</label>
+                    <textarea [(ngModel)]="plainLyrics" rows="6"
+                        class="w-full px-3 py-2 rounded-xl bg-black/30 border border-white/10 text-white/80 text-sm outline-none focus:border-violet-500 transition-all resize-none">
+          </textarea>
+                </div>
+                @if(audioName && syncedLyricsParsed.length) {
+                <button type="button" (click)="openLyricsPreview()"
+                    class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-sm transition-all cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Xem trước lyrics theo nhạc
+                </button>
+                }
+            </div>
+            }
+        </div>
+        }
+
+        @if(lyricsMode === 'manual') {
+        <div class="rounded-2xl bg-white/5 border border-white/10 p-4 space-y-3">
+            <div class="space-y-1">
+                <label class="text-xs text-white/40">Lời thường</label>
+                <textarea [(ngModel)]="plainLyrics" rows="6" placeholder="Nhập lời bài hát..."
+                    class="w-full px-3 py-2 rounded-xl bg-black/30 border border-white/10 text-white/80 text-sm outline-none focus:border-violet-500 transition-all resize-none">
+        </textarea>
+            </div>
+            @if(audioName && syncedLyricsParsed.length) {
+            <button type="button" (click)="openLyricsPreview()"
+                class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 border border-emerald-500/30 text-emerald-300 text-sm transition-all cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Xem trước lyrics theo nhạc
+            </button>
+            }
+        </div>
+        }
+    </div>
+    <div class="space-y-2">
+        <label class="text-sm text-white/60">Chế độ hiển thị</label>
+        <div class="grid grid-cols-2 gap-3">
+            <button type="button" (click)="model.type = 1" [class]="model.type === 1
+        ? 'bg-violet-600/30 border-violet-500 text-violet-300'
+        : 'bg-white/5 border-white/10 text-white/60'" class="py-3 rounded-xl border transition-all">
+                Công khai
+            </button>
+            <button type="button" (click)="model.type = 2" [class]="model.type === 2
+        ? 'bg-violet-600/30 border-violet-500 text-violet-300'
+        : 'bg-white/5 border-white/10 text-white/60'" class="py-3 rounded-xl border transition-all">
+                Riêng tư
+            </button>
+        </div>
+    </div>
+    <button (click)="submit()" [disabled]="isSubmitting()"
+        class="w-full bg-violet-600 hover:bg-violet-500 disabled:opacity-50 disabled:cursor-not-allowed py-3 rounded-xl font-semibold transition-all cursor-pointer">
+        @if(isSubmitting()) { Đang tải lên... } @else { Tạo bài hát }
     </button>
 </div>
 
 <app-add-artist [open]="showArtistModal" (closed)="closeArtistModal()" (created)="onArtistCreated($event)">
 </app-add-artist>
+
+<app-lyrics-preview [open]="showLyricsPreview" [songTitle]="model.title" [artistName]="selectedArtistName"
+    [imgUrl]="imagePreview" [audioUrl]="previewAudioUrl" [lines]="syncedLyricsParsed" (close)="closeLyricsPreview()">
+</app-lyrics-preview>

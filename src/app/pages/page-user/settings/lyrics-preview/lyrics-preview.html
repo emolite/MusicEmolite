@@ -1,0 +1,113 @@
+@if(open) {
+<div class="backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
+  (click)="onBackdropClick($event)">
+
+  <div class="relative w-full flex flex-col"
+    style="max-width: 980px; height: 88vh;
+           background: linear-gradient(145deg, #0f0a1e 0%, #1a0f2e 50%, #0d0d1a 100%);
+           border: 1px solid rgba(139,92,246,0.2);
+           border-radius: 28px; overflow: hidden;
+           box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 60px rgba(109,40,217,0.15) inset;">
+
+    <div class="absolute inset-x-0 top-0 h-44 pointer-events-none"
+      style="background: radial-gradient(ellipse at 50% 0%, rgba(139,92,246,0.15) 0%, transparent 70%)">
+    </div>
+
+    <div class="relative flex items-center justify-between px-6 pt-5 pb-3 shrink-0">
+      <div class="min-w-0">
+        <p class="text-xs font-medium tracking-[0.15em] uppercase text-violet-400/60">Xem trước</p>
+        <h2 class="text-lg font-bold text-white mt-0.5 truncate max-w-[400px]">
+          {{ songTitle || 'Bài hát' }}
+        </h2>
+      </div>
+      <button (click)="close.emit()"
+        class="w-9 h-9 rounded-full flex items-center justify-center cursor-pointer shrink-0 transition-all bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden">
+      <div class="flex flex-col items-center justify-center px-8 shrink-0 w-64 gap-5">
+        <div class="vinyl-wrapper">
+          <div class="vinyl-ring">
+            <div #vinylImg class="vinyl-img overflow-hidden"
+              [style.background]="imgUrl ? 'none' : 'linear-gradient(135deg, #4c1d95, #2e1065)'">
+              @if(imgUrl) {
+              <img [src]="imgUrl" class="w-full h-full object-cover">
+              } @else {
+              <div class="w-full h-full flex items-center justify-center">
+                <svg class="w-10 h-10 text-violet-400/40" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                </svg>
+              </div>
+              }
+            </div>
+            <div class="vinyl-center-dot"></div>
+          </div>
+        </div>
+
+        <div class="text-center space-y-1 px-2">
+          <p class="text-white font-semibold text-sm truncate max-w-[180px]">{{ songTitle }}</p>
+          @if(artistName) {
+          <p class="text-violet-400/60 text-xs truncate max-w-[180px]">{{ artistName }}</p>
+          }
+        </div>
+      </div>
+
+      <div class="w-px shrink-0" style="background: rgba(139,92,246,0.12)"></div>
+
+      <div #lyricsContainer class="lyrics-scroll flex-1 overflow-y-auto px-6">
+        <div class="py-[30vh]">
+          @for(line of lines; track $index) {
+          <div [id]="'pl-' + $index"
+            class="lyric-line text-center select-none mb-5 px-2"
+            [style.color]="getLineColor($index)"
+            [style.opacity]="getLineOpacity($index)">
+            {{ line.text }}
+          </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <div class="relative px-5 pb-5 pt-4 shrink-0"
+      style="border-top: 1px solid rgba(139,92,246,0.12); background: rgba(0,0,0,0.3); backdrop-filter: blur(10px)">
+
+      @if(audioUrl) {
+      <audio #audioEl [src]="audioUrl" (loadedmetadata)="onAudioLoaded()" class="hidden"></audio>
+
+      <input #seekBar type="range" min="0" [max]="duration * 1000" value="0"
+        (input)="onSeek($event)" class="seek-bar w-full mb-3 cursor-pointer">
+
+      <div class="flex items-center justify-between">
+        <span #timeDisplay class="text-xs tabular-nums text-violet-400/60">00:00</span>
+
+        <button (click)="togglePlay()"
+          class="w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95"
+          style="background: linear-gradient(135deg, #7c3aed, #6d28d9);
+                 box-shadow: 0 0 20px rgba(109,40,217,0.5), 0 4px 12px rgba(0,0,0,0.3);
+                 border: 1px solid rgba(167,139,250,0.3)">
+          @if(isPlaying) {
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+          </svg>
+          } @else {
+          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+          }
+        </button>
+
+        <span class="text-xs tabular-nums text-violet-400/60">{{ formatTime(duration * 1000) }}</span>
+      </div>
+      } @else {
+      <p class="text-xs text-center py-2 text-amber-400/60">Chưa có file nhạc</p>
+      }
+    </div>
+
+  </div>
+</div>
+}

@@ -1,6 +1,6 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { SongService } from '../../../core/services/song.service';
 import { AlbumService } from '../../../core/services/album.service';
@@ -13,7 +13,7 @@ import { AlbumResponse } from '../../../core/models/album/res-album.model';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   styleUrl: './home.css',
   templateUrl: './home.html',
 })
@@ -137,5 +137,8 @@ export class HomeComponent {
 
   goLogin() {
     this.router.navigate(['/auth/login']);
+  }
+  goToPlaylist() {
+    this.router.navigate(['/users/playlist']);
   }
 }

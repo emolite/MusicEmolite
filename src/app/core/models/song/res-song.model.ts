@@ -1,3 +1,5 @@
+import { LyricsLine } from "./req-song.model";
+
 export interface SongResponse {
   id: number;
   title: string;
@@ -11,6 +13,8 @@ export interface SongResponse {
   likes: number;
   views: number;
   typeSong: string;
+  syncedLyrics?: LyricsLine[];
+  lyrics?: string;
   createdAt?: string;
   createdBy?: number;
   isActived?: boolean;

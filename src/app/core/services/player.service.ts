@@ -23,6 +23,7 @@ export class PlayerService {
   volume = signal(100);
   isMuted = signal(false);
   isPlayerHidden = signal(false);
+  currentTimeRaw = signal(0);
 
   constructor() {
     this.initAudioEvents();
@@ -95,7 +96,7 @@ export class PlayerService {
   private startTrack(track: any) {
     this.songService.getSongDetail(track.id).subscribe(res => {
       const detail = res.data;
-      this.currentTrack.set({ ...track, isLiked: detail?.isLiked, imgUrl: detail?.imgUrl, releaseDate: detail?.releaseDate });
+      this.currentTrack.set({ ...track, isLiked: detail?.isLiked, imgUrl: detail?.imgUrl, releaseDate: detail?.releaseDate, syncedLyrics: detail?.syncedLyrics ?? [], });
       this.isLiked.set(detail?.isLiked ?? false);
       this.audio.src = track.url;
       this.audio.load();
@@ -161,9 +162,11 @@ export class PlayerService {
   private initAudioEvents() {
     this.audio.ontimeupdate = () => {
       this.zone.run(() => {
-        this.currentTime.set(this.formatTime(this.audio.currentTime));
+        const t = this.audio.currentTime;
+        this.currentTimeRaw.set(t);
+        this.currentTime.set(this.formatTime(t));
         if (this.audio.duration) {
-          this.progressPercent.set((this.audio.currentTime / this.audio.duration) * 100);
+          this.progressPercent.set((t / this.audio.duration) * 100);
         }
       });
     };

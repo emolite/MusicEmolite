@@ -21,6 +21,7 @@
     opacity: 0;
     transform: translateY(100%);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -32,6 +33,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(100%);
@@ -43,11 +45,46 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 img {
   user-select: none;
   -webkit-user-drag: none;
+}
+
+.lyric-line {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.18);
+  transition: color 0.4s ease, opacity 0.4s ease, font-size 0.3s, transform 0.3s, background 0.3s;
+}
+
+.lyric-line.past {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.lyric-line.active {
+  color: #fff;
+  font-size: 17px;
+  background: rgba(139, 92, 246, 0.12);
+  transform: translateX(4px);
+}
+
+.lyrics-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 85%, transparent 100%);
+}
+
+.lyrics-scroll::-webkit-scrollbar {
+  display: none;
 }

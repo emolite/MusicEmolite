@@ -9,6 +9,7 @@ import { LoginComponent } from './pages/page-login/login/login';
 import { RegisterComponent } from './pages/page-login/register/register';
 import { AlbumComponent } from './pages/page-user/album/album';
 import { PlayerBarDetailComponent } from './pages/page-user/player-bar/player-bar-detail/player-bar-detail';
+import { PlaylistComponent } from './pages/page-user/playlist/playlist';
 
 export const routes: Routes = [
     {
@@ -37,6 +38,10 @@ export const routes: Routes = [
             {
                 path: URL_END.USER.HOME,
                 component: HomeComponent
+            },
+            {
+                path: URL_END.USER.PLAYLIST,
+                component: PlaylistComponent
             },
             {
                 path: URL_END.USER.ALBUM,

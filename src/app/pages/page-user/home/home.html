@@ -55,7 +55,7 @@
     <section class="mb-10">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-xl font-bold text-white">Nghe gần đây</h2>
-        <a href="#" class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+        <a (click)="goToPlaylist()" class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
       </div>
       <div class="grid grid-cols-3 gap-3">
         @for (item of recentItems(); track item.id) {
