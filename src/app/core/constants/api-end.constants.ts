@@ -18,10 +18,13 @@ export const API_END = {
     BASE: `${BASE_URL}songs`,
     SEARCH: `${BASE_URL}songs/search`,
     SEARCH_PUBLIC: `${BASE_URL}songs/public/search`,
+    SONG_TO_ALBUMS: `${BASE_URL}songs/albums`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,
     LIKE: (id: number) => `${BASE_URL}songs/${id}/like`,
-    LYRICS: `${BASE_URL}songs/lyrics`
+    LYRICS: `${BASE_URL}songs/lyrics`,
+    LYRICS_SEARCH: `${BASE_URL}songs/lyrics/search`,
+    LYRICS_BY_ID: (id: number) => `${BASE_URL}songs/lyrics/${id}`
   },
 
   ALBUM: {

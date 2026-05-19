@@ -9,6 +9,9 @@ import { AuthService } from '../../../core/services/auth.service';
 
 import { SongResponse } from '../../../core/models/song/res-song.model';
 import { AlbumResponse } from '../../../core/models/album/res-album.model';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { AlbumRequest } from '../../../core/models/album/req-album.model';
+import { BaseSearchDto } from '../../../core/models/base/base-search.model';
 
 @Component({
   selector: 'app-home',
@@ -27,13 +30,87 @@ export class HomeComponent {
   trendingTracks = signal<any[]>([]);
   playlists = signal<any[]>([]);
   featuredSong = signal<any>(null);
+  showAddToAlbum = signal(false);
+  selectedSongId = signal<number | null>(null);
+  selectedAlbumId = signal<number | null>(null);
+  albumList = signal<AlbumResponse[]>([]);
+  selectedSongAlbumIds = signal<number[]>([]);
+  albumKeyword = signal('');
+  isAddingToAlbum = signal(false);
 
   showLoginMessage = signal(false);
   isLoggedIn = computed(() => !!this.authService.user());
+  private albumSearch$ = new Subject<string>();
 
   ngOnInit() {
     this.loadSongs();
     this.loadAlbums();
+    this.albumSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(keyword => {
+      this.fetchAlbums(keyword);
+    });
+  }
+
+  openAddToAlbum(songId: number, event: Event) {
+    event.stopPropagation();
+    if (!this.isLoggedIn()) {
+      this.showLoginMessage.set(true);
+      return;
+    }
+    const track = this.trendingTracks().find(t => t.id === songId);
+    this.selectedSongAlbumIds.set(track?.albumIds ?? []);
+    this.selectedSongId.set(songId);
+    this.selectedAlbumId.set(null);
+    this.albumKeyword.set('');
+    this.showAddToAlbum.set(true);
+    this.fetchAlbums('');
+  }
+
+  closeAddToAlbum() {
+    this.showAddToAlbum.set(false);
+    this.selectedSongId.set(null);
+    this.selectedAlbumId.set(null);
+  }
+
+  selectAlbum(album: AlbumResponse) {
+    this.selectedAlbumId.set(album.id);
+  }
+
+  onAlbumSearch(event: Event) {
+    const keyword = (event.target as HTMLInputElement).value;
+    this.albumKeyword.set(keyword);
+    this.albumSearch$.next(keyword);
+  }
+
+  private fetchAlbums(keyword: string) {
+    const payload: BaseSearchDto<AlbumRequest> = {
+      page: 1,
+      pageSize: 20,
+      asc: false,
+      searchParams: { keyword }
+    };
+    this.albumService.searchAlbums(payload).subscribe(res => {
+      this.albumList.set(res.data ?? []);
+    });
+  }
+
+  confirmAddToAlbum() {
+    const songId = this.selectedSongId();
+    const albumId = this.selectedAlbumId();
+    if (!songId || !albumId) return;
+
+    this.isAddingToAlbum.set(true);
+    this.songService.addSongToAlbum(songId, albumId).subscribe({
+      next: () => {
+        this.isAddingToAlbum.set(false);
+        this.closeAddToAlbum();
+      },
+      error: () => {
+        this.isAddingToAlbum.set(false);
+      }
+    });
   }
 
   private getRealDuration(url: string): Promise<number> {
@@ -67,6 +144,7 @@ export class HomeComponent {
           imgUrl: s.imgUrl || null,
           like: s.likes ?? 0,
           view: s.views ?? 0,
+          albumIds: s.albumIds ?? [],
           year: s.createdAt
             ? new Date(s.createdAt).getFullYear()
             : ''
@@ -87,6 +165,7 @@ export class HomeComponent {
         view: s.view,
         plays: (s.like + s.view).toLocaleString(),
         imgUrl: s.imgUrl || null,
+        albumIds: s.albumIds ?? [],
         color: 'linear-gradient(135deg, #3b82f6, #0f0d1a)'
       })));
 

@@ -1,6 +1,6 @@
 @if(open) {
 <div class="backdrop fixed inset-0 z-50 flex items-center justify-center p-4"
-  (click)="onBackdropClick($event)">
+>
 
   <div class="relative w-full flex flex-col"
     style="max-width: 980px; height: 88vh;
@@ -79,7 +79,7 @@
       @if(audioUrl) {
       <audio #audioEl [src]="audioUrl" (loadedmetadata)="onAudioLoaded()" class="hidden"></audio>
 
-      <input #seekBar type="range" min="0" [max]="duration * 1000" value="0"
+      <input #seekBar type="range" min="0" [max]="duration" value="0"
         (input)="onSeek($event)" class="seek-bar w-full mb-3 cursor-pointer">
 
       <div class="flex items-center justify-between">
@@ -101,7 +101,7 @@
           }
         </button>
 
-        <span class="text-xs tabular-nums text-violet-400/60">{{ formatTime(duration * 1000) }}</span>
+        <span class="text-xs tabular-nums text-violet-400/60">{{ formatTime(duration) }}</span>
       </div>
       } @else {
       <p class="text-xs text-center py-2 text-amber-400/60">Chưa có file nhạc</p>

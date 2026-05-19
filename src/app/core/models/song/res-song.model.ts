@@ -7,6 +7,7 @@ export interface SongResponse {
   fileUrl: string;
   imgUrl: string;
   albumId?: number;
+  albumIds?: number[]; 
   releaseDate?: string;
   artistName?: string;
   isLiked: boolean;

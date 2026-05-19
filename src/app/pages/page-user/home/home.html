@@ -55,7 +55,9 @@
     <section class="mb-10">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-xl font-bold text-white">Nghe gần đây</h2>
-        <a (click)="goToPlaylist()" class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+        <a (click)="goToPlaylist()"
+          class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất
+          cả</a>
       </div>
       <div class="grid grid-cols-3 gap-3">
         @for (item of recentItems(); track item.id) {
@@ -117,12 +119,14 @@
           </div>
           <p class="text-sm font-semibold text-white truncate mb-0.5">{{ track.name }}</p>
           <p class="text-xs text-white/40 truncate">{{ track.artist }}</p>
-          <div class="flex items-center gap-1 mt-2">
-            <svg class="w-3 h-3 text-violet-400" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 3.21-1.81 6-4.72 7.28L13 17v5c5.52-.55 9-4.57 9-9 0-4.79-3.44-8.77-9-9.95zM11 2.05C5.95 2.78 3 6.73 3 12c0 4.43 3.48 8.45 8 9v-2.02c-3.45-.5-6-3.32-6-6.98 0-3.43 2.55-6.29 6-6.93V2.05z" />
-            </svg>
-            <span class="text-xs text-violet-400/70">{{ track.plays }}</span>
+          <div class="flex items-center justify-between mt-2">
+            <span class="text-xs text-violet-400/70">{{ track.plays }} lượt nghe</span>
+            <button (click)="openAddToAlbum(track.id, $event)"
+              class="w-7 h-7 bg-white/10 hover:bg-violet-600 rounded-full flex items-center justify-center transition-all duration-200">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
           </div>
         </div>
         }
@@ -201,6 +205,82 @@
             </p>
           </div>
         </div>
+      </div>
+    </div>
+    }
+    @if (showAddToAlbum()) {
+    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      (click)="closeAddToAlbum()">
+
+      <div class="relative w-[480px] max-w-[92%] rounded-[24px] bg-gradient-to-br from-[#1e1b2e] to-[#0f0d1a]
+      border border-white/10 p-8 shadow-2xl" (click)="$event.stopPropagation()">
+
+        <button (click)="closeAddToAlbum()"
+          class="absolute top-4 right-5 text-white/50 hover:text-white text-xl transition cursor-pointer">
+          ✕
+        </button>
+
+        <h3 class="text-xl font-bold text-white mb-1">Thêm vào Album</h3>
+        <p class="text-white/40 text-sm mb-5">Chọn album bạn muốn thêm bài hát vào</p>
+
+        <input type="text" placeholder="Tìm album..." [value]="albumKeyword()" (input)="onAlbumSearch($event)"
+          class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-violet-500/50 mb-4 transition" />
+
+        <div class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scroll">
+
+          @for (album of albumList(); track album.id) {
+
+          <div (click)="selectAlbum(album)"
+            class="flex items-center gap-3 p-3 rounded-xl transition-all duration-150 border" [class]="selectedSongAlbumIds().includes(album.id)
+              ? 'opacity-40 cursor-not-allowed bg-white/3 border-white/5'
+              : selectedAlbumId() === album.id
+                ? 'bg-violet-600/20 border-violet-500/40 cursor-pointer'
+                : 'bg-white/3 border-white/5 hover:bg-white/7 hover:border-white/10 cursor-pointer'">
+
+            <div
+              class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-800 to-purple-900 shrink-0 flex items-center justify-center">
+              <svg class="w-5 h-5 text-violet-300" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+              </svg>
+            </div>
+
+            <div class="min-w-0">
+              <p class="text-sm font-semibold text-white truncate">{{ album.title }}</p>
+              <p class="text-xs text-white/40">{{ album.albumTypeName ?? 'Album' }}</p>
+            </div>
+
+            @if (selectedSongAlbumIds().includes(album.id)) {
+            <span class="text-xs text-white/40 ml-auto shrink-0">Đã có</span>
+            }
+            @else if (selectedAlbumId() === album.id) {
+            <svg class="w-5 h-5 text-violet-400 ml-auto shrink-0" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+            }
+
+          </div>
+          }
+
+          @empty {
+          <p class="text-center text-white/30 text-sm py-6">
+            Không tìm thấy album
+          </p>
+          }
+
+        </div>
+
+        <div class="flex gap-3 mt-6">
+          <button (click)="closeAddToAlbum()"
+            class="flex-1 h-11 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/30 text-sm font-medium transition-all cursor-pointer">
+            Hủy
+          </button>
+
+          <button (click)="confirmAddToAlbum()" [disabled]="!selectedAlbumId() || isAddingToAlbum()"
+            class="flex-1 h-11 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+            {{ isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' }}
+          </button>
+        </div>
+
       </div>
     </div>
     }

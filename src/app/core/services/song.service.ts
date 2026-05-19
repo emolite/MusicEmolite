@@ -8,7 +8,7 @@ import { SongCreateRequest, SongRequest } from "../models/song/req-song.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
 import { BaseResponse } from "../models/base/base-res.model";
 import { LyricsResponseDto } from "../models/song/res-lyrics.model";
-import { LyricsRequestDto } from "../models/song/req-lyrics.model";
+import { LyricsRequestDto, LyricsSearchRequestDto } from "../models/song/req-lyrics.model";
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +47,7 @@ export class SongService {
     formData.append('title', data.title);
     formData.append('releaseDate', data.releaseDate);
     formData.append('albumId', data.albumId.toString());
-    formData.append('artistId', data.artistId.toString());
+    formData.append('artistName', data.artistName);
     formData.append('fileUrl', data.fileUrl);
     formData.append('imgUrl', data.imgUrl);
     formData.append('type', data.type.toString());
@@ -68,20 +68,51 @@ export class SongService {
     );
   }
 
+  addSongToAlbum(songId: number, albumId: number): Observable<BaseResponse<SongResponse>> {
+    return this.api.postData<BaseResponse<SongResponse>, {}>(
+      `${API_END.SONG.SONG_TO_ALBUMS}?songId=${songId}&albumId=${albumId}`,
+      {}
+    );
+  }
+
   getSongDetail(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.getData<BaseResponse<SongResponse>>(API_END.SONG.DETAIL(id));
   }
 
-  getLyrics(params: LyricsRequestDto): Observable<BaseResponse<LyricsResponseDto>> {
-    return this.api.getData<BaseResponse<LyricsResponseDto>>(
-      `${API_END.SONG.LYRICS}?title=${encodeURIComponent(params.title ?? '')}&artist=${encodeURIComponent(params.artist ?? '')}`
-    );
-  }
   incrementView(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.VIEW(id), {});
   }
 
   toggleLike(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.LIKE(id), {});
+  }
+
+
+  getLyrics(params: LyricsRequestDto): Observable<BaseResponse<LyricsResponseDto>> {
+    return this.api.getData<BaseResponse<LyricsResponseDto>>(
+      `${API_END.SONG.LYRICS}?title=${encodeURIComponent(params.title ?? '')}&artist=${encodeURIComponent(params.artist ?? '')}`
+    );
+  }
+
+  searchLyrics(data: BaseSearchDto<LyricsSearchRequestDto>)
+    : Observable<BaseTableResponse<LyricsResponseDto>> {
+
+    return this.api.postData<
+      BaseTableResponse<LyricsResponseDto>,
+      BaseSearchDto<LyricsRequestDto>
+    >(
+      API_END.SONG.LYRICS_SEARCH,
+      data
+    );
+  }
+
+  getLyricsById(id: number)
+    : Observable<BaseResponse<LyricsResponseDto>> {
+
+    return this.api.getData<
+      BaseResponse<LyricsResponseDto>
+    >(
+      API_END.SONG.LYRICS_BY_ID(id)
+    );
   }
 }

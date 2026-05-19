@@ -110,9 +110,12 @@ export class LyricsPreviewComponent implements OnChanges, OnDestroy {
   private updateSeekBarDOM(time: number, duration: number) {
     const bar = this.seekBar?.nativeElement;
     if (!bar || !duration) return;
+
     bar.value = String(time);
     bar.max = String(duration);
-    const pct = (time / (duration)) * 100;
+
+    const pct = (time / duration) * 100;
+
     bar.style.setProperty('--pct', `${pct}%`);
   }
 
@@ -166,9 +169,16 @@ export class LyricsPreviewComponent implements OnChanges, OnDestroy {
   }
 
   formatTime(seconds: number): string {
+    if (!seconds || isNaN(seconds)) {
+      return '00:00';
+    }
+
     const s = Math.floor(seconds);
+
     const m = Math.floor(s / 60);
+
     const sec = s % 60;
+
     return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
   }
 

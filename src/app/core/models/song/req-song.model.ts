@@ -8,7 +8,7 @@ export interface SongCreateRequest{
   title: string;
   releaseDate: string;
   albumId: number;
-  artistId: number;
+  artistName: string;
   fileUrl: File;
   imgUrl: File;
   type: SongType;

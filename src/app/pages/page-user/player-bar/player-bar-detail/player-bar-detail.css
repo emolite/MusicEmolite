@@ -81,8 +81,6 @@ img {
 .lyrics-scroll {
   scrollbar-width: none;
   -ms-overflow-style: none;
-  mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 85%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 85%, transparent 100%);
 }
 
 .lyrics-scroll::-webkit-scrollbar {
