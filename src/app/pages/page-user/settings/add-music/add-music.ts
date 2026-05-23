@@ -106,7 +106,8 @@ export class AddMusicComponent {
       page: 1,
       pageSize: 20,
       searchParams: {
-        title: this.model.title
+        query: this.model.title,
+        album: "EMOLITE_MUSIC"
       }
     }).subscribe({
       next: (res) => {
@@ -141,6 +142,7 @@ export class AddMusicComponent {
         if (!data) return;
 
         this.selectedArtistName = data.artist || '';
+        this.model.title = data.title || '';
         this.model.artistName = data.artist || '';
         this.plainLyrics = data.lyrics || '';
 
