@@ -16,6 +16,7 @@ export class LoginComponent {
 
     showPassword = signal(false);
     loading = this.authService.loading;
+    errorMessage = signal('');
 
     form = {
         userName: '',
@@ -26,35 +27,67 @@ export class LoginComponent {
         this.showPassword.update(v => !v);
     }
 
-    login() {
-        this.authService.login(this.form).subscribe({
-            next: (res) => {
-                const data = res?.data;
-                if (!data?.accessToken) return;
-                sessionStorage.setItem('token', data.accessToken);
-                this.authService.getCurrentUser().subscribe({
-                    next: (userRes: any) => {
-                        const user = userRes?.data;
-                        this.authService.user.set(user ?? null);
-                        const roleCode = user?.roleCode ?? '';
-                        if (roleCode.includes('ADMIN')) {
-                            this.router.navigate(['/admin/profile']);
-                            return;
-                        }
-                        if (roleCode.includes('USER')) {
-                            this.router.navigate(['/users/home']);
-                            return;
-                        }
-                        this.router.navigate(['/auth/login']);
-                    },
-                    error: () => {
-                        this.router.navigate(['/auth/login']);
-                    }
-                });
-            },
-            error: (err) => {
-                console.log(err);
-            }
-        });
+  login() {
+    this.errorMessage.set('');
+    if (!this.form.userName.trim() || !this.form.password.trim()) {
+        this.errorMessage.set('Vui lòng nhập đầy đủ thông tin');
+        return;
     }
+    this.authService.login(this.form).subscribe({
+        next: (res: any) => {
+            if (res?.code !== '200') {
+                this.errorMessage.set(
+                    res?.message || 'Lỗi hệ thống'
+                );
+                return;
+            }
+
+            const data = res?.data;
+            if (!data?.accessToken) {
+                this.errorMessage.set('Lỗi hệ thống');
+                return;
+            }
+            sessionStorage.setItem(
+                'token',
+                data.accessToken
+            );
+            this.authService.getCurrentUser().subscribe({
+                next: (userRes: any) => {
+                    const user = userRes?.data;
+                    this.authService.user.set(user ?? null);
+                    const roleCode = user?.roleCode ?? '';
+                    if (roleCode.includes('ADMIN')) {
+                        this.router.navigate(['/admin/profile']);
+                        return;
+                    }
+
+                    if (roleCode.includes('USER')) {
+                        this.router.navigate(['/users/home']);
+                        return;
+                    }
+
+                    this.errorMessage.set(
+                        'Không xác định được quyền tài khoản'
+                    );
+                },
+
+                error: () => {
+                    this.errorMessage.set(
+                        'Lỗi hệ thống'
+                    );
+                }
+            });
+        },
+
+        error: (err) => {
+            const message =
+                err?.error?.message ||
+                err?.error?.title ||
+                err?.message ||
+                'Lỗi hệ thống';
+
+            this.errorMessage.set(message);
+        }
+    });
+}
 }

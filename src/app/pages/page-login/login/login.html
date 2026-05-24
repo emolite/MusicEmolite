@@ -17,14 +17,19 @@
             <p class="text-white/60 mb-10 text-base">
                 Chào mừng bạn quay trở lại
             </p>
+            @if(errorMessage()) {
+            <div class="mb-5 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-md text-red-300">
+                {{ errorMessage() }}
+            </div>
+            }
             <form class="space-y-5" (ngSubmit)="login()">
 
-                <input type="text" [(ngModel)]="form.userName" name="userName" placeholder="Tên đăng nhập" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+                <input type="text" [(ngModel)]="form.userName" (input)="errorMessage.set('')" name="userName" placeholder="Tên đăng nhập" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
                 focus:border-violet-500 outline-none text-lg">
 
                 <div class="relative">
 
-                    <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" name="password"
+                    <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" (input)="errorMessage.set('')" name="password"
                         placeholder="Mật khẩu" class="w-full px-4 py-4 pr-12 rounded-xl bg-white/5 border border-white/10
                   focus:border-violet-500 outline-none text-lg">
 

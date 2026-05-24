@@ -2,6 +2,7 @@ import { SongType } from "../../enums/song-type.enums";
 
 export interface SongRequest {
   keyword?: string;
+  albumId?: number;
 }
 
 export interface SongCreateRequest{

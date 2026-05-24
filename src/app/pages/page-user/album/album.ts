@@ -1,12 +1,13 @@
 import { CommonModule } from "@angular/common";
 import { Component, effect, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlbumService } from "../../../core/services/album.service";
 import { AlbumResponse } from "../../../core/models/album/res-album.model";
 
 @Component({
     selector: "app-album",
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, RouterLink],
     templateUrl: "./album.html"
 })
 export class AlbumComponent {

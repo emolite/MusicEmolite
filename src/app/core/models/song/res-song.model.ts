@@ -7,6 +7,7 @@ export interface SongResponse {
   fileUrl: string;
   imgUrl: string;
   albumId?: number;
+  albumName?: string;
   albumIds?: number[]; 
   releaseDate?: string;
   artistName?: string;

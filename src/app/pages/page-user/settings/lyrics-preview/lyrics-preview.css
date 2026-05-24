@@ -1,7 +1,8 @@
-.backdrop {
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+.lyric-line {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.6;
+  transition: color 0.4s ease, opacity 0.4s ease;
 }
 
 .lyrics-scroll {
@@ -11,13 +12,6 @@
 
 .lyrics-scroll::-webkit-scrollbar {
   display: none;
-}
-
-.lyric-line {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.6;
-  transition: color 0.4s ease, opacity 0.4s ease;
 }
 
 .vinyl-wrapper {
@@ -32,11 +26,10 @@
   width: 210px;
   height: 210px;
   border-radius: 50%;
-  padding: 0;
   background: none;
   box-shadow:
-    0 0 0 1px rgba(139,92,246,0.2),
-    0 8px 32px rgba(0,0,0,0.6);
+    0 0 0 1px rgba(0,0,0,0.08),
+    0 8px 32px rgba(0,0,0,0.12);
 }
 
 .vinyl-img {
@@ -55,9 +48,8 @@
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: radial-gradient(circle, #1a0f2e 60%, rgba(139,92,246,0.4) 100%);
-  border: 2px solid rgba(167,139,250,0.4);
-  box-shadow: 0 0 8px rgba(139,92,246,0.5);
+  background: #fff;
+  border: 2px solid rgba(0,0,0,0.1);
   z-index: 10;
   pointer-events: none;
 }
@@ -70,8 +62,8 @@
   outline: none;
   background: linear-gradient(
     to right,
-    #7c3aed var(--pct, 0%),
-    rgba(255, 255, 255, 0.1) var(--pct, 0%)
+    #111 var(--pct, 0%),
+    rgba(0,0,0,0.1) var(--pct, 0%)
   );
 }
 
@@ -80,9 +72,8 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #a78bfa;
+  background: #111;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(167, 139, 250, 0.6);
   transition: transform 0.15s;
 }
 
@@ -94,7 +85,7 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #a78bfa;
+  background: #111;
   cursor: pointer;
   border: none;
 }

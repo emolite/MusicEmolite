@@ -42,7 +42,7 @@
 
         <div class="grid grid-cols-5 gap-5">
             @for (album of albums(); track album.id) {
-            <div class="group cursor-pointer">
+           <div class="group cursor-pointer" [routerLink]="['/users/album', album.id]">
                 <div class="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-violet-700/40 to-[#1d1633] border border-white/5 mb-3">
                     <div class="absolute inset-0 flex items-center justify-center">
                         <svg class="w-14 h-14 text-white/10" fill="currentColor" viewBox="0 0 24 24">

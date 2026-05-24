@@ -41,6 +41,13 @@ export class SongService {
     );
   }
 
+  getTrendingSongs(data: BaseSearchDto<SongRequest>) : Observable<BaseTableResponse<SongResponse>> {
+    return this.api.postData(
+      API_END.SONG.TRENDINGS,
+      data
+    );
+  }
+
   createSong(data: SongCreateRequest): Observable<BaseResponse<SongResponse>> {
     const formData = new FormData();
 

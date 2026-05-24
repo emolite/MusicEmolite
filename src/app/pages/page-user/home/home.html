@@ -16,7 +16,7 @@
         <p class="text-white/50 text-sm mb-6">{{ song.artist }} &bull; {{ song.year }} &bull; {{
           formatDuration(song.duration) }}</p>
         <div class="flex items-center gap-3">
-          <button (click)="playSong(song.id)"
+          <button (click)="playTrendingSong(song.id)"
             class="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-6 py-2.5 rounded-full transition-all text-sm">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
@@ -55,13 +55,13 @@
     <section class="mb-10">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-xl font-bold text-white">Nghe gần đây</h2>
-        <a (click)="goToPlaylist()"
+        <a (click)="goToPlaylist('recent')"
           class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất
           cả</a>
       </div>
       <div class="grid grid-cols-3 gap-3">
         @for (item of recentItems(); track item.id) {
-        <div (click)="playSong(item.id)"
+        <div (click)="playRecentSong(item.id)"
           class="flex items-center gap-3 bg-white/5 hover:bg-white/8 border border-white/5 hover:border-violet-500/20 rounded-xl p-3 cursor-pointer transition-all duration-200 group">
           <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative flex items-center justify-center"
             [style.background]="!item.imgUrl ? item.color : null">
@@ -90,11 +90,12 @@
     <section class="mb-10">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-xl font-bold text-white">Đang thịnh hành</h2>
-        <a href="#" class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+        <a (click)="goToPlaylist('trending')"
+          class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
       </div>
       <div class="grid grid-cols-7 gap-2">
         @for (track of trendingTracks(); track track.id; let i = $index) {
-        <div (click)="playSong(track.id)"
+        <div (click)="playTrendingSong(track.id)"
           class="bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-4 cursor-pointer transition-all duration-200 group">
           <div class="relative mb-4">
             <div class="w-full aspect-square rounded-xl overflow-hidden"
@@ -144,16 +145,14 @@
         <div class="grid grid-cols-2 gap-10 items-center">
           <div class="flex justify-center">
             <div class="w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl">
-              <img [src]="featuredSong()?.imgUrl || 'assets/images/default-song.jpg'" alt=""
+              <img [src]="selectedPreviewSong()?.imgUrl || 'assets/images/default-song.jpg'" alt=""
                 class="w-full h-full object-cover" />
             </div>
           </div>
           <div class="text-white">
             <h2 class="text-5xl font-extrabold leading-tight">
-              Bắt đầu nghe bằng
-              <br />
-              tài khoản
-              <span class="text-violet-300">Music Studio</span>
+              Đăng nhập tài khoản trên
+              <span class="text-violet-300">Song with me</span>
             </h2>
             <p class="mt-5 text-white/70 text-base leading-relaxed">
               Đăng nhập để thưởng thức những bài hát yêu thích,
@@ -164,7 +163,7 @@
                    text-white font-bold text-lg transition-all">
                 Đăng nhập ngay
               </button>
-              <button routerLink="/register" class="h-14 rounded-full border border-white/20 cursor-pointer
+              <button routerLink="/auth/register" class="h-14 rounded-full border border-white/20 cursor-pointer
                    hover:border-white/50 hover:bg-white/5
                    text-white font-semibold transition-all">
                 Tạo tài khoản miễn phí

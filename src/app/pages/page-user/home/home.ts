@@ -27,45 +27,68 @@ export class HomeComponent {
   private player = inject(PlayerService);
   private router = inject(Router);
   private authService = inject(AuthService);
+
   recentItems = signal<any[]>([]);
   trendingTracks = signal<any[]>([]);
   playlists = signal<any[]>([]);
   featuredSong = signal<any>(null);
+
+  recentQueue = signal<any[]>([]);
+  trendingQueue = signal<any[]>([]);
+
   showAddToAlbum = signal(false);
   selectedSongId = signal<number | null>(null);
   selectedAlbumId = signal<number | null>(null);
+
   albumList = signal<AlbumResponse[]>([]);
   selectedSongAlbumIds = signal<number[]>([]);
   albumKeyword = signal('');
+
   isAddingToAlbum = signal(false);
 
+  selectedPreviewSong = signal<any>(null);
   showLoginMessage = signal(false);
+
   isLoggedIn = computed(() => !!this.authService.user());
+
   private albumSearch$ = new Subject<string>();
 
   ngOnInit() {
     this.loadSongs();
     this.loadAlbums();
-    this.albumSearch$.pipe(
-      debounceTime(300),
-      distinctUntilChanged()
-    ).subscribe(keyword => {
-      this.fetchAlbums(keyword);
-    });
+
+    this.albumSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged()
+      )
+      .subscribe(keyword => {
+        this.fetchAlbums(keyword);
+      });
   }
 
   openAddToAlbum(songId: number, event: Event) {
     event.stopPropagation();
+
+    const allSongs = [
+      ...this.trendingTracks(),
+      ...this.recentItems()
+    ];
+
+    const clickedSong = allSongs.find(t => t.id === songId);
+
     if (!this.isLoggedIn()) {
+      this.selectedPreviewSong.set(clickedSong);
       this.showLoginMessage.set(true);
       return;
     }
-    const track = this.trendingTracks().find(t => t.id === songId);
-    this.selectedSongAlbumIds.set(track?.albumIds ?? []);
+
+    this.selectedSongAlbumIds.set(clickedSong?.albumIds ?? []);
     this.selectedSongId.set(songId);
     this.selectedAlbumId.set(null);
     this.albumKeyword.set('');
     this.showAddToAlbum.set(true);
+
     this.fetchAlbums('');
   }
 
@@ -76,11 +99,13 @@ export class HomeComponent {
   }
 
   selectAlbum(album: AlbumResponse) {
+    if (this.selectedSongAlbumIds().includes(album.id)) return;
     this.selectedAlbumId.set(album.id);
   }
 
   onAlbumSearch(event: Event) {
     const keyword = (event.target as HTMLInputElement).value;
+
     this.albumKeyword.set(keyword);
     this.albumSearch$.next(keyword);
   }
@@ -90,8 +115,11 @@ export class HomeComponent {
       page: 1,
       pageSize: 20,
       asc: false,
-      searchParams: { keyword }
+      searchParams: {
+        keyword
+      }
     };
+
     this.albumService.searchAlbums(payload).subscribe(res => {
       this.albumList.set(res.data ?? []);
     });
@@ -100,9 +128,11 @@ export class HomeComponent {
   confirmAddToAlbum() {
     const songId = this.selectedSongId();
     const albumId = this.selectedAlbumId();
+
     if (!songId || !albumId) return;
 
     this.isAddingToAlbum.set(true);
+
     this.songService.addSongToAlbum(songId, albumId).subscribe({
       next: () => {
         this.isAddingToAlbum.set(false);
@@ -120,23 +150,42 @@ export class HomeComponent {
 
       audio.src = url;
 
-      audio.onloadedmetadata = () =>
+      audio.onloadedmetadata = () => {
         resolve(Math.floor(audio.duration));
+      };
 
-      audio.onerror = () => resolve(0);
+      audio.onerror = () => {
+        resolve(0);
+      };
     });
   }
 
   async loadSongs() {
-    this.songService.searchPublicSongs({
+
+    const recentRequest = this.songService.searchPublicSongs({
       page: 1,
       pageSize: 14,
       asc: false,
-      searchParams: { keyword: '' }
-    }).subscribe(async res => {
-      const data = res.data ?? [];
-      const queue = await Promise.all(
-        data.map(async (s: SongResponse) => ({
+      searchParams: {
+        keyword: ''
+      }
+    });
+
+    const trendingRequest = this.songService.getTrendingSongs({
+      page: 1,
+      pageSize: 14,
+      asc: false,
+      searchParams: {
+        keyword: ''
+      }
+    });
+
+    recentRequest.subscribe(async recentRes => {
+
+      const recentData = recentRes.data ?? [];
+
+      const recentQueue = await Promise.all(
+        recentData.map(async (s: SongResponse) => ({
           id: s.id,
           name: s.title,
           artist: s.artistName,
@@ -151,32 +200,64 @@ export class HomeComponent {
             : ''
         }))
       );
-      const sorted = [...queue].sort(
-        (a, b) => (b.like + b.view) - (a.like + a.view)
+
+      this.recentQueue.set(recentQueue);
+
+      this.recentItems.set(
+        recentQueue.slice(0, 6).map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          artist: s.artist,
+          duration: s.duration,
+          url: s.url,
+          imgUrl: s.imgUrl || null,
+          albumIds: s.albumIds ?? [],
+          views: s.view ?? 0,
+          color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
+        }))
       );
-      this.featuredSong.set(sorted[0] ?? null);
+    });
 
-      this.player.setQueue(queue);
+    trendingRequest.subscribe(async trendingRes => {
 
-      this.trendingTracks.set(queue.map((s: any) => ({
-        id: s.id,
-        name: s.name,
-        artist: s.artist,
-        like: s.like,
-        view: s.view,
-        plays: (s.like + s.view).toLocaleString(),
-        imgUrl: s.imgUrl || null,
-        albumIds: s.albumIds ?? [],
-        color: 'linear-gradient(135deg, #3b82f6, #0f0d1a)'
-      })));
+      const trendingData = trendingRes.data ?? [];
 
-      this.recentItems.set(queue.slice(0, 6).map((s: any) => ({
-        id: s.id,
-        name: s.name,
-        artist: s.artist,
-        imgUrl: s.imgUrl || null,
-        color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
-      })));
+      const trendingQueue = await Promise.all(
+        trendingData.map(async (s: SongResponse) => ({
+          id: s.id,
+          name: s.title,
+          artist: s.artistName,
+          duration: await this.getRealDuration(s.fileUrl),
+          url: s.fileUrl,
+          imgUrl: s.imgUrl || null,
+          like: s.likes ?? 0,
+          view: s.views ?? 0,
+          albumIds: s.albumIds ?? [],
+          year: s.createdAt
+            ? new Date(s.createdAt).getFullYear()
+            : ''
+        }))
+      );
+
+      this.trendingQueue.set(trendingQueue);
+
+      this.featuredSong.set(trendingQueue[0] ?? null);
+
+      this.trendingTracks.set(
+        trendingQueue.map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          artist: s.artist,
+          duration: s.duration,
+          url: s.url,
+          like: s.like,
+          view: s.view,
+          plays: s.view.toLocaleString(),
+          imgUrl: s.imgUrl || null,
+          albumIds: s.albumIds ?? [],
+          color: 'linear-gradient(135deg, #3b82f6, #0f0d1a)'
+        }))
+      );
     });
   }
 
@@ -185,19 +266,26 @@ export class HomeComponent {
       page: 1,
       pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
       asc: false,
-      searchParams: { keyword: '' }
+      searchParams: {
+        keyword: ''
+      }
     }).subscribe(res => {
+
       const data = res.data ?? [];
-      this.playlists.set(data.map((a: AlbumResponse) => ({
-        id: a.id,
-        name: a.title,
-        desc: a.albumTypeName ?? 'Album',
-        color: 'linear-gradient(135deg, #ec4899, #0f0d1a)'
-      })));
+
+      this.playlists.set(
+        data.map((a: AlbumResponse) => ({
+          id: a.id,
+          name: a.title,
+          desc: a.albumTypeName ?? 'Album',
+          color: 'linear-gradient(135deg, #ec4899, #0f0d1a)'
+        }))
+      );
     });
   }
 
   formatDuration(sec: number): string {
+
     if (!sec) return '0:00';
 
     const m = Math.floor(sec / 60);
@@ -206,19 +294,48 @@ export class HomeComponent {
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  playSong(id: number) {
+  playRecentSong(id: number) {
 
-    if (!this.isLoggedIn) {
+    const clickedSong = this.recentQueue().find(x => x.id === id);
+
+    if (!clickedSong) return;
+
+    if (!this.isLoggedIn()) {
+      this.selectedPreviewSong.set(clickedSong);
       this.showLoginMessage.set(true);
       return;
     }
+
+    this.player.setQueue(this.recentQueue());
+    this.player.playSong(id);
+  }
+
+  playTrendingSong(id: number) {
+
+    const clickedSong = this.trendingQueue().find(x => x.id === id);
+
+    if (!clickedSong) return;
+
+    if (!this.isLoggedIn()) {
+      this.selectedPreviewSong.set(clickedSong);
+      this.showLoginMessage.set(true);
+      return;
+    }
+
+    this.player.setQueue(this.trendingQueue());
     this.player.playSong(id);
   }
 
   goLogin() {
     this.router.navigate(['/auth/login']);
   }
-  goToPlaylist() {
-    this.router.navigate(['/users/playlist']);
+
+  goToPlaylist(tab: 'recent' | 'trending' = 'recent') {
+    this.router.navigate(
+      ['/users/playlist'],
+      {
+        queryParams: { tab }
+      }
+    );
   }
 }

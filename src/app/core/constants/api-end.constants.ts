@@ -18,6 +18,7 @@ export const API_END = {
     BASE: `${BASE_URL}songs`,
     SEARCH: `${BASE_URL}songs/search`,
     SEARCH_PUBLIC: `${BASE_URL}songs/public/search`,
+    TRENDINGS: `${BASE_URL}songs/public/trending`,
     SONG_TO_ALBUMS: `${BASE_URL}songs/albums`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,

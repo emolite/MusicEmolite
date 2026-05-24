@@ -74,6 +74,25 @@
         <p class="text-white/30 text-sm mt-2">{{ songs().length }} bài hát</p>
       </div>
 
+      <div class="flex items-center gap-3 mb-8">
+        @if(isLoggedIn()) {
+        <button (click)="setTab('recent')"
+          class="px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer" [class]="activeTab() === 'recent'
+      ? 'bg-violet-600 text-white'
+      : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'">
+
+          Gần đây
+        </button>
+      }
+        <button (click)="setTab('trending')"
+          class="px-5 py-2 rounded-full text-sm font-medium transition-all cursor-pointer" [class]="activeTab() === 'trending'
+      ? 'bg-violet-600 text-white'
+      : 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'">
+
+          Đang thịnh hành
+        </button>
+      </div>
+
       @if(isLoading()) {
       <div class="flex items-center justify-center py-20">
         <div class="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
@@ -149,6 +168,50 @@
       }
     </div>
   </div>
+  @if(showLoginMessage()) {
+    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div class="relative w-[820px] max-w-[92%] rounded-[28px]
+           bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+           p-10 shadow-2xl overflow-hidden">
+        <button (click)="showLoginMessage.set(false)"
+          class="absolute top-5 right-5 text-white/60 hover:text-white text-xl transition cursor-pointer">
+          ✕
+        </button>
+        <div class="grid grid-cols-2 gap-10 items-center">
+          <div class="flex justify-center">
+            <div class="w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl">
+              <img [src]="selectedPreviewSong()?.imgUrl || 'assets/images/default-song.jpg'" alt=""
+                class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <div class="text-white">
+            <h2 class="text-5xl font-extrabold leading-tight">
+              Đăng nhập tài khoản trên
+              <span class="text-violet-300">Song with me</span>
+            </h2>
+            <p class="mt-5 text-white/70 text-base leading-relaxed">
+              Đăng nhập để thưởng thức những bài hát yêu thích,
+              tạo playlist cá nhân và trải nghiệm âm nhạc không giới hạn
+            </p>
+            <div class="mt-8 flex flex-col gap-4">
+              <button routerLink="/auth/login" class="h-14 rounded-full bg-violet-500 hover:bg-violet-400 cursor-pointer
+                   text-white font-bold text-lg transition-all">
+                Đăng nhập ngay
+              </button>
+              <button routerLink="/auth/register" class="h-14 rounded-full border border-white/20 cursor-pointer
+                   hover:border-white/50 hover:bg-white/5
+                   text-white font-semibold transition-all">
+                Tạo tài khoản miễn phí
+              </button>
+            </div>
+            <p class="mt-6 text-sm text-white/50">
+              Khám phá âm nhạc theo cách của riêng bạn.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
   <app-pagination [currentPage]="page()" [totalPages]="totalPages()" variant="user" (pageChange)="onPageChange($event)">
   </app-pagination>
 </div>
