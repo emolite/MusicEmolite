@@ -1,0 +1,120 @@
+<nav class="w-60 h-screen bg-white border-r border-gray-200 flex flex-col shrink-0">
+    <div class="h-16 px-5 border-b border-gray-100 flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center shrink-0">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M8 4v9.09A3 3 0 1010 16V7h4V4H8z" fill="white" />
+            </svg>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="font-semibold text-gray-900 text-sm">Song with me</span>
+            <span
+                class="text-[10px] font-medium px-1.5 py-0.5 rounded bg-gray-900 text-white tracking-wide">ADMIN</span>
+        </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto py-4 px-3 flex flex-col gap-6">
+        <div>
+            <p class="text-[10px] font-semibold tracking-widest text-gray-400 uppercase px-2 mb-2">Quản lý</p>
+            <ul class="space-y-0.5">
+                <li>
+                    <a routerLink="dashboard" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <rect x="3" y="3" width="6" height="6" rx="1.5" />
+                            <rect x="11" y="3" width="6" height="6" rx="1.5" />
+                            <rect x="3" y="11" width="6" height="6" rx="1.5" />
+                            <rect x="11" y="11" width="6" height="6" rx="1.5" />
+                        </svg>
+                        Tổng quan
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="users" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <path d="M13 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path d="M3 17a7 7 0 0114 0" stroke-linecap="round" />
+                        </svg>
+                        Người dùng
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="songs" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <path d="M8 4v9.09A3 3 0 1010 16V7h4V4H8z" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Bài hát
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="albums" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <circle cx="10" cy="10" r="7" />
+                            <circle cx="10" cy="10" r="2.5" />
+                        </svg>
+                        Album
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <p class="text-[10px] font-semibold tracking-widest text-gray-400 uppercase px-2 mb-2">Hệ thống</p>
+            <ul class="space-y-0.5">
+                <li>
+                    <a routerLink="profile" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <circle cx="10" cy="7" r="3" />
+                            <path d="M4 17a6 6 0 0112 0" stroke-linecap="round" />
+                        </svg>
+                        Thông tin
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="add-music" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <path d="M8 4v9.09A3 3 0 1010 16V7h4V4H8z" stroke-linecap="round" />
+                            <path d="M14 6l2-2m0 0l2 2m-2-2v4" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Sáng tác
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="px-3 py-4 border-t border-gray-100">
+        <div class="flex items-center gap-2.5 px-2 py-2 rounded-md hover:bg-gray-50 transition-colors cursor-pointer">
+            @if(profileUri) {
+            <img [src]="profileUri" class="w-10 h-10 rounded-full object-cover border border-white/10">
+            } @else {
+            <div
+                class="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                 {{ displayName.charAt(0) || 'U' }}
+            </div>
+            }
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-800 truncate">{{displayName}}</p>
+                <p class="text-[11px] text-gray-400 truncate">{{ user()?.userType }}</p>
+            </div>
+            <button (click)="logout()"
+                class="w-7 h-7 flex items-center justify-center rounded text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                title="Đăng xuất">
+                <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" width="15" height="15">
+                    <path d="M13 4.5h2.5a1 1 0 011 1v9a1 1 0 01-1 1H13" stroke-linecap="round" />
+                    <path d="M8.5 13.5L12 10l-3.5-3.5M12 10H4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+    </div>
+</nav>

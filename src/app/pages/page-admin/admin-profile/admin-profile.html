@@ -1,0 +1,71 @@
+<div class="max-w-2xl">
+  <div class="mb-6">
+    <h1 class="text-3xl text-gray-900 font-bold">Thông tin cá nhân</h1>
+    <p class="mt-1 text-gray-400">Quản lý hồ sơ của bạn</p>
+  </div>
+
+  <div class="bg-white rounded-lg border border-gray-200">
+    <div class="px-6 py-5 border-b border-gray-100 flex items-center gap-4">
+      <div class="relative group">
+        <div class="w-14 h-14 rounded-lg overflow-hidden bg-gray-900 flex items-center justify-center text-white text-xl font-semibold shrink-0">
+          @if (previewImage()) {
+            <img [src]="previewImage()!" class="w-full h-full object-cover">
+          } @else {
+            {{ form.fullName.charAt(0) || 'A' }}
+          }
+        </div>
+        <label class="absolute inset-0 rounded-lg bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20">
+            <path d="M13 3H7L4 7v9a1 1 0 001 1h10a1 1 0 001-1V7l-3-4z" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="10" cy="12" r="2"/>
+          </svg>
+          <input type="file" accept="image/*" hidden (change)="onSelectImage($event)">
+        </label>
+      </div>
+      <div>
+        <p class="font-medium text-gray-900">{{ form.fullName || 'Chưa cập nhật' }}</p>
+        <p class="text-sm text-gray-400">{{ user?.email }}</p>
+      </div>
+    </div>
+
+    <div class="p-6 grid grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Họ và tên</label>
+        <input type="text" [(ngModel)]="form.fullName"
+          class="w-full px-3 py-2.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-800 outline-none focus:border-gray-400 focus:bg-white transition-colors">
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Số điện thoại</label>
+        <input type="text" [(ngModel)]="form.phone"
+          class="w-full px-3 py-2.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-800 outline-none focus:border-gray-400 focus:bg-white transition-colors">
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Ngày sinh</label>
+        <input type="date" [(ngModel)]="form.dateOfBirth"
+          class="w-full px-3 py-2.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-800 outline-none focus:border-gray-400 focus:bg-white transition-colors">
+      </div>
+
+      <div class="space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Giới tính</label>
+        <app-dropdown [options]="genderOptions" placeholder="Chọn giới tính" [(ngModel)]="form.gender">
+        </app-dropdown>
+      </div>
+
+      <div class="col-span-2 space-y-1.5">
+        <label class="text-xs font-medium text-gray-500">Giới thiệu</label>
+        <textarea rows="4" [(ngModel)]="form.bio"
+          class="w-full px-3 py-2.5 rounded-md bg-gray-50 border border-gray-200 text-sm text-gray-800 outline-none focus:border-gray-400 focus:bg-white transition-colors resize-none">
+        </textarea>
+      </div>
+    </div>
+
+    <div class="px-6 py-4 border-t border-gray-100 flex justify-end">
+      <button (click)="saveProfile()"
+        class="px-4 py-2 rounded-md bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium transition-colors cursor-pointer">
+        Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>

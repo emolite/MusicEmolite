@@ -56,6 +56,10 @@ export const routes: Routes = [
     {
         path: URL_END.USER.SETTING,
         loadChildren: () => import('./pages/page-user/settings/settings.routes').then(m => m.SETTINGS_ROUTES)
+    },
+    {
+        path: URL_END.ADMIN.BASE,
+        loadChildren: () => import('./pages/page-admin/admin.routes').then(m => m.ADMIN_ROUTES)
     }
 
 ];

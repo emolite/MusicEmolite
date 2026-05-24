@@ -12,6 +12,7 @@ import { AlbumResponse } from '../../../core/models/album/res-album.model';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { AlbumRequest } from '../../../core/models/album/req-album.model';
 import { BaseSearchDto } from '../../../core/models/base/base-search.model';
+import { PAGINATION } from '../../../core/constants/pagination.constants';
 
 @Component({
   selector: 'app-home',
@@ -129,7 +130,7 @@ export class HomeComponent {
   async loadSongs() {
     this.songService.searchPublicSongs({
       page: 1,
-      pageSize: 10,
+      pageSize: 14,
       asc: false,
       searchParams: { keyword: '' }
     }).subscribe(async res => {
@@ -182,7 +183,7 @@ export class HomeComponent {
   loadAlbums() {
     this.albumService.searchPublicAlbums({
       page: 1,
-      pageSize: 10,
+      pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
       asc: false,
       searchParams: { keyword: '' }
     }).subscribe(res => {

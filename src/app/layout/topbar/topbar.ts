@@ -71,10 +71,6 @@ export class TopbarComponent {
     this.router.navigate(['/auth/register']);
   }
 
-  goCreate() {
-    this.router.navigate(['/setting/add-music']);
-  }
-
   goProfile() {
     this.router.navigate(['/setting/profile']);
     this.openMenu.set(false);

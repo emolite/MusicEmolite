@@ -9,6 +9,12 @@ export const URL_END = {
     SETTING: 'setting'
   },
 
+  ADMIN: {
+    BASE: 'admin',
+    SONGS: 'songs',
+    PROFILE: 'profile'
+  },
+
   AUTH: {
     BASE: 'auth',
     LOGIN: 'login',

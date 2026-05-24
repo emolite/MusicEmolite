@@ -1,0 +1,110 @@
+<div class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
+
+  <div class="max-h-[550px] overflow-auto admin-scroll">
+    <table class="w-full border-collapse text-sm text-gray-700 table-fixed">
+      <thead class="bg-gray-50 sticky top-0 z-10">
+        <tr>
+          @for (column of columns; track trackByColumn($index, column)) {
+          <th
+            class="border-b border-gray-200 px-4 py-3 font-semibold text-gray-600 bg-gray-50"
+            [style.width]="column.width || 'auto'"
+            [class.text-left]="column.align !== 'center' && column.align !== 'right'"
+            [class.text-center]="column.align === 'center'"
+            [class.text-right]="column.align === 'right'">
+            {{ column.label }}
+          </th>
+          }
+        </tr>
+      </thead>
+
+      <tbody>
+
+        @if (loading) {
+        <tr>
+          <td [attr.colspan]="columns.length" class="py-10 text-center text-gray-500">
+            Đang tải dữ liệu...
+          </td>
+        </tr>
+        }
+
+        @else {
+
+        @if (rows.length === 0) {
+        <tr>
+          <td [attr.colspan]="columns.length" class="py-10 text-center text-gray-400">
+            {{ emptyText }}
+          </td>
+        </tr>
+        }
+
+        @else {
+
+        @for (row of rows; track row.id || $index) {
+
+        <tr (click)="onRowClick(row)"
+            class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+
+          @for (column of columns; track trackByColumn($index, column)) {
+
+          <td
+            class="px-4 py-3 truncate"
+            [class.text-left]="column.align !== 'center' && column.align !== 'right'"
+            [class.text-center]="column.align === 'center'"
+            [class.text-right]="column.align === 'right'">
+
+            @switch (column.type) {
+
+            @case ('image') {
+            <img [src]="getValue(row, column.key)"
+              class="h-11 w-11 rounded-md object-cover border border-gray-200">
+            }
+
+            @case ('status') {
+            <div class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+              [class.bg-green-100]="getValue(row, column.key)"
+              [class.text-green-700]="getValue(row, column.key)"
+              [class.bg-red-100]="!getValue(row, column.key)"
+              [class.text-red-700]="!getValue(row, column.key)">
+              {{ getValue(row, column.key) ? 'Hoạt động' : 'Ngừng hoạt động' }}
+            </div>
+            }
+
+            @case ('date') {
+            <span class="text-gray-600">
+              {{ getValue(row, column.key) | date:'dd/MM/yyyy HH:mm' }}
+            </span>
+            }
+
+            @default {
+            <span class="text-gray-700 truncate block">
+              {{ getValue(row, column.key) }}
+            </span>
+            }
+
+            }
+
+          </td>
+
+          }
+
+        </tr>
+
+        }
+
+        }
+
+        }
+
+      </tbody>
+    </table>
+
+  </div>
+
+  <app-pagination
+    [currentPage]="currentPage"
+    [totalPages]="totalPages"
+    variant="admin"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
+
+</div>

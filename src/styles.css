@@ -44,3 +44,51 @@ main::-webkit-scrollbar-thumb:hover {
 .custom-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, .5);
 }
+
+
+
+
+.admin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, .7) transparent;
+}
+
+.admin-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.admin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, .45);
+  border-radius: 6px;
+}
+
+.admin-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, .7);
+}
+
+.admin-main {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, .7) transparent;
+}
+
+.admin-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-main::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, .45);
+  border-radius: 6px;
+}
+
+.admin-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, .7);
+}

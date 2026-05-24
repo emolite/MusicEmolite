@@ -1,11 +1,12 @@
 import {
   Component, Input, Output, EventEmitter,
   OnInit, OnChanges, SimpleChanges,
-  HostListener, ElementRef, forwardRef
+  HostListener, ElementRef, forwardRef, inject, computed
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/services/auth.service';
 
 export interface DropdownOption {
   label: string;
@@ -26,7 +27,7 @@ export interface DropdownOption {
     }
   ]
 })
-export class DropdownComponent {
+export class DropdownComponent implements OnInit, OnChanges {
 
   @Input() options: DropdownOption[] = [];
   @Input() placeholder = 'Chọn một giá trị';
@@ -36,6 +37,14 @@ export class DropdownComponent {
 
   @Output() changed = new EventEmitter<DropdownOption | null>();
 
+  private authService = inject(AuthService);
+  private el = inject(ElementRef);
+
+  isAdmin = computed(() => {
+    const roleCode = this.authService.user()?.roleCode ?? '';
+    return roleCode.includes('ADMIN');
+  });
+
   isOpen = false;
   searchQuery = '';
   filteredOptions: DropdownOption[] = [];
@@ -44,8 +53,6 @@ export class DropdownComponent {
 
   private onChange = (_: any) => {};
   private onTouched = () => {};
-
-  constructor(private el: ElementRef) {}
 
   ngOnInit() {
     this.filteredOptions = [...this.options];

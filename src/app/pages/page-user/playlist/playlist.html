@@ -1,12 +1,10 @@
-<div class="playlist-page pb-28 min-h-screen bg-[#0f0d1a] text-white">
-
+<div class="playlist-page min-h-screen bg-[#0f0d1a] text-white">
   <div class="flex min-h-screen">
-
     <div class="sticky top-0 h-screen w-[280px] min-w-[280px] shrink-0 flex items-center justify-center pt-16">
       <div class="vinyl-wrapper">
         <div class="vinyl-ring" [class.spinning]="player.isPlaying()">
           <div class="vinyl-img">
-            @if(player.currentTrack()?.imgUrl) {  
+            @if(player.currentTrack()?.imgUrl) {
             <img [src]="player.currentTrack()!.imgUrl" class="w-full h-full object-cover rounded-full"
               draggable="false">
             } @else {
@@ -151,6 +149,6 @@
       }
     </div>
   </div>
+  <app-pagination [currentPage]="page()" [totalPages]="totalPages()" variant="user" (pageChange)="onPageChange($event)">
+  </app-pagination>
 </div>
-<app-pagination [currentPage]="page()" [totalPages]="totalPages()" (pageChange)="onPageChange($event)">
-</app-pagination>

@@ -3,18 +3,20 @@
     type="button"
     (click)="toggle()"
     [disabled]="disabled"
-    class="w-full px-4 py-3 rounded-xl bg-white/5 border text-white outline-none text-left flex items-center justify-between transition-colors cursor-pointer"
-    [class.border-violet-500]="isOpen"
-    [class.border-white/10]="!isOpen"
-    [class.opacity-50]="disabled"
-    [class.cursor-not-allowed]="disabled">
+    class="w-full px-4 py-3 text-left flex items-center justify-between outline-none transition-colors cursor-pointer"
+    [class]="isAdmin()
+      ? 'rounded-md bg-gray-50 border text-gray-800 text-sm ' + (isOpen ? 'border-gray-400 bg-white' : 'border-gray-200') + (disabled ? ' opacity-50 cursor-not-allowed' : '')
+      : 'rounded-xl bg-white/5 border text-white ' + (isOpen ? 'border-violet-500' : 'border-white/10') + (disabled ? ' opacity-50 cursor-not-allowed' : '')">
 
-    <span [class.text-white/40]="!selectedOption">
+    <span [class]="isAdmin()
+      ? (!selectedOption ? 'text-gray-400' : 'text-gray-800')
+      : (!selectedOption ? 'text-white/40' : 'text-white')">
       {{ selectedOption?.label || placeholder }}
     </span>
 
     <svg
-      class="w-4 h-4 text-white/40 transition-transform duration-200"
+      class="w-4 h-4 transition-transform duration-200"
+      [class]="isAdmin() ? 'text-gray-400' : 'text-white/40'"
       [class.rotate-180]="isOpen"
       fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -22,21 +24,30 @@
   </button>
 
   @if (isOpen) {
-    <div class="absolute z-50 w-full mt-2 rounded-xl bg-[#1a1825] border border-white/10 shadow-xl overflow-hidden">
+    <div class="absolute z-50 w-full mt-1 overflow-hidden shadow-lg"
+      [class]="isAdmin()
+        ? 'rounded-md bg-white border border-gray-200'
+        : 'rounded-xl bg-[#1a1825] border border-white/10 shadow-xl'">
+
       @if (searchable) {
-        <div class="p-2 border-b border-white/10">
+        <div [class]="isAdmin() ? 'p-2 border-b border-gray-100' : 'p-2 border-b border-white/10'">
           <input
             type="text"
             [(ngModel)]="searchQuery"
             (ngModelChange)="onSearch()"
             [placeholder]="searchPlaceholder"
-            class="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-violet-500 placeholder:text-white/30"
+            class="w-full px-3 py-2 text-sm outline-none transition-colors"
+            [class]="isAdmin()
+              ? 'rounded-md bg-gray-50 border border-gray-200 text-gray-800 placeholder:text-gray-400 focus:border-gray-400 focus:bg-white'
+              : 'rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:border-violet-500'"
             (click)="$event.stopPropagation()">
         </div>
       }
+
       <ul class="max-h-56 overflow-y-auto">
         @if (filteredOptions.length === 0) {
-          <li class="px-4 py-3 text-white/30 text-sm text-center">
+          <li class="px-4 py-3 text-sm text-center"
+            [class]="isAdmin() ? 'text-gray-400' : 'text-white/30'">
             Không có kết quả
           </li>
         }
@@ -44,12 +55,16 @@
         @for (option of filteredOptions; track option.value) {
           <li
             (click)="select(option)"
-            class="px-4 py-3 text-white text-sm transition-colors flex items-center justify-between"
-            [class.opacity-40]="option.disabled"
-            [class.cursor-not-allowed]="option.disabled"
-            [class.cursor-pointer]="!option.disabled"
-            [class.bg-violet-600]="option.value === value"
-            [class.hover:bg-white/5]="option.value !== value">
+            class="px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
+            [class]="isAdmin()
+              ? (option.value === value
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:bg-gray-50 cursor-pointer')
+                + (option.disabled ? ' opacity-40 cursor-not-allowed' : '')
+              : (option.value === value
+                  ? 'bg-violet-600 text-white'
+                  : 'text-white hover:bg-white/5 cursor-pointer')
+                + (option.disabled ? ' opacity-40 cursor-not-allowed' : '')">
 
             {{ option.label }}
 
@@ -63,5 +78,4 @@
       </ul>
     </div>
   }
-
 </div>
