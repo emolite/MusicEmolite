@@ -161,15 +161,53 @@ export class HomeComponent {
   }
 
   async loadSongs() {
+    if (this.isLoggedIn()) {
 
-    const recentRequest = this.songService.searchPublicSongs({
-      page: 1,
-      pageSize: 14,
-      asc: false,
-      searchParams: {
-        keyword: ''
-      }
-    });
+      this.songService.getRecentSongs({
+        page: 1,
+        pageSize: 14,
+        asc: false,
+        searchParams: {
+          keyword: ''
+        }
+      }).subscribe(async recentRes => {
+
+        const recentData = recentRes.data ?? [];
+
+        const recentQueue = await Promise.all(
+          recentData.map(async (s: SongResponse) => ({
+            id: s.id,
+            name: s.title,
+            artist: s.artistName,
+            duration: await this.getRealDuration(s.fileUrl),
+            url: s.fileUrl,
+            imgUrl: s.imgUrl || null,
+            like: s.likes ?? 0,
+            view: s.views ?? 0,
+            albumIds: s.albumIds ?? [],
+            year: s.createdAt
+              ? new Date(s.createdAt).getFullYear()
+              : ''
+          }))
+        );
+
+        this.recentQueue.set(recentQueue);
+
+        this.recentItems.set(
+          recentQueue.slice(0, 6).map((s: any) => ({
+            id: s.id,
+            name: s.name,
+            artist: s.artist,
+            duration: s.duration,
+            url: s.url,
+            imgUrl: s.imgUrl || null,
+            albumIds: s.albumIds ?? [],
+            views: s.view ?? 0,
+            color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
+          }))
+        );
+      });
+    }
 
     const trendingRequest = this.songService.getTrendingSongs({
       page: 1,
@@ -178,44 +216,6 @@ export class HomeComponent {
       searchParams: {
         keyword: ''
       }
-    });
-
-    recentRequest.subscribe(async recentRes => {
-
-      const recentData = recentRes.data ?? [];
-
-      const recentQueue = await Promise.all(
-        recentData.map(async (s: SongResponse) => ({
-          id: s.id,
-          name: s.title,
-          artist: s.artistName,
-          duration: await this.getRealDuration(s.fileUrl),
-          url: s.fileUrl,
-          imgUrl: s.imgUrl || null,
-          like: s.likes ?? 0,
-          view: s.views ?? 0,
-          albumIds: s.albumIds ?? [],
-          year: s.createdAt
-            ? new Date(s.createdAt).getFullYear()
-            : ''
-        }))
-      );
-
-      this.recentQueue.set(recentQueue);
-
-      this.recentItems.set(
-        recentQueue.slice(0, 6).map((s: any) => ({
-          id: s.id,
-          name: s.name,
-          artist: s.artist,
-          duration: s.duration,
-          url: s.url,
-          imgUrl: s.imgUrl || null,
-          albumIds: s.albumIds ?? [],
-          views: s.view ?? 0,
-          color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
-        }))
-      );
     });
 
     trendingRequest.subscribe(async trendingRes => {

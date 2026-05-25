@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { PlayerService } from '../../../core/services/player.service';
 import { SongService } from '../../../core/services/song.service';
 import { SongResponse } from '../../../core/models/song/res-song.model';
-import { PAGINATION } from '../../../core/constants/pagination.constants';
+import { PAGINATION, PAGINATION_USER } from '../../../core/constants/pagination.constants';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
@@ -68,7 +68,7 @@ export class PlaylistComponent {
 
     const request = {
       page: this.page(),
-      pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+      pageSize: PAGINATION_USER.DEFAULT_PAGE_SIZE,
       asc: false,
       searchParams: {
         keyword: ''
@@ -78,7 +78,7 @@ export class PlaylistComponent {
     const api$ =
       this.activeTab() === 'trending'
         ? this.songService.getTrendingSongs(request)
-        : this.songService.searchPublicSongs(request);
+        : this.songService.getRecentSongs(request);
 
     api$.subscribe(res => {
 

@@ -23,7 +23,7 @@ export class App {
         this.authService.user.set(res.data);
       },
       error: () => {
-        sessionStorage.removeItem('token');
+        localStorage.removeItem('token');
         this.authService.user.set(null);
       }
     });

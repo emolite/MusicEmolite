@@ -1,6 +1,16 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  inject,
+  signal,
+  OnDestroy,
+  OnInit
+} from '@angular/core';
+
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
 import {
   LucideAngularModule,
   User,
@@ -8,19 +18,38 @@ import {
   ChevronDown,
   Settings
 } from 'lucide-angular';
+
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  of
+} from 'rxjs';
+
+import { AuthService } from '../../core/services/auth.service';
 import { PlayerService } from '../../core/services/player.service';
+import { SongService } from '../../core/services/song.service';
+
+import { SongResponse } from '../../core/models/song/res-song.model';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
   templateUrl: './topbar.html',
-  imports: [RouterLink, LucideAngularModule]
+  imports: [
+    RouterLink,
+    LucideAngularModule,
+    CommonModule,
+    FormsModule
+  ]
 })
-export class TopbarComponent {
+export class TopbarComponent implements OnDestroy, OnInit {
 
   private router = inject(Router);
   public authService = inject(AuthService);
-  private player = inject(PlayerService)
+  private player = inject(PlayerService);
+  private songService = inject(SongService);
 
   readonly UserIcon = User;
   readonly LogoutIcon = LogOut;
@@ -29,42 +58,170 @@ export class TopbarComponent {
 
   openMenu = signal(false);
 
+  searchQuery = signal('');
+  suggestions = signal<SongResponse[]>([]);
+
+  showDropdown = signal(false);
+  isSearching = signal(false);
+
+  private searchSubject = new Subject<string>();
+
+  private sub = this.searchSubject.pipe(
+
+    debounceTime(300),
+
+    distinctUntilChanged(),
+
+    switchMap(keyword => {
+
+      const kw = keyword.trim();
+
+      if (!kw) {
+
+        this.suggestions.set([]);
+        this.showDropdown.set(false);
+        this.isSearching.set(false);
+
+        return of(null);
+      }
+
+      this.isSearching.set(true);
+
+      return this.songService.searchPublicSongs({
+        page: 1,
+        pageSize: 5,
+        searchParams: {
+          keyword: kw
+        }
+      });
+    })
+
+  ).subscribe(res => {
+
+    this.isSearching.set(false);
+
+    if (!res) return;
+
+    const items = res.data ?? [];
+
+    this.suggestions.set(items);
+
+    this.showDropdown.set(items.length > 0);
+  });
+
+  ngOnInit() {
+    this.loadProfile();
+  }
+
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
+
+  onSearchInput(event: Event) {
+
+    const val = (event.target as HTMLInputElement).value;
+
+    this.searchQuery.set(val);
+
+    this.searchSubject.next(val);
+  }
+
+  onSearchKeydown(event: KeyboardEvent) {
+
+    if (event.key === 'Enter') {
+
+      const kw = this.searchQuery().trim();
+
+      if (kw) {
+        this.goToPlaylistWithKeyword(kw);
+      }
+    }
+
+    if (event.key === 'Escape') {
+      this.closeSearch();
+    }
+  }
+
+  selectSuggestion(item: SongResponse) {
+
+  this.showDropdown.set(false);
+
+  this.router.navigate(
+    ['/users/discover'],
+    {
+      queryParams: {
+        keyword: this.searchQuery(),
+        highlightId: item.id        
+      }
+    }
+  );
+}
+
+  goToPlaylistWithKeyword(keyword: string) {
+
+    this.showDropdown.set(false);
+
+    this.router.navigate(
+      ['/users/discover'],
+      {
+        queryParams: {
+          keyword
+        }
+      }
+    );
+  }
+
+  closeSearch() {
+    this.showDropdown.set(false);
+  }
+
   get displayName(): string {
+
     const user = this.authService.user();
-    return user?.profile?.fullName || user?.username || '';
+
+    return (
+      user?.profile?.fullName ||
+      user?.username ||
+      ''
+    );
   }
 
   get profileUri(): string | null {
     return this.authService.user()?.profile?.uri ?? null;
   }
-  ngOnInit() {
-    this.loadProfile();
-  }
 
   loadProfile() {
+
     if (!this.authService.user()) return;
 
-    this.authService.getCurrentUser()
-      .subscribe(res => {
-        const uri = res.data?.profile?.uri ?? null;
-        const current = this.authService.user();
-        if (!current?.profile) return;
-        this.authService.user.set({
-          ...current,
-          profile: {
-            ...current?.profile,
-            uri
-          }
-        });
+    this.authService.getCurrentUser().subscribe(res => {
+
+      const uri = res.data?.profile?.uri ?? null;
+
+      const current = this.authService.user();
+
+      if (!current?.profile) return;
+
+      this.authService.user.set({
+        ...current,
+        profile: {
+          ...current.profile,
+          uri
+        }
       });
+    });
   }
+
   toggleMenu() {
     this.openMenu.update(v => !v);
   }
 
   @HostListener('document:click')
-  closeMenu() {
+  onDocumentClick() {
+
     this.openMenu.set(false);
+
+    this.showDropdown.set(false);
   }
 
   goRegister() {
@@ -72,13 +229,15 @@ export class TopbarComponent {
   }
 
   goProfile() {
+
     this.router.navigate(['/setting/profile']);
+
     this.openMenu.set(false);
   }
 
   logout() {
-    sessionStorage.removeItem('token');
-    sessionStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    localStorage.removeItem('currentUser');
     this.player.stop();
     this.authService.user.set(null);
     this.router.navigate(['/auth/login']);

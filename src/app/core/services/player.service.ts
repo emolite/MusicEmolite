@@ -10,6 +10,10 @@ export class PlayerService {
   private currentIndex = -1;
   private isDraggingVolume = false;
   private volumeBarRef: HTMLElement | null = null;
+  private hasAddedHistory = false;
+  private hasIncrementedView = false;
+  private listenedSeconds = 0;
+  private lastTime = 0;
 
   currentTrack = signal<any>(null);
   isPlaying = signal(false);
@@ -94,15 +98,37 @@ export class PlayerService {
   }
 
   private startTrack(track: any) {
+
+    this.hasAddedHistory = false;
+    this.hasIncrementedView = false;
+
+    this.listenedSeconds = 0;
+    this.lastTime = 0;
+
     this.songService.getSongDetail(track.id).subscribe(res => {
+
       const detail = res.data;
-      this.currentTrack.set({ ...track, isLiked: detail?.isLiked, imgUrl: detail?.imgUrl, releaseDate: detail?.releaseDate, syncedLyrics: detail?.syncedLyrics ?? [], });
+
+      this.currentTrack.set({
+        ...track,
+        isLiked: detail?.isLiked,
+        imgUrl: detail?.imgUrl,
+        releaseDate: detail?.releaseDate,
+        syncedLyrics: detail?.syncedLyrics ?? [],
+      });
       this.isLiked.set(detail?.isLiked ?? false);
       this.audio.src = track.url;
       this.audio.load();
       this.audio.play();
       this.isPlaying.set(true);
-      this.songService.incrementView(track.id).subscribe();
+      if (!this.hasAddedHistory) {
+
+        this.hasAddedHistory = true;
+
+        this.songService
+          .addSongHistory(track.id)
+          .subscribe();
+      }
     });
   }
 
@@ -161,12 +187,49 @@ export class PlayerService {
 
   private initAudioEvents() {
     this.audio.ontimeupdate = () => {
+
       this.zone.run(() => {
-        const t = this.audio.currentTime;
-        this.currentTimeRaw.set(t);
-        this.currentTime.set(this.formatTime(t));
+
+        const current = this.audio.currentTime;
+
+        const delta = current - this.lastTime;
+        if (delta > 0 && delta < 2) {
+          this.listenedSeconds += delta;
+        }
+
+        this.lastTime = current;
+
+        this.currentTimeRaw.set(current);
+
+        this.currentTime.set(
+          this.formatTime(current)
+        );
+
         if (this.audio.duration) {
-          this.progressPercent.set((t / this.audio.duration) * 100);
+
+          this.progressPercent.set(
+            (current / this.audio.duration) * 100
+          );
+
+          const listenedPercent =
+            (this.listenedSeconds / this.audio.duration) * 100;
+
+          if (
+            !this.hasIncrementedView &&
+            listenedPercent >= 70
+          ) {
+
+            this.hasIncrementedView = true;
+
+            const currentTrack = this.currentTrack();
+
+            if (currentTrack?.id) {
+
+              this.songService
+                .incrementView(currentTrack.id)
+                .subscribe();
+            }
+          }
         }
       });
     };

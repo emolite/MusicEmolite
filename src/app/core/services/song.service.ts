@@ -41,9 +41,16 @@ export class SongService {
     );
   }
 
-  getTrendingSongs(data: BaseSearchDto<SongRequest>) : Observable<BaseTableResponse<SongResponse>> {
+  getTrendingSongs(data: BaseSearchDto<SongRequest>): Observable<BaseTableResponse<SongResponse>> {
     return this.api.postData(
       API_END.SONG.TRENDINGS,
+      data
+    );
+  }
+
+  getRecentSongs(data: BaseSearchDto<SongRequest>): Observable<BaseTableResponse<SongResponse>> {
+    return this.api.postData<BaseTableResponse<SongResponse>, BaseSearchDto<SongRequest>>(
+      API_END.SONG.RECENTS,
       data
     );
   }
@@ -88,6 +95,16 @@ export class SongService {
 
   incrementView(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.VIEW(id), {});
+  }
+
+  addSongHistory(id: number): Observable<BaseResponse<string>> {
+    return this.api.postData<
+      BaseResponse<string>,
+      {}
+    >(
+      API_END.SONG.HISTORY(id),
+      {}
+    );
   }
 
   toggleLike(id: number): Observable<BaseResponse<SongResponse>> {
