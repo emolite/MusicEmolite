@@ -50,6 +50,7 @@
                         Bài hát
                     </a>
                 </li>
+
                 <li>
                     <a routerLink="albums" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
                         class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
@@ -89,6 +90,17 @@
                         Sáng tác
                     </a>
                 </li>
+                <li>
+                    <a routerLink="publish-lyrics" routerLinkActive="bg-gray-100 text-gray-900 font-medium"
+                        class="flex items-center gap-2.5 px-2 py-2 rounded-md text-sm text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                            stroke-width="1.7">
+                            <path d="M8 4v9.09A3 3 0 1010 16V7h4V4H8z" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M14 4v4m-2-2h4" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        Publish Lyrics
+                    </a>
+                </li>
             </ul>
         </div>
     </div>
@@ -100,7 +112,7 @@
             } @else {
             <div
                 class="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center text-white text-xs font-semibold shrink-0">
-                 {{ displayName.charAt(0) || 'U' }}
+                {{ displayName.charAt(0) || 'U' }}
             </div>
             }
             <div class="flex-1 min-w-0">

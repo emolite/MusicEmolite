@@ -8,7 +8,7 @@ import { SongCreateRequest, SongRequest } from "../models/song/req-song.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
 import { BaseResponse } from "../models/base/base-res.model";
 import { LyricsResponseDto } from "../models/song/res-lyrics.model";
-import { LyricsRequestDto, LyricsSearchRequestDto } from "../models/song/req-lyrics.model";
+import { LyricsRequestDto, LyricsSearchRequestDto, PublishLyricsRequest } from "../models/song/req-lyrics.model";
 
 @Injectable({
   providedIn: 'root'
@@ -137,6 +137,18 @@ export class SongService {
       BaseResponse<LyricsResponseDto>
     >(
       API_END.SONG.LYRICS_BY_ID(id)
+    );
+  }
+
+  publishLyrics(data: PublishLyricsRequest)
+    : Observable<BaseResponse<string>> {
+
+    return this.api.postData<
+      BaseResponse<string>,
+      PublishLyricsRequest
+    >(
+      API_END.SONG.LYRICS_PUBLISH,
+      data
     );
   }
 }

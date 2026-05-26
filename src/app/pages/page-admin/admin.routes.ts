@@ -3,6 +3,7 @@ import { AdminLayoutComponent } from '../../layout/layout-admin/layout-admin';
 import { AdminProfileComponent } from './admin-profile/admin-profile';
 import { AdminAddMusicComponent } from './add-music/add-music';
 import { Songs } from './songs/song';
+import { PublishLyricsComponent } from './publish-lyrics/publish-lyrics';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -23,6 +24,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'add-music',
         component: AdminAddMusicComponent,
         data: { title: 'Sáng tác' }
+      },
+      {
+        path: 'publish-lyrics',
+        component: PublishLyricsComponent,
+        data: { title: 'Publish Lyrics'}
       },
       {
         path: '',
