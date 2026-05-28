@@ -4,4 +4,5 @@ export interface TableColumn {
   width?: string;
   align?: 'left' | 'center' | 'right';
   type?: 'text' | 'image' | 'date' | 'status' | 'custom';
+  sortable?: boolean;
 }

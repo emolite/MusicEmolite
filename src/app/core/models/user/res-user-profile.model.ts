@@ -17,3 +17,23 @@ export interface ResUserProfile {
   updatedAt: string;
   updatedBy: number;
 }
+
+export interface ResUsers {
+    id: number;
+    refCode?: string;
+    username?: string;
+    email?: string;
+    roleCode?: string;
+    fullName?: string;
+    phone?: string;
+    dateOfBirth?: string;
+    gender?: string;
+    bio?: string;
+    uri?: string;
+    isActived: boolean;
+    isDeleted: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+    createdBy?: number;
+    updatedBy?: number;
+}

@@ -3,9 +3,12 @@ import { SongType } from "../../enums/song-type.enums";
 export interface SongRequest {
   keyword?: string;
   albumId?: number;
+  type?: number;
+  isActived?: boolean;
+  sortBy?: string;
 }
 
-export interface SongCreateRequest{
+export interface SongCreateRequest {
   title: string;
   releaseDate: string;
   albumId: number;

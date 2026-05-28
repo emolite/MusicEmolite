@@ -22,7 +22,11 @@ export class AppTableComponent {
   @Input() currentPage = 1;
   @Input() totalPages = 1;
   @Input() loading = false;
+  @Input() sortBy = '';
+  @Input() asc = false;
   @Input() emptyText = 'Không có dữ liệu';
+
+  @Output() sortChange = new EventEmitter<string>();
   @Output() rowClick = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<number>();
 
@@ -40,5 +44,12 @@ export class AppTableComponent {
 
   onPageChange(page: number) {
     this.pageChange.emit(page);
+  }
+
+  onSort(column: TableColumn) {
+    if (!column.sortable) {
+      return;
+    }
+    this.sortChange.emit(column.key);
   }
 }

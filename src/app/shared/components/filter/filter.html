@@ -1,0 +1,49 @@
+<div class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+
+    <form [formGroup]="form" class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+
+        @for(field of fields; track field.key) {
+
+        <div>
+
+            <label class="mb-2 block text-sm font-medium text-gray-700">
+                {{ field.label }}
+            </label>
+
+            @switch (field.type) {
+
+            @case ('text') {
+
+            <input type="text" [formControlName]="field.key" [placeholder]="field.placeholder || ''"
+                class="w-full rounded-md border border-gray-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-400" />
+
+            }
+
+            @case ('select') {
+
+            <app-dropdown [options]="field.options || []" [placeholder]="field.placeholder || 'Chọn'"
+                [value]="form.get(field.key)?.value" (changed)="onDropdownChange(field.key, $event?.value)">
+            </app-dropdown>
+
+            }
+
+            }
+
+        </div>
+
+        }
+
+        <div class="flex items-end">
+
+            <button type="button" (click)="onReset()"
+                class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50">
+
+                Đặt lại
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>

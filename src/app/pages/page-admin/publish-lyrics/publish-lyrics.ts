@@ -53,7 +53,7 @@ export class PublishLyricsComponent {
   form = {
     trackName: '',
     artistName: '',
-    albumName: '',
+    albumName: 'EMOLITE_MUSIC',
     duration: 0,
     plainLyrics: '',
     syncedLyrics: ''

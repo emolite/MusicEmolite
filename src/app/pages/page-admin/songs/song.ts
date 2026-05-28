@@ -6,13 +6,17 @@ import { TableColumn } from '../../../core/models/front-end/table/table-column.m
 import { SongService } from '../../../core/services/song.service';
 import { SongResponse } from '../../../core/models/song/res-song.model';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
+import { FilterComponent } from '../../../shared/components/filter/filter';
+import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
+import { SongRequest } from '../../../core/models/song/req-song.model';
 
 @Component({
     selector: 'app-songs',
     standalone: true,
     imports: [
         CommonModule,
-        AppTableComponent
+        AppTableComponent,
+        FilterComponent
     ],
     templateUrl: './songs.html'
 })
@@ -21,10 +25,40 @@ export class Songs {
     private songService = inject(SongService);
 
     loading = signal(false);
+    sortBy = signal('createdAt');
 
+    asc = signal(false);
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    filter = signal<SongRequest>({
+        keyword: ''
+    });
+
+    filterFields: FilterField[] = [
+        {
+            key: 'keyword',
+            label: 'Từ khóa',
+            type: 'text',
+            placeholder: 'Nhập tên bài hát...'
+        },
+
+        {
+            key: 'isActived',
+            label: 'Trạng thái',
+            type: 'select',
+            options: [
+                {
+                    label: 'Hoạt động',
+                    value: 'true'
+                },
+                {
+                    label: 'Không hoạt động',
+                    value: 'false'
+                }
+            ]
+        }
+    ];
 
     columns: TableColumn[] = [
         {
@@ -51,12 +85,14 @@ export class Songs {
         {
             key: 'views',
             label: 'Lượt xem',
-            align: 'center'
+            align: 'center',
+            sortable: true
         },
         {
             key: 'likes',
             label: 'Lượt thích',
-            align: 'center'
+            align: 'center',
+            sortable: true
         },
         {
             key: 'typeSong',
@@ -72,7 +108,8 @@ export class Songs {
         {
             key: 'createdAt',
             label: 'Ngày tạo',
-            type: 'date'
+            type: 'date',
+            sortable: true
         }
     ];
 
@@ -87,9 +124,10 @@ export class Songs {
         this.songService.searchPublicSongs({
             page: this.currentPage(),
             pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
-            asc: false,
+            asc: this.asc(),
             searchParams: {
-                keyword: ''
+                ...this.filter(),
+                sortBy: this.sortBy()
             }
         })
             .subscribe({
@@ -117,6 +155,21 @@ export class Songs {
             });
     }
 
+    onFilterChange(data: any) {
+
+        this.currentPage.set(1);
+
+        this.filter.set({
+            ...data,
+
+            isActived:
+                data.isActived === ''
+                    ? undefined
+                    : data.isActived === 'true'
+        });
+
+        this.loadSongs();
+    }
     onPageChange(page: number) {
         this.currentPage.set(page);
         this.loadSongs();
@@ -124,5 +177,21 @@ export class Songs {
 
     onRowClick(row: any) {
         console.log(row);
+    }
+
+    onSort(column: string) {
+
+        if (this.sortBy() === column) {
+
+            this.asc.set(!this.asc());
+        }
+        else {
+
+            this.sortBy.set(column);
+
+            this.asc.set(false);
+        }
+
+        this.loadSongs();
     }
 }

@@ -4,6 +4,7 @@ import { AdminProfileComponent } from './admin-profile/admin-profile';
 import { AdminAddMusicComponent } from './add-music/add-music';
 import { Songs } from './songs/song';
 import { PublishLyricsComponent } from './publish-lyrics/publish-lyrics';
+import { UsersComponent } from './users/users';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -19,6 +20,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'profile',
         component: AdminProfileComponent,
         data: { title: 'Thông tin' }
+      },
+      {
+        path: 'users',
+        component: UsersComponent,
+        data: { title: 'Người dùng' }
       },
       {
         path: 'add-music',
