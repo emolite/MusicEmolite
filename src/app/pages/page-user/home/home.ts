@@ -24,7 +24,7 @@ import { PAGINATION } from '../../../core/constants/pagination.constants';
 export class HomeComponent {
   private songService = inject(SongService);
   private albumService = inject(AlbumService);
-  private player = inject(PlayerService);
+  public player = inject(PlayerService);
   private router = inject(Router);
   private authService = inject(AuthService);
 
@@ -48,7 +48,9 @@ export class HomeComponent {
 
   selectedPreviewSong = signal<any>(null);
   showLoginMessage = signal(false);
-
+  currentTrackId = computed(() =>
+    this.player.currentTrack()?.id
+  );
   isLoggedIn = computed(() => !!this.authService.user());
 
   private albumSearch$ = new Subject<string>();

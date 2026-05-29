@@ -15,6 +15,7 @@ export interface ReqUsers
 
 export interface ReqUsersFilter {
     refCode?: string;
+    keyword?: string;
     username?: string;
     email?: string;
     role?: string;

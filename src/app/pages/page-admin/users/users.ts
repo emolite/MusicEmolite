@@ -52,32 +52,13 @@ export class UsersComponent {
     );
 
     filter = signal<ReqUsersFilter>({
-        username: '',
+        keyword: '',
         isActived: true
     });
 
     filterFields: FilterField[] = [
 
-        {
-            key: 'username',
-            label: 'Tên tài khoản',
-            type: 'text',
-            placeholder: 'Nhập username...'
-        },
-
-        {
-            key: 'email',
-            label: 'Email',
-            type: 'text',
-            placeholder: 'Nhập email...'
-        },
-
-        {
-            key: 'fullName',
-            label: 'Họ tên',
-            type: 'text',
-            placeholder: 'Nhập họ tên...'
-        },
+        { key: 'keyword', label: 'Tìm kiếm', type: 'text', placeholder: 'Tìm kiếm...' },
 
         {
             key: 'isActived',

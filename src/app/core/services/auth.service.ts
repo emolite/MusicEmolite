@@ -70,4 +70,15 @@ export class AuthService {
     );
   }
 
+  checkEmail(email: string) {
+    return this.api.getData<BaseResponse<boolean>>(
+      `${API_END.AUTH.CHECK_EMAIL}?email=${email}`
+    );
+  }
+
+  checkIp(ipAddress: string) {
+    return this.api.getData<BaseResponse<boolean>>(
+      `${API_END.AUTH.CHECK_IP}?ipAddress=${ipAddress}`
+    );
+  }
 }

@@ -6,6 +6,8 @@ export const API_END = {
   AUTH: {
     LOGIN: `${BASE_URL}auth/login`,
     REGISTER: `${BASE_URL}auth/register`,
+    CHECK_EMAIL: `${BASE_URL}auth/check-email`,
+    CHECK_IP: `${BASE_URL}auth/check-ip`,
     CURRENT_USER: `${BASE_URL}auth/current-user`
   },
 

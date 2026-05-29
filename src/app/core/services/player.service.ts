@@ -91,6 +91,11 @@ export class PlayerService {
   }
 
   playSong(id: number) {
+    const current = this.currentTrack();
+    if (current?.id === id) {
+      this.togglePlay();
+      return;
+    }
     const index = this.queue.findIndex(x => x.id === id);
     if (index === -1) return;
     this.currentIndex = index;

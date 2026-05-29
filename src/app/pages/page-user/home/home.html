@@ -110,12 +110,31 @@
               </div>
               }
             </div>
-            <button
-              class="absolute bottom-2 right-2 w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 opacity-0 group-hover:opacity-100 translate-y-1 group-hover:translate-y-0 transition-all duration-200">
+            <div
+              class="absolute bottom-2 right-2 w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 transition-all duration-200"
+              [class.opacity-0]="track.id !== currentTrackId()"
+              [class.group-hover:opacity-100]="track.id !== currentTrackId()"
+              [class.translate-y-1]="track.id !== currentTrackId()"
+              [class.group-hover:translate-y-0]="track.id !== currentTrackId()">
+
+              @if(track.id === currentTrackId() && player.isPlaying()) {
+
+              <div class="bars-anim scale-75">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              } @else {
+
               <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+
                 <path d="M8 5v14l11-7z" />
               </svg>
-            </button>
+
+              }
+
+            </div>
             <span class="absolute top-2 left-2 text-2xl font-black text-white/10 leading-none">#{{ i + 1 }}</span>
           </div>
           <p class="text-sm font-semibold text-white truncate mb-0.5">{{ track.name }}</p>
