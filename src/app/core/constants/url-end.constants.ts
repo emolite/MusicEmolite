@@ -19,6 +19,7 @@ export const URL_END = {
   AUTH: {
     BASE: 'auth',
     LOGIN: 'login',
-    REGISTER: 'register'
+    REGISTER: 'register',
+    WELCOME: 'welcome'
   }
 };

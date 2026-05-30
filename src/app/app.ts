@@ -16,7 +16,7 @@ export class App {
   protected readonly title = signal('MusicEmolite');
 
   ngOnInit(): void {
-    const token = sessionStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token) return;
     this.authService.getCurrentUser().subscribe({
       next: (res: any) => {

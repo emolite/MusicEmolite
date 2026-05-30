@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { API_SERVICE } from './commons/api.service';
 import { API_END } from '../constants/api-end.constants';
 import { LoginRequest } from '../models/auth/req-login.model';
@@ -69,6 +69,13 @@ export class AuthService {
       })
     );
   }
+  
+  completeProfile(payload: any) {
+    return this.api.postData<BaseResponse<boolean>, any>(
+      API_END.AUTH.COMPLETE_PROFILE,
+      payload
+    );
+  }
 
   checkEmail(email: string) {
     return this.api.getData<BaseResponse<boolean>>(
@@ -80,5 +87,48 @@ export class AuthService {
     return this.api.getData<BaseResponse<boolean>>(
       `${API_END.AUTH.CHECK_IP}?ipAddress=${ipAddress}`
     );
+  }
+
+  loginWithGoogle(): Observable<any> {
+    this.loading.set(true);
+    this.error.set(null);
+
+    return new Observable(observer => {
+      const google = (window as any).google;
+
+      if (!google) {
+        this.loading.set(false);
+        observer.error('Google SDK chưa load');
+        return;
+      }
+
+      google.accounts.id.initialize({
+        client_id: '721913068181-vthg768rcefrt046vlhnad1t4gqq1uk0.apps.googleusercontent.com',
+        callback: (response: any) => {
+          const idToken = response.credential;
+
+          if (!idToken) {
+            this.loading.set(false);
+            observer.error('Không lấy được token từ Google');
+            return;
+          }
+
+          this.api.postData<BaseResponse<LoginResponse>, { idToken: string }>(
+            API_END.AUTH.LOGIN_WITH_GG,
+            { idToken }
+          ).pipe(
+            tap({
+              next: () => this.loading.set(false),
+              error: (err) => {
+                this.error.set(err?.error?.message || 'Google login failed');
+                this.loading.set(false);
+              }
+            })
+          ).subscribe(observer);
+        }
+      });
+
+      google.accounts.id.prompt();
+    });
   }
 }

@@ -11,6 +11,7 @@ import { AlbumComponent } from './pages/page-user/album/album';
 import { PlayerBarDetailComponent } from './pages/page-user/player-bar/player-bar-detail/player-bar-detail';
 import { PlaylistComponent } from './pages/page-user/playlist/playlist';
 import { AlbumDetailComponent } from './pages/page-user/album/album-detail/album-detail';
+import { WelcomeComponent } from './pages/page-login/welcome/welcome';
 
 export const routes: Routes = [
     {
@@ -29,6 +30,10 @@ export const routes: Routes = [
             {
                 path: URL_END.AUTH.REGISTER,
                 component: RegisterComponent
+            },
+            {
+                path: URL_END.AUTH.WELCOME,
+                component: WelcomeComponent
             }
         ]
     },

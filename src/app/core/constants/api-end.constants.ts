@@ -5,6 +5,8 @@ const BASE_URL = ENVI.apiUrl;
 export const API_END = {
   AUTH: {
     LOGIN: `${BASE_URL}auth/login`,
+    LOGIN_WITH_GG: `${BASE_URL}auth/login-google`,
+    COMPLETE_PROFILE: `${BASE_URL}auth/complete-profile`,
     REGISTER: `${BASE_URL}auth/register`,
     CHECK_EMAIL: `${BASE_URL}auth/check-email`,
     CHECK_IP: `${BASE_URL}auth/check-ip`,
