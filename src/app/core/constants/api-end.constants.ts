@@ -15,7 +15,10 @@ export const API_END = {
 
   USER: {
     BASE: `${BASE_URL}users`,
-    PROFILE: `${BASE_URL}users/profile`
+    PROFILE: `${BASE_URL}users/profile`,
+    BANK_USER: `${BASE_URL}users/bank-user`,
+    BANK_USER_ADD: `${BASE_URL}users/bank-user/add`,
+    BANK_USER_EDIT: (id: number) => `${BASE_URL}users/${id}/bank-user`,
   },
 
   SONG: {
@@ -45,5 +48,14 @@ export const API_END = {
     BASE: `${BASE_URL}artists`,
     SEARCH: `${BASE_URL}artists/search`,
     EDIT: (id: number) => `${BASE_URL}artists/${id}`,
+  },
+
+  BANK: {
+    LIST: `${BASE_URL}bank`
+  },
+
+  DASHBOARD: {
+    SUMMARY: `${BASE_URL}dashboard/summary`,
+    TREND: `${BASE_URL}dashboard/trend`,
   }
 };

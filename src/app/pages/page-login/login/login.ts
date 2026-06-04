@@ -57,7 +57,7 @@ export class LoginComponent {
                         this.authService.user.set(user ?? null);
                         const roleCode = user?.roleCode ?? '';
                         if (roleCode.includes('ADMIN')) {
-                            this.router.navigate(['/admin/profile']);
+                            this.router.navigate(['/admin/dashboard']);
                             return;
                         }
 

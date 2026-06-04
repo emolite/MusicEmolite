@@ -1,0 +1,34 @@
+<div class="p-1">
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl text-gray-900 font-bold">
+                Quản lý album
+            </h1>
+
+            <p class="mt-1 text-gray-400">
+                Danh sách tất cả album trong hệ thống
+            </p>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <app-filter
+            [fields]="filterFields"
+            [initialValues]="filter()"
+            (filterChange)="onFilterChange($event)">
+        </app-filter>
+    </div>
+
+    <app-table
+        [columns]="columns"
+        [rows]="rows()"
+        [loading]="loading()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        [sortBy]="sortBy()"
+        [asc]="asc()"
+        (sortChange)="onSort($event)"
+        (rowClick)="onRowClick($event)"
+        (pageChange)="onPageChange($event)">
+    </app-table>
+</div>
