@@ -26,6 +26,7 @@ export const API_END = {
     SEARCH: `${BASE_URL}songs/search`,
     SEARCH_PUBLIC: `${BASE_URL}songs/public/search`,
     TRENDINGS: `${BASE_URL}songs/public/trending`,
+    NEWEST: `${BASE_URL}songs/public/newest`,
     RECENTS: `${BASE_URL}songs/recent`,
     SONG_TO_ALBUMS: `${BASE_URL}songs/albums`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,

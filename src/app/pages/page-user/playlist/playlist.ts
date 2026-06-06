@@ -20,7 +20,7 @@ export class PlaylistComponent {
   private route = inject(ActivatedRoute);
   private authService = inject(AuthService);
   player = inject(PlayerService);
-  activeTab = signal<'recent' | 'trending'>('recent');
+  activeTab = signal<'recent' | 'trending' | 'newest'>('recent');
   songs = signal<any[]>([]);
   isLoading = signal(true);
   page = signal(PAGINATION.DEFAULT_PAGE);
@@ -31,24 +31,31 @@ export class PlaylistComponent {
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
-
       const tab = params['tab'];
-
       if (!this.isLoggedIn()) {
-        this.activeTab.set('trending');
-      }
-      else if (tab === 'trending') {
-        this.activeTab.set('trending');
+        if (tab === 'newest') {
+          this.activeTab.set('newest');
+        }
+        else {
+          this.activeTab.set('trending');
+        }
       }
       else {
-        this.activeTab.set('recent');
+        if (tab === 'trending') {
+          this.activeTab.set('trending');
+        }
+        else if (tab === 'newest') {
+          this.activeTab.set('newest');
+        }
+        else {
+          this.activeTab.set('recent');
+        }
       }
-
       this.loadSongs();
     });
   }
 
-  setTab(tab: 'recent' | 'trending') {
+  setTab(tab: 'recent' | 'trending' | 'newest') {
     if (this.activeTab() === tab) return;
     this.activeTab.set(tab);
     this.page.set(1);
@@ -56,7 +63,6 @@ export class PlaylistComponent {
   }
 
   private loadSongs() {
-
     if (!this.isLoggedIn() && this.activeTab() === 'recent') {
       this.songs.set([]);
       this.totalPages.set(0);
@@ -75,14 +81,24 @@ export class PlaylistComponent {
       }
     };
 
-    const api$ =
-      this.activeTab() === 'trending'
-        ? this.songService.getTrendingSongs(request)
-        : this.songService.getRecentSongs(request);
+    let api$;
+
+    switch (this.activeTab()) {
+      case 'trending':
+        api$ = this.songService.getTrendingSongs(request);
+        break;
+      case 'newest':
+        api$ = this.songService.getNewestSongs(request);
+        break;
+      default:
+        api$ = this.songService.getRecentSongs(request);
+        break;
+    }
 
     api$.subscribe(res => {
 
       const data = res.data ?? [];
+
       const total = res.totalPages ?? 0;
 
       this.totalPages.set(total);

@@ -55,6 +55,16 @@ export class SongService {
     );
   }
 
+  getNewestSongs(data: BaseSearchDto<SongRequest>): Observable<BaseTableResponse<SongResponse>> {
+    return this.api.postData<
+      BaseTableResponse<SongResponse>,
+      BaseSearchDto<SongRequest>
+    >(
+      API_END.SONG.NEWEST,
+      data
+    );
+  }
+
   createSong(data: SongCreateRequest): Observable<BaseResponse<SongResponse>> {
     const formData = new FormData();
 
