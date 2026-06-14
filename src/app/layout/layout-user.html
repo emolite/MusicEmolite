@@ -1,10 +1,10 @@
 <div class="h-screen overflow-hidden bg-[#0f0d1a] text-white">
   <app-sidebar></app-sidebar>
 
-  <div class="ml-64 h-full flex flex-col">
-    <app-topbar></app-topbar>
+  <div class="h-full flex flex-col md:ml-64">
+    <app-topbar class=""></app-topbar>
 
-    <main class="flex-1 overflow-y-auto app-content">
+    <main class="flex-1 overflow-y-auto app-content pb-32 md:pb-24">
       <router-outlet></router-outlet>
     </main>
   </div>

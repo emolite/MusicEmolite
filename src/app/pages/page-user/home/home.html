@@ -1,30 +1,40 @@
-<div class="pb-28 min-h-screen overflow-y-auto bg-[#0f0d1a] text-white font-sans">
-  <div class="px-8 py-8">
+<div class="min-h-screen overflow-y-auto bg-[#0f0d1a] text-white font-sans">
+  <div class="px-4 md:px-8 py-5 md:py-8">
     @if (featuredSong(); as song) {
-    <section class="relative rounded-3xl overflow-hidden mb-10 h-72"
+    <section class="relative rounded-3xl overflow-hidden mb-8 md:mb-10 min-h-[220px] md:h-72"
       style="background: linear-gradient(135deg, #1a1035 0%, #0f0d1a 60%); border: 1px solid rgba(139,92,246,0.15);">
       <div class="absolute top-0 left-0 w-80 h-80 rounded-full opacity-20 pointer-events-none"
         style="background: radial-gradient(circle, #7c3aed 0%, transparent 70%); transform: translate(-30%, -30%);">
       </div>
-      <div class="absolute bottom-0 right-40 w-60 h-60 rounded-full opacity-10 pointer-events-none"
+
+      <div class="absolute bottom-0 right-10 md:right-40 w-60 h-60 rounded-full opacity-10 pointer-events-none"
         style="background: radial-gradient(circle, #a78bfa 0%, transparent 70%); transform: translate(20%, 30%);">
       </div>
-      <div class="relative z-10 h-full flex flex-col justify-end p-10">
-        <span class="text-xs font-semibold text-violet-400 uppercase tracking-widest mb-2">Bài hát nổi bật tuần
-          này</span>
-        <h1 class="text-4xl font-bold text-white leading-tight mb-1">{{ song.name }}</h1>
-        <p class="text-white/50 text-sm mb-6">{{ song.artist }} &bull; {{ song.year }} &bull; {{
-          formatDuration(song.duration) }}</p>
+
+      <div class="relative z-10 min-h-[220px] md:h-full flex flex-col justify-end p-5 md:p-10 pr-24 md:pr-64">
+        <span class="text-[10px] md:text-xs font-semibold text-violet-400 uppercase tracking-widest mb-2">
+          Bài hát nổi bật tuần này
+        </span>
+
+        <h1 class="text-2xl md:text-4xl font-bold text-white leading-tight mb-1 truncate">
+          {{ song.name }}
+        </h1>
+
+        <p class="text-white/50 text-xs md:text-sm mb-5 md:mb-6 line-clamp-2">
+          {{ song.artist }} &bull; {{ song.year }} &bull; {{ formatDuration(song.duration) }}
+        </p>
+
         <div class="flex items-center gap-3">
           <button (click)="playTrendingSong(song.id)"
-            class="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-6 py-2.5 rounded-full transition-all text-sm">
+            class="flex items-center gap-2 bg-violet-600 hover:bg-violet-500 text-white font-bold px-5 md:px-6 py-2.5 rounded-full transition-all text-sm">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 5v14l11-7z" />
             </svg>
             Phát ngay
           </button>
+
           <button
-            class="flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-medium px-6 py-2.5 rounded-full transition-all text-sm border border-white/10">
+            class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-medium px-6 py-2.5 rounded-full transition-all text-sm border border-white/10">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M12 5v14M5 12h14" />
             </svg>
@@ -32,40 +42,41 @@
           </button>
         </div>
       </div>
+
       <div
-        class="absolute right-12 top-1/2 -translate-y-1/2 w-44 h-44 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
+        class="absolute right-4 md:right-12 top-1/2 -translate-y-1/2 w-20 h-20 md:w-44 md:h-44 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
         style="border: 1px solid rgba(255,255,255,0.08);">
         @if (song.imgUrl) {
         <img [src]="song.imgUrl" class="w-full h-full object-cover">
         } @else {
         <div
           class="w-full h-full bg-gradient-to-br from-violet-900/60 via-purple-800/40 to-black flex items-center justify-center">
-          <svg class="w-16 h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
+          <svg class="w-10 h-10 md:w-16 md:h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
             <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
           </svg>
         </div>
         }
-        <svg class="w-16 h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
-        </svg>
       </div>
     </section>
     }
+
     @if(isLoggedIn()) {
-    <section class="mb-10">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-xl font-bold text-white">Nghe gần đây</h2>
+    <section class="mb-8 md:mb-10">
+      <div class="flex items-center justify-between mb-4 md:mb-5">
+        <h2 class="text-lg md:text-xl font-bold text-white">Nghe gần đây</h2>
         <a (click)="goToPlaylist('recent')"
-          class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất
-          cả</a>
+          class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium whitespace-nowrap">
+          Xem tất cả
+        </a>
       </div>
-      <div class="grid grid-cols-3 gap-3">
+
+      <div
+        class="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (item of recentItems(); track item.id) {
         <div (click)="playRecentSong(item.id)"
-          class="flex items-center gap-3 bg-white/5 hover:bg-white/8 border border-white/5 hover:border-violet-500/20 rounded-xl p-3 cursor-pointer transition-all duration-200 group">
+          class="snap-start shrink-0 w-[230px] md:w-auto md:shrink flex items-center gap-3 bg-white/5 hover:bg-white/8 border border-white/5 hover:border-violet-500/20 rounded-xl p-3 cursor-pointer transition-all duration-200 group">
           <div class="w-14 h-14 rounded-xl shrink-0 overflow-hidden relative flex items-center justify-center"
             [style.background]="!item.imgUrl ? item.color : null">
-
             @if (item.imgUrl) {
             <img [src]="item.imgUrl" class="absolute inset-0 w-full h-full object-cover">
             } @else {
@@ -77,6 +88,7 @@
             </svg>
             }
           </div>
+
           <div class="min-w-0">
             <p class="text-sm font-semibold text-white truncate">{{ item.name }}</p>
             <p class="text-xs text-white/40 truncate">{{ item.artist }}</p>
@@ -87,62 +99,65 @@
     </section>
     }
 
-    <section class="mb-10">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-xl font-bold text-white">Đang thịnh hành</h2>
+    <section class="mb-8 md:mb-10">
+      <div class="flex items-center justify-between mb-4 md:mb-5">
+        <h2 class="text-lg md:text-xl font-bold text-white">Đang thịnh hành</h2>
         <a (click)="goToPlaylist('trending')"
-          class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium">Xem tất cả</a>
+          class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium whitespace-nowrap">
+          Xem tất cả
+        </a>
       </div>
-      <div class="grid grid-cols-7 gap-2">
+
+      <div
+        class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (track of trendingTracks(); track track.id; let i = $index) {
         <div (click)="playTrendingSong(track.id)"
-          class="bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-4 cursor-pointer transition-all duration-200 group">
-          <div class="relative mb-4">
+          class="snap-start shrink-0 w-[150px] md:w-auto md:shrink bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-3 md:p-4 cursor-pointer transition-all duration-200 group">
+          <div class="relative mb-3 md:mb-4">
             <div class="w-full aspect-square rounded-xl overflow-hidden"
               [style.background]="!track.imgUrl ? track.color : null">
               @if (track.imgUrl) {
               <img [src]="track.imgUrl" class="w-full h-full object-cover">
               } @else {
               <div class="w-full h-full flex items-center justify-center">
-                <svg class="w-12 h-12 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-10 h-10 md:w-12 md:h-12 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                 </svg>
               </div>
               }
             </div>
+
             <div
-              class="absolute bottom-2 right-2 w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 transition-all duration-200"
+              class="absolute bottom-2 right-2 w-9 h-9 md:w-10 md:h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 transition-all duration-200"
               [class.opacity-0]="track.id !== currentTrackId()"
               [class.group-hover:opacity-100]="track.id !== currentTrackId()"
               [class.translate-y-1]="track.id !== currentTrackId()"
               [class.group-hover:translate-y-0]="track.id !== currentTrackId()">
-
               @if(track.id === currentTrackId() && player.isPlaying()) {
-
               <div class="bars-anim scale-75">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
-
               } @else {
-
               <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-
                 <path d="M8 5v14l11-7z" />
               </svg>
-
               }
-
             </div>
-            <span class="absolute top-2 left-2 text-2xl font-black text-white/10 leading-none">#{{ i + 1 }}</span>
+
+            <span class="absolute top-2 left-2 text-xl md:text-2xl font-black text-white/10 leading-none">
+              #{{ i + 1 }}
+            </span>
           </div>
+
           <p class="text-sm font-semibold text-white truncate mb-0.5">{{ track.name }}</p>
           <p class="text-xs text-white/40 truncate">{{ track.artist }}</p>
-          <div class="flex items-center justify-between mt-2">
-            <span class="text-xs text-violet-400/70">{{ track.plays }} lượt nghe</span>
+
+          <div class="flex items-center justify-between mt-2 gap-2">
+            <span class="text-xs text-violet-400/70 truncate">{{ track.plays }} lượt nghe</span>
             <button (click)="openAddToAlbum(track.id, $event)"
-              class="w-7 h-7 bg-white/10 hover:bg-violet-600 rounded-full flex items-center justify-center transition-all duration-200">
+              class="w-7 h-7 bg-white/10 hover:bg-violet-600 rounded-full flex items-center justify-center transition-all duration-200 shrink-0">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path d="M12 5v14M5 12h14" />
               </svg>
@@ -152,76 +167,58 @@
         }
       </div>
     </section>
-    <section class="mb-10">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-xl font-bold text-white">Mới phát hành</h2>
 
+    <section class="mb-8 md:mb-10">
+      <div class="flex items-center justify-between mb-4 md:mb-5">
+        <h2 class="text-lg md:text-xl font-bold text-white">Mới phát hành</h2>
         <a (click)="goToPlaylist('newest')"
-          class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium cursor-pointer">
+          class="text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium cursor-pointer whitespace-nowrap">
           Xem tất cả
         </a>
       </div>
 
-      <div class="grid grid-cols-7 gap-2">
-
+      <div
+        class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (track of newestTracks(); track track.id) {
-
         <div (click)="playNewestSong(track.id)"
-          class="bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-4 cursor-pointer transition-all duration-200 group">
-
-          <div class="relative mb-4">
-
+          class="snap-start shrink-0 w-[150px] md:w-auto md:shrink bg-white/3 hover:bg-violet-500/10 border border-white/5 hover:border-violet-500/25 rounded-2xl p-3 md:p-4 cursor-pointer transition-all duration-200 group">
+          <div class="relative mb-3 md:mb-4">
             <div class="w-full aspect-square rounded-xl overflow-hidden"
               [style.background]="!track.imgUrl ? track.color : null">
-
               @if (track.imgUrl) {
-
               <img [src]="track.imgUrl" class="w-full h-full object-cover">
-
               } @else {
-
               <div class="w-full h-full flex items-center justify-center">
-                <svg class="w-12 h-12 text-white/20" fill="currentColor" viewBox="0 0 24 24">
-
+                <svg class="w-10 h-10 md:w-12 md:h-12 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                 </svg>
               </div>
-
               }
-
             </div>
 
             <div
-              class="absolute bottom-2 right-2 w-10 h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 transition-all duration-200"
+              class="absolute bottom-2 right-2 w-9 h-9 md:w-10 md:h-10 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 transition-all duration-200"
               [class.opacity-0]="track.id !== currentTrackId()"
               [class.group-hover:opacity-100]="track.id !== currentTrackId()"
               [class.translate-y-1]="track.id !== currentTrackId()"
               [class.group-hover:translate-y-0]="track.id !== currentTrackId()">
-
               @if(track.id === currentTrackId() && player.isPlaying()) {
-
               <div class="bars-anim scale-75">
                 <span></span>
                 <span></span>
                 <span></span>
               </div>
-
               } @else {
-
               <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-
                 <path d="M8 5v14l11-7z" />
               </svg>
-
               }
-
             </div>
 
             <span
-              class="absolute top-2 left-2 text-xs font-bold px-2 py-1 rounded-full bg-violet-500/15 text-violet-300 border border-violet-400/20">
+              class="absolute top-2 left-2 text-[10px] md:text-xs font-bold px-2 py-1 rounded-full bg-violet-500/15 text-violet-300 border border-violet-400/20">
               NEW
             </span>
-
           </div>
 
           <p class="text-sm font-semibold text-white truncate mb-0.5">
@@ -232,67 +229,66 @@
             {{ track.artist }}
           </p>
 
-          <div class="flex items-center justify-between mt-2">
-
-            <span class="text-xs text-violet-400/70">
+          <div class="flex items-center justify-between mt-2 gap-2">
+            <span class="text-xs text-violet-400/70 truncate">
               {{ track.year }}
             </span>
 
             <button (click)="openAddToAlbum(track.id, $event)"
-              class="w-7 h-7 bg-white/10 hover:bg-violet-600 rounded-full flex items-center justify-center transition-all duration-200">
-
+              class="w-7 h-7 bg-white/10 hover:bg-violet-600 rounded-full flex items-center justify-center transition-all duration-200 shrink-0">
               <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-
                 <path d="M12 5v14M5 12h14" />
               </svg>
-
             </button>
-
           </div>
-
         </div>
-
         }
-
       </div>
     </section>
+
     @if(showLoginMessage()) {
-    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div class="relative w-[820px] max-w-[92%] rounded-[28px]
+    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+      <div class="relative w-full md:w-[820px] max-w-[92%] rounded-[28px]
            bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
-           p-10 shadow-2xl overflow-hidden">
+           p-6 md:p-10 shadow-2xl overflow-hidden">
         <button (click)="showLoginMessage.set(false)"
           class="absolute top-5 right-5 text-white/60 hover:text-white text-xl transition cursor-pointer">
           ✕
         </button>
-        <div class="grid grid-cols-2 gap-10 items-center">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
           <div class="flex justify-center">
-            <div class="w-[300px] h-[300px] rounded-2xl overflow-hidden shadow-2xl">
+            <div class="w-[180px] h-[180px] md:w-[300px] md:h-[300px] rounded-2xl overflow-hidden shadow-2xl">
               <img [src]="selectedPreviewSong()?.imgUrl || 'assets/images/default-song.jpg'" alt=""
                 class="w-full h-full object-cover" />
             </div>
           </div>
-          <div class="text-white">
-            <h2 class="text-5xl font-extrabold leading-tight">
+
+          <div class="text-white text-center md:text-left">
+            <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
               Đăng nhập tài khoản trên
               <span class="text-violet-300">Song with me</span>
             </h2>
-            <p class="mt-5 text-white/70 text-base leading-relaxed">
+
+            <p class="mt-4 md:mt-5 text-white/70 text-sm md:text-base leading-relaxed">
               Đăng nhập để thưởng thức những bài hát yêu thích,
               tạo playlist cá nhân và trải nghiệm âm nhạc không giới hạn
             </p>
-            <div class="mt-8 flex flex-col gap-4">
-              <button (click)="goLogin()" class="h-14 rounded-full bg-violet-500 hover:bg-violet-400 cursor-pointer
-                   text-white font-bold text-lg transition-all">
+
+            <div class="mt-6 md:mt-8 flex flex-col gap-3 md:gap-4">
+              <button (click)="goLogin()" class="h-12 md:h-14 rounded-full bg-violet-500 hover:bg-violet-400 cursor-pointer
+                   text-white font-bold text-base md:text-lg transition-all">
                 Đăng nhập ngay
               </button>
-              <button routerLink="/auth/register" class="h-14 rounded-full border border-white/20 cursor-pointer
+
+              <button routerLink="/auth/register" class="h-12 md:h-14 rounded-full border border-white/20 cursor-pointer
                    hover:border-white/50 hover:bg-white/5
                    text-white font-semibold transition-all">
                 Tạo tài khoản miễn phí
               </button>
             </div>
-            <p class="mt-6 text-sm text-white/50">
+
+            <p class="mt-5 md:mt-6 text-sm text-white/50">
               Khám phá âm nhạc theo cách của riêng bạn.
             </p>
           </div>
@@ -300,13 +296,12 @@
       </div>
     </div>
     }
+
     @if (showAddToAlbum()) {
-    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+    <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
       (click)="closeAddToAlbum()">
-
-      <div class="relative w-[480px] max-w-[92%] rounded-[24px] bg-gradient-to-br from-[#1e1b2e] to-[#0f0d1a]
-      border border-white/10 p-8 shadow-2xl" (click)="$event.stopPropagation()">
-
+      <div class="relative w-full md:w-[480px] max-w-[92%] rounded-[24px] bg-gradient-to-br from-[#1e1b2e] to-[#0f0d1a]
+      border border-white/10 p-5 md:p-8 shadow-2xl" (click)="$event.stopPropagation()">
         <button (click)="closeAddToAlbum()"
           class="absolute top-4 right-5 text-white/50 hover:text-white text-xl transition cursor-pointer">
           ✕
@@ -319,16 +314,13 @@
           class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-violet-500/50 mb-4 transition" />
 
         <div class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scroll">
-
           @for (album of albumList(); track album.id) {
-
           <div (click)="selectAlbum(album)"
             class="flex items-center gap-3 p-3 rounded-xl transition-all duration-150 border" [class]="selectedSongAlbumIds().includes(album.id)
               ? 'opacity-40 cursor-not-allowed bg-white/3 border-white/5'
               : selectedAlbumId() === album.id
                 ? 'bg-violet-600/20 border-violet-500/40 cursor-pointer'
                 : 'bg-white/3 border-white/5 hover:bg-white/7 hover:border-white/10 cursor-pointer'">
-
             <div
               class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-800 to-purple-900 shrink-0 flex items-center justify-center">
               <svg class="w-5 h-5 text-violet-300" fill="currentColor" viewBox="0 0 24 24">
@@ -349,7 +341,6 @@
               <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
             </svg>
             }
-
           </div>
           }
 
@@ -358,7 +349,6 @@
             Không tìm thấy album
           </p>
           }
-
         </div>
 
         <div class="flex gap-3 mt-6">
@@ -372,7 +362,6 @@
             {{ isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' }}
           </button>
         </div>
-
       </div>
     </div>
     }

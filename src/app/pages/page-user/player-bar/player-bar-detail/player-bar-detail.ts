@@ -15,6 +15,7 @@ export class PlayerBarDetailComponent {
   player = inject(PlayerService);
   @ViewChild('lyricsContainer') lyricsContainer!: ElementRef<HTMLElement>;
   @ViewChildren('lyricLine') lyricLines!: QueryList<ElementRef<HTMLElement>>;
+  activeMobileTab = signal<'overview' | 'lyrics'>('overview');
   loading = signal(true);
   song = computed(() => {
     const track = this.player.currentTrack();
