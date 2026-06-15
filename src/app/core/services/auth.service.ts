@@ -83,6 +83,12 @@ export class AuthService {
     );
   }
 
+  checkUsername(username: string) {
+    return this.api.getData<BaseResponse<boolean>>(
+      `${API_END.AUTH.CHECK_USERNAME}?username=${username}`
+    );
+  }
+
   checkIp(ipAddress: string) {
     return this.api.getData<BaseResponse<boolean>>(
       `${API_END.AUTH.CHECK_IP}?ipAddress=${ipAddress}`

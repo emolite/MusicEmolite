@@ -17,6 +17,7 @@ export class RegisterComponent {
   showPassword = signal(false);
   emailError = signal('');
   checkingEmail = signal(false);
+  checkingUsername = signal(false);
   usernameError = signal('');
   passwordError = signal('');
   form: RegisterRequest = {
@@ -41,6 +42,8 @@ export class RegisterComponent {
     }
 
     this.usernameError.set('');
+
+    this.checkUsername();
   }
 
   validatePassword() {
@@ -102,6 +105,34 @@ export class RegisterComponent {
         }
       });
   }
+
+  checkUsername() {
+    if (!this.form.userName?.trim()) {
+      this.usernameError.set('');
+      return;
+    }
+
+    this.checkingUsername.set(true);
+
+    this.authService
+      .checkUsername(this.form.userName)
+      .subscribe({
+        next: (res) => {
+          if (res.data) {
+            this.usernameError.set('Tên người dùng đã tồn tại');
+          }
+          else {
+            this.usernameError.set('');
+          }
+          this.checkingUsername.set(false);
+        },
+        error: () => {
+          this.usernameError.set('');
+          this.checkingUsername.set(false);
+        }
+      });
+  }
+
   togglePassword() {
     this.showPassword.update(v => !v);
   }
