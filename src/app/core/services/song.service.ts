@@ -9,6 +9,8 @@ import { BaseSearchDto } from "../models/base/base-search.model";
 import { BaseResponse } from "../models/base/base-res.model";
 import { LyricsResponseDto } from "../models/song/res-lyrics.model";
 import { LyricsRequestDto, LyricsSearchRequestDto, PublishLyricsRequest } from "../models/song/req-lyrics.model";
+import { YoutubeVideoResponse } from "../models/youtube/youtube-res.model";
+import { YoutubeSearchRequest } from "../models/youtube/youtube-req.model";
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +39,18 @@ export class SongService {
       BaseSearchDto<SongRequest>
     >(
       API_END.SONG.SEARCH_PUBLIC,
+      data
+    );
+  }
+
+  searchYoutube(data: BaseSearchDto<YoutubeSearchRequest>)
+    : Observable<BaseTableResponse<YoutubeVideoResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<YoutubeVideoResponse>,
+      BaseSearchDto<YoutubeSearchRequest>
+    >(
+      API_END.SONG.YOUTUBE_SEARCH,
       data
     );
   }

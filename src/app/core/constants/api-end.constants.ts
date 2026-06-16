@@ -37,7 +37,8 @@ export const API_END = {
     LYRICS: `${BASE_URL}songs/lyrics`,
     LYRICS_SEARCH: `${BASE_URL}songs/lyrics/search`,
     LYRICS_BY_ID: (id: number) => `${BASE_URL}songs/lyrics/${id}`,
-    LYRICS_PUBLISH: `${BASE_URL}songs/publish`
+    LYRICS_PUBLISH: `${BASE_URL}songs/publish`,
+    YOUTUBE_SEARCH: `${BASE_URL}songs/youtube/search`
   },
 
   ALBUM: {

@@ -1,3 +1,249 @@
+// import {
+//   Component,
+//   HostListener,
+//   inject,
+//   signal,
+//   OnDestroy,
+//   OnInit
+// } from '@angular/core';
+
+// import { Router, RouterLink } from '@angular/router';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+
+// import {
+//   LucideAngularModule,
+//   User,
+//   LogOut,
+//   ChevronDown,
+//   Settings
+// } from 'lucide-angular';
+
+// import {
+//   Subject,
+//   debounceTime,
+//   distinctUntilChanged,
+//   switchMap,
+//   of
+// } from 'rxjs';
+
+// import { AuthService } from '../../core/services/auth.service';
+// import { PlayerService } from '../../core/services/player.service';
+// import { SongService } from '../../core/services/song.service';
+
+// import { SongResponse } from '../../core/models/song/res-song.model';
+
+// @Component({
+//   selector: 'app-topbar',
+//   standalone: true,
+//   templateUrl: './topbar.html',
+//   imports: [
+//     RouterLink,
+//     LucideAngularModule,
+//     CommonModule,
+//     FormsModule
+//   ]
+// })
+// export class TopbarComponent implements OnDestroy, OnInit {
+
+//   private router = inject(Router);
+//   public authService = inject(AuthService);
+//   private player = inject(PlayerService);
+//   private songService = inject(SongService);
+
+//   readonly UserIcon = User;
+//   readonly LogoutIcon = LogOut;
+//   readonly ChevronDownIcon = ChevronDown;
+//   readonly SettingsIcon = Settings;
+
+//   openMenu = signal(false);
+
+//   searchQuery = signal('');
+//   suggestions = signal<SongResponse[]>([]);
+
+//   showDropdown = signal(false);
+//   isSearching = signal(false);
+
+//   private searchSubject = new Subject<string>();
+
+//   private sub = this.searchSubject.pipe(
+
+//     debounceTime(300),
+
+//     distinctUntilChanged(),
+
+//     switchMap(keyword => {
+
+//       const kw = keyword.trim();
+
+//       if (!kw) {
+
+//         this.suggestions.set([]);
+//         this.showDropdown.set(false);
+//         this.isSearching.set(false);
+
+//         return of(null);
+//       }
+
+//       this.isSearching.set(true);
+
+//       return this.songService.searchPublicSongs({
+//         page: 1,
+//         pageSize: 5,
+//         searchParams: {
+//           keyword: kw
+//         }
+//       });
+//     })
+
+//   ).subscribe(res => {
+
+//     this.isSearching.set(false);
+
+//     if (!res) return;
+
+//     const items = res.data ?? [];
+
+//     this.suggestions.set(items);
+
+//     this.showDropdown.set(items.length > 0);
+//   });
+
+//   ngOnInit() {
+//     this.loadProfile();
+//   }
+
+//   ngOnDestroy() {
+//     this.sub.unsubscribe();
+//   }
+
+//   onSearchInput(event: Event) {
+
+//     const val = (event.target as HTMLInputElement).value;
+
+//     this.searchQuery.set(val);
+
+//     this.searchSubject.next(val);
+//   }
+
+//   onSearchKeydown(event: KeyboardEvent) {
+
+//     if (event.key === 'Enter') {
+
+//       const kw = this.searchQuery().trim();
+
+//       if (kw) {
+//         this.goToPlaylistWithKeyword(kw);
+//       }
+//     }
+
+//     if (event.key === 'Escape') {
+//       this.closeSearch();
+//     }
+//   }
+
+//   selectSuggestion(item: SongResponse) {
+
+//   this.showDropdown.set(false);
+
+//   this.router.navigate(
+//     ['/users/discover'],
+//     {
+//       queryParams: {
+//         keyword: this.searchQuery(),
+//         highlightId: item.id        
+//       }
+//     }
+//   );
+// }
+
+//   goToPlaylistWithKeyword(keyword: string) {
+
+//     this.showDropdown.set(false);
+
+//     this.router.navigate(
+//       ['/users/discover'],
+//       {
+//         queryParams: {
+//           keyword
+//         }
+//       }
+//     );
+//   }
+
+//   closeSearch() {
+//     this.showDropdown.set(false);
+//   }
+
+//   get displayName(): string {
+
+//     const user = this.authService.user();
+
+//     return (
+//       user?.profile?.fullName ||
+//       user?.username ||
+//       ''
+//     );
+//   }
+
+//   get profileUri(): string | null {
+//     return this.authService.user()?.profile?.uri ?? null;
+//   }
+
+//   loadProfile() {
+
+//     if (!this.authService.user()) return;
+
+//     this.authService.getCurrentUser().subscribe(res => {
+
+//       const uri = res.data?.profile?.uri ?? null;
+
+//       const current = this.authService.user();
+
+//       if (!current?.profile) return;
+
+//       this.authService.user.set({
+//         ...current,
+//         profile: {
+//           ...current.profile,
+//           uri
+//         }
+//       });
+//     });
+//   }
+
+//   toggleMenu() {
+//     this.openMenu.update(v => !v);
+//   }
+
+//   @HostListener('document:click')
+//   onDocumentClick() {
+
+//     this.openMenu.set(false);
+
+//     this.showDropdown.set(false);
+//   }
+
+//   goRegister() {
+//     this.router.navigate(['/auth/register']);
+//   }
+
+//   goProfile() {
+
+//     this.router.navigate(['/setting/profile']);
+
+//     this.openMenu.set(false);
+//   }
+
+//   logout() {
+//     localStorage.removeItem('token');
+//     localStorage.removeItem('currentUser');
+//     this.player.stop();
+//     this.authService.user.set(null);
+//     this.router.navigate(['/auth/login']);
+//   }
+// }
+
 import {
   Component,
   HostListener,
@@ -30,8 +276,7 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { PlayerService } from '../../core/services/player.service';
 import { SongService } from '../../core/services/song.service';
-
-import { SongResponse } from '../../core/models/song/res-song.model';
+import { YoutubeVideoResponse } from '../../core/models/youtube/youtube-res.model';
 
 @Component({
   selector: 'app-topbar',
@@ -59,7 +304,7 @@ export class TopbarComponent implements OnDestroy, OnInit {
   openMenu = signal(false);
 
   searchQuery = signal('');
-  suggestions = signal<SongResponse[]>([]);
+  suggestions = signal<YoutubeVideoResponse[]>([]);
 
   showDropdown = signal(false);
   isSearching = signal(false);
@@ -67,17 +312,12 @@ export class TopbarComponent implements OnDestroy, OnInit {
   private searchSubject = new Subject<string>();
 
   private sub = this.searchSubject.pipe(
-
     debounceTime(300),
-
     distinctUntilChanged(),
-
     switchMap(keyword => {
-
       const kw = keyword.trim();
 
       if (!kw) {
-
         this.suggestions.set([]);
         this.showDropdown.set(false);
         this.isSearching.set(false);
@@ -87,7 +327,7 @@ export class TopbarComponent implements OnDestroy, OnInit {
 
       this.isSearching.set(true);
 
-      return this.songService.searchPublicSongs({
+      return this.songService.searchYoutube({
         page: 1,
         pageSize: 5,
         searchParams: {
@@ -95,41 +335,41 @@ export class TopbarComponent implements OnDestroy, OnInit {
         }
       });
     })
+  ).subscribe({
+    next: res => {
+      this.isSearching.set(false);
 
-  ).subscribe(res => {
+      if (!res) return;
 
-    this.isSearching.set(false);
+      const items = res.data ?? [];
 
-    if (!res) return;
-
-    const items = res.data ?? [];
-
-    this.suggestions.set(items);
-
-    this.showDropdown.set(items.length > 0);
+      this.suggestions.set(items);
+      this.showDropdown.set(items.length > 0);
+    },
+    error: () => {
+      this.isSearching.set(false);
+      this.suggestions.set([]);
+      this.showDropdown.set(false);
+    }
   });
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadProfile();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.sub.unsubscribe();
   }
 
-  onSearchInput(event: Event) {
-
+  onSearchInput(event: Event): void {
     const val = (event.target as HTMLInputElement).value;
 
     this.searchQuery.set(val);
-
     this.searchSubject.next(val);
   }
 
-  onSearchKeydown(event: KeyboardEvent) {
-
+  onSearchKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
-
       const kw = this.searchQuery().trim();
 
       if (kw) {
@@ -142,22 +382,24 @@ export class TopbarComponent implements OnDestroy, OnInit {
     }
   }
 
-  selectSuggestion(item: SongResponse) {
+  selectSuggestion(item: YoutubeVideoResponse): void {
+    this.showDropdown.set(false);
 
-  this.showDropdown.set(false);
-
-  this.router.navigate(
-    ['/users/discover'],
-    {
-      queryParams: {
-        keyword: this.searchQuery(),
-        highlightId: item.id        
+    this.router.navigate(
+      ['/users/discover'],
+      {
+        queryParams: {
+          keyword: this.searchQuery(),
+          highlightId: item.videoId
+        }
       }
-    }
-  );
-}
+    );
+  }
 
-  goToPlaylistWithKeyword(keyword: string) {
+  goToPlaylistWithKeyword(keyword: string): void {
+    const kw = keyword.trim();
+
+    if (!kw) return;
 
     this.showDropdown.set(false);
 
@@ -165,18 +407,17 @@ export class TopbarComponent implements OnDestroy, OnInit {
       ['/users/discover'],
       {
         queryParams: {
-          keyword
+          keyword: kw
         }
       }
     );
   }
 
-  closeSearch() {
+  closeSearch(): void {
     this.showDropdown.set(false);
   }
 
   get displayName(): string {
-
     const user = this.authService.user();
 
     return (
@@ -190,12 +431,10 @@ export class TopbarComponent implements OnDestroy, OnInit {
     return this.authService.user()?.profile?.uri ?? null;
   }
 
-  loadProfile() {
-
+  loadProfile(): void {
     if (!this.authService.user()) return;
 
     this.authService.getCurrentUser().subscribe(res => {
-
       const uri = res.data?.profile?.uri ?? null;
 
       const current = this.authService.user();
@@ -212,32 +451,29 @@ export class TopbarComponent implements OnDestroy, OnInit {
     });
   }
 
-  toggleMenu() {
+  toggleMenu(): void {
     this.openMenu.update(v => !v);
   }
 
   @HostListener('document:click')
-  onDocumentClick() {
-
+  onDocumentClick(): void {
     this.openMenu.set(false);
-
     this.showDropdown.set(false);
   }
 
-  goRegister() {
+  goRegister(): void {
     this.router.navigate(['/auth/register']);
   }
 
-  goProfile() {
-
+  goProfile(): void {
     this.router.navigate(['/setting/profile']);
-
     this.openMenu.set(false);
   }
 
-  logout() {
+  logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
+
     this.player.stop();
     this.authService.user.set(null);
     this.router.navigate(['/auth/login']);
