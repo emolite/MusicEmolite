@@ -10,41 +10,85 @@
       class="absolute top-6 left-6 flex items-center gap-2 text-white/60 hover:text-white transition">
       <span class="text-sm">← Đăng nhập</span>
     </button>
+
     <div class="w-full px-14">
       <h1 class="text-4xl font-bold mb-2">Đăng ký</h1>
       <p class="text-white/60 mb-10 text-base">Tạo tài khoản mới</p>
-      @if(emailError()) {
-      <div class="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300 mb-5">
-        {{ emailError() }}
-      </div>
-      }
+
       <form class="space-y-5" (ngSubmit)="register()">
-        <input type="text" [(ngModel)]="form.fullName" name="fullName" placeholder="Họ và tên" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
-              focus:border-violet-500 outline-none text-lg">
 
-        <input type="text" [(ngModel)]="form.userName" (input)="validateUsername($event)" name="userName"
-          placeholder="Tên đăng nhập" class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
-         focus:border-violet-500 outline-none text-lg" />
+        <input
+          type="text"
+          [(ngModel)]="form.fullName"
+          name="fullName"
+          placeholder="Họ và tên"
+          class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
+          focus:border-violet-500 outline-none text-lg">
 
-        <input type="email" [(ngModel)]="form.email" (blur)="checkEmail()" name="email" placeholder="Email" class="w-full px-4 py-4 rounded-xl bg-white/5 border
-  outline-none text-lg" [class.border-red-500]="emailError()" [class.border-white/10]="!emailError()"
-          [class.focus:border-red-500]="emailError()" [class.focus:border-violet-500]="!emailError()" />
+        <div>
+          <input
+            type="text"
+            [(ngModel)]="form.userName"
+            (input)="validateUsername($event)"
+            (blur)="checkUsername()"
+            name="userName"
+            placeholder="Tên đăng nhập"
+            class="w-full px-4 py-4 rounded-xl bg-white/5 border outline-none text-lg"
+            [class.border-red-500]="usernameError()"
+            [class.border-white/10]="!usernameError()" />
 
-        @if(checkingEmail()) {
-        <p class="text-white/40 text-sm mt-1">
-          Đang kiểm tra email...
-        </p>
-        }
+          @if(checkingUsername()) {
+          <p class="text-white/40 text-sm mt-1">
+            Đang kiểm tra tên đăng nhập...
+          </p>
+          }
+
+          @if(usernameError()) {
+          <p class="text-red-400 text-sm mt-1">
+            {{ usernameError() }}
+          </p>
+          }
+        </div>
+
+        <div>
+          <input
+            type="email"
+            [(ngModel)]="form.email"
+            (blur)="checkEmail()"
+            name="email"
+            placeholder="Email"
+            class="w-full px-4 py-4 rounded-xl bg-white/5 border outline-none text-lg"
+            [class.border-red-500]="emailError()"
+            [class.border-white/10]="!emailError()" />
+
+          @if(checkingEmail()) {
+          <p class="text-white/40 text-sm mt-1">
+            Đang kiểm tra email...
+          </p>
+          }
+
+          @if(emailError()) {
+          <p class="text-red-400 text-sm mt-1">
+            {{ emailError() }}
+          </p>
+          }
+        </div>
 
         <div class="relative">
-
-          <input [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="form.password" (input)="validatePassword()"
-            name="password" placeholder="Mật khẩu"
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            [(ngModel)]="form.password"
+            (input)="validatePassword()"
+            name="password"
+            placeholder="Mật khẩu"
             class="w-full px-4 py-4 pr-12 rounded-xl bg-white/5 border outline-none text-lg"
-            [class.border-red-500]="passwordError()" [class.border-white/10]="!passwordError()" />
+            [class.border-red-500]="passwordError()"
+            [class.border-white/10]="!passwordError()" />
 
-          <button type="button" (click)="togglePassword()"
-            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white cursor-pointer">
+          <button
+            type="button"
+            (click)="togglePassword()"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white">
 
             @if (!showPassword()) {
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -55,31 +99,33 @@
               <path d="M2 4l18 18 1.5-1.5-2.3-2.3C21 16 22 12 22 12s-3-7-10-7c-1.6 0-3 .3-4.2.8L3.5 3.5 2 4z" />
             </svg>
             }
-
           </button>
-
         </div>
 
         @if(passwordError()) {
-        <div class="text-sm text-red-300 -mt-3">
+        <p class="text-red-400 text-sm -mt-3">
           {{ passwordError() }}
-        </div>
+        </p>
         }
 
-        <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Nhập lại mật khẩu"
+        <input
+          type="password"
+          [(ngModel)]="confirmPassword"
+          name="confirmPassword"
+          placeholder="Nhập lại mật khẩu"
           class="w-full px-4 py-4 rounded-xl bg-white/5 border border-white/10
-                      focus:border-violet-500 outline-none text-lg">
+          focus:border-violet-500 outline-none text-lg">
 
-        <button type="submit" [disabled]="!!emailError() || checkingEmail() || !!usernameError() || !!passwordError()"
-          class="w-full py-4 rounded-xl
-  bg-violet-600 hover:bg-violet-500
-  disabled:opacity-50 disabled:cursor-not-allowed
-  font-semibold text-lg transition">
+        <button
+          type="submit"
+          [disabled]="!!emailError() || checkingEmail() || !!usernameError() || !!passwordError()"
+          class="w-full py-4 rounded-xl bg-violet-600 hover:bg-violet-500
+          disabled:opacity-50 disabled:cursor-not-allowed
+          font-semibold text-lg transition">
           Đăng ký
         </button>
 
       </form>
-
     </div>
   </div>
 </div>

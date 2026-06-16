@@ -6,7 +6,11 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "tauri:dev": "npx tauri dev",
+    "tauri:build": "npx tauri build",
+    "android:sync": "npx cap sync android",
+    "android:open": "npx cap open android"
   },
   "private": true,
   "packageManager": "npm@10.9.3",

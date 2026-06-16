@@ -9,6 +9,7 @@ export const API_END = {
     COMPLETE_PROFILE: `${BASE_URL}auth/complete-profile`,
     REGISTER: `${BASE_URL}auth/register`,
     CHECK_EMAIL: `${BASE_URL}auth/check-email`,
+    CHECK_USERNAME: `${BASE_URL}auth/check-username`,
     CHECK_IP: `${BASE_URL}auth/check-ip`,
     CURRENT_USER: `${BASE_URL}auth/current-user`
   },
