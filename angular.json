@@ -30,6 +30,12 @@
             ]
           },
           "configurations": {
+            "local": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": []
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -60,7 +66,8 @@
               ],
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -68,6 +75,9 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
+            "local": {
+              "buildTarget": "MusicEmolite:build:local"
+            },
             "production": {
               "buildTarget": "MusicEmolite:build:production"
             },
@@ -75,7 +85,7 @@
               "buildTarget": "MusicEmolite:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "test": {
           "builder": "@angular/build:unit-test"

@@ -81,6 +81,7 @@ export class PlayerService {
   private onDocumentMouseUp = () => {
     this.isDraggingVolume = false;
     this.volumeBarRef = null;
+
     document.removeEventListener('mousemove', this.onDocumentMouseMove);
     document.removeEventListener('mouseup', this.onDocumentMouseUp);
   };
@@ -179,18 +180,57 @@ export class PlayerService {
 
     this.currentTrack.set({
       ...track,
-      isLiked: false,
+      dbSongId: null,
+      isLiked: track.isLiked ?? false,
       syncedLyrics: []
     });
 
-    this.isLiked.set(false);
+    this.isLiked.set(track.isLiked ?? false);
+
     this.isPlaying.set(true);
     this.currentTime.set('0:00');
     this.duration.set(track.duration ? this.formatTime(track.duration) : '--:--');
     this.currentTimeRaw.set(0);
     this.progressPercent.set(0);
 
+    this.addYoutubeHistory(track);
     this.loadYoutubeVideo(track.videoId);
+  }
+
+  private addYoutubeHistory(track: any) {
+    if (this.hasAddedHistory) return;
+
+    this.hasAddedHistory = true;
+
+    this.songService
+      .addSongHistory({
+        videoId: track.videoId,
+        title: track.name,
+        channel: track.artist,
+        thumbnailHigh: track.imgUrl ?? '',
+        duration: track.duration ?? 0
+      })
+      .subscribe({
+        next: (res: any) => {
+          const song = res.data;
+          if (!song?.id) return;
+
+          const currentLiked = this.currentTrack()?.isLiked ?? track.isLiked ?? false;
+
+          this.currentTrack.update((current: any) => ({
+            ...current,
+            dbSongId: song.id,
+            views: song.views ?? current.views ?? 0,
+            likes: song.likes ?? current.likes ?? 0,
+            isLiked: currentLiked,
+            youtubeVideoId: song.youtubeVideoId,
+            playCount: song.playCount,
+            sourceType: song.sourceType
+          }));
+
+          this.isLiked.set(currentLiked);
+        }
+      });
   }
 
   private startTrack(track: any) {
@@ -206,7 +246,6 @@ export class PlayerService {
 
     this.hasAddedHistory = false;
     this.hasIncrementedView = false;
-
     this.listenedSeconds = 0;
     this.lastTime = 0;
 
@@ -215,7 +254,8 @@ export class PlayerService {
 
       this.currentTrack.set({
         ...track,
-        isLiked: detail?.isLiked,
+        dbSongId: track.id,
+        isLiked: detail?.isLiked ?? false,
         imgUrl: detail?.imgUrl,
         releaseDate: detail?.releaseDate,
         syncedLyrics: detail?.syncedLyrics ?? [],
@@ -269,20 +309,26 @@ export class PlayerService {
   }
 
   toggleLike() {
-    if (!this.currentTrack()) return;
+    const current = this.currentTrack();
+    if (!current) return;
 
-    if (this.isYoutubeMode()) {
-      this.isLiked.update(v => !v);
+    const songId = this.isYoutubeMode()
+      ? current.dbSongId
+      : current.id;
+
+    if (!songId) return;
+
+    this.songService.toggleLike(songId).subscribe((res: any) => {
+      const data = res.data;
+      const liked = data?.isLiked ?? !this.isLiked();
+
+      this.isLiked.set(liked);
+
       this.currentTrack.update((track: any) => ({
         ...track,
-        isLiked: !track.isLiked
+        isLiked: liked,
+        likes: data?.likes ?? track.likes
       }));
-      return;
-    }
-
-    this.songService.toggleLike(this.currentTrack().id).subscribe(() => {
-      this.isLiked.set(!this.isLiked());
-      this.currentTrack.update((track: any) => ({ ...track, isLiked: !track.isLiked }));
     });
   }
 
@@ -292,7 +338,9 @@ export class PlayerService {
     if (this.isShuffle()) {
       this.currentIndex = Math.floor(Math.random() * this.queue.length);
     } else {
-      this.currentIndex = this.currentIndex + 1 >= this.queue.length ? 0 : this.currentIndex + 1;
+      this.currentIndex = this.currentIndex + 1 >= this.queue.length
+        ? 0
+        : this.currentIndex + 1;
     }
 
     this.playCurrentTrack();
@@ -301,14 +349,15 @@ export class PlayerService {
   prevTrack() {
     if (!this.queue.length) return;
 
-    this.currentIndex = this.currentIndex - 1 < 0 ? this.queue.length - 1 : this.currentIndex - 1;
+    this.currentIndex = this.currentIndex - 1 < 0
+      ? this.queue.length - 1
+      : this.currentIndex - 1;
 
     this.playCurrentTrack();
   }
 
   private playCurrentTrack() {
     const track = this.queue[this.currentIndex];
-
     if (!track) return;
 
     if (track.videoId) {
@@ -377,23 +426,14 @@ export class PlayerService {
         this.lastTime = current;
 
         this.currentTimeRaw.set(current);
-
-        this.currentTime.set(
-          this.formatTime(current)
-        );
+        this.currentTime.set(this.formatTime(current));
 
         if (this.audio.duration) {
-          this.progressPercent.set(
-            (current / this.audio.duration) * 100
-          );
+          this.progressPercent.set((current / this.audio.duration) * 100);
 
-          const listenedPercent =
-            (this.listenedSeconds / this.audio.duration) * 100;
+          const listenedPercent = (this.listenedSeconds / this.audio.duration) * 100;
 
-          if (
-            !this.hasIncrementedView &&
-            listenedPercent >= 70
-          ) {
+          if (!this.hasIncrementedView && listenedPercent >= 70) {
             this.hasIncrementedView = true;
 
             const currentTrack = this.currentTrack();
@@ -401,7 +441,15 @@ export class PlayerService {
             if (currentTrack?.id) {
               this.songService
                 .incrementView(currentTrack.id)
-                .subscribe();
+                .subscribe((res: any) => {
+                  const data = res.data;
+                  if (!data) return;
+
+                  this.currentTrack.update((track: any) => ({
+                    ...track,
+                    views: data.views ?? track.views
+                  }));
+                });
             }
           }
         }
@@ -411,7 +459,6 @@ export class PlayerService {
     this.audio.onloadedmetadata = () => {
       this.zone.run(() => {
         if (this.isYoutubeMode()) return;
-
         this.duration.set(this.formatTime(this.audio.duration));
       });
     };
@@ -572,12 +619,42 @@ export class PlayerService {
     const current = this.youtubePlayer.getCurrentTime?.() ?? 0;
     const duration = this.youtubePlayer.getDuration?.() ?? 0;
 
+    const delta = current - this.lastTime;
+    if (delta > 0 && delta < 2) {
+      this.listenedSeconds += delta;
+    }
+
+    this.lastTime = current;
+
     this.currentTimeRaw.set(current);
     this.currentTime.set(this.formatTime(current));
 
     if (duration) {
       this.duration.set(this.formatTime(duration));
       this.progressPercent.set((current / duration) * 100);
+
+      const listenedPercent = (this.listenedSeconds / duration) * 100;
+
+      if (!this.hasIncrementedView && listenedPercent >= 70) {
+        this.hasIncrementedView = true;
+
+        const currentTrack = this.currentTrack();
+        const songId = currentTrack?.dbSongId;
+
+        if (songId) {
+          this.songService
+            .incrementView(songId)
+            .subscribe((res: any) => {
+              const data = res.data;
+              if (!data) return;
+
+              this.currentTrack.update((track: any) => ({
+                ...track,
+                views: data.views ?? track.views
+              }));
+            });
+        }
+      }
     }
   }
 

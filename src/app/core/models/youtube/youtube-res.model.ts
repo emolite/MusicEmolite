@@ -28,6 +28,7 @@ export interface YoutubeVideoResponse {
   projection: string;
 
   views: number;
+  isLiked: boolean;
   likeCount: number;
   commentCount: number;
 

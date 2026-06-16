@@ -4,7 +4,7 @@ import { API_SERVICE } from "./commons/api.service";
 import { API_END } from "../constants/api-end.constants";
 import { BaseTableResponse } from "../models/base/base-table-res.model";
 import { SongResponse } from "../models/song/res-song.model";
-import { SongCreateRequest, SongRequest } from "../models/song/req-song.model";
+import { AddSongHistoryRequest, SongCreateRequest, SongRequest } from "../models/song/req-song.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
 import { BaseResponse } from "../models/base/base-res.model";
 import { LyricsResponseDto } from "../models/song/res-lyrics.model";
@@ -121,13 +121,16 @@ export class SongService {
     return this.api.postData<BaseResponse<SongResponse>, {}>(API_END.SONG.VIEW(id), {});
   }
 
-  addSongHistory(id: number): Observable<BaseResponse<string>> {
+  addSongHistory(
+    data: AddSongHistoryRequest
+  ): Observable<BaseResponse<SongResponse>> {
+
     return this.api.postData<
-      BaseResponse<string>,
-      {}
+      BaseResponse<SongResponse>,
+      AddSongHistoryRequest
     >(
-      API_END.SONG.HISTORY(id),
-      {}
+      API_END.SONG.HISTORY,
+      data
     );
   }
 
