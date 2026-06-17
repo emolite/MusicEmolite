@@ -1,5 +1,6 @@
 export interface YoutubeVideoResponse {
   videoId: string;
+  songId?: number | null;
   kind: string;
   etag: string;
 
