@@ -121,26 +121,52 @@ export class HomeComponent {
 
     }, 200);
   }
-
   private async mapSongQueue(data: SongResponse[]) {
 
     return await Promise.all(
-      data.map(async (s: SongResponse) => ({
-        id: s.id,
-        name: s.title,
-        artist: s.artistName,
-        duration: await this.getRealDuration(s.fileUrl),
-        url: s.fileUrl,
-        imgUrl: s.imgUrl || null,
-        like: s.likes ?? 0,
-        view: s.views ?? 0,
-        albumIds: s.albumIds ?? [],
-        year: s.releaseDate
-          ? new Date(s.releaseDate).getFullYear()
-          : s.createdAt
-            ? new Date(s.createdAt).getFullYear()
-            : ''
-      }))
+      data.map(async (s: SongResponse) => {
+        const isYoutube = s.sourceType === 3 || !!s.youtubeVideoId;
+
+        return {
+          id: isYoutube
+            ? s.youtubeVideoId
+            : s.id,
+
+          dbSongId: s.id,
+
+          videoId: s.youtubeVideoId,
+
+          sourceType: s.sourceType,
+
+          name: s.title,
+
+          artist: s.artistName,
+
+          duration: isYoutube
+            ? s.duration
+            : await this.getRealDuration(s.fileUrl),
+
+          url: isYoutube
+            ? ''
+            : s.fileUrl,
+
+          imgUrl: s.imgUrl || null,
+
+          like: s.likes ?? 0,
+
+          view: s.views ?? 0,
+
+          isLiked: s.isLiked ?? false,
+
+          albumIds: s.albumIds ?? [],
+
+          year: s.releaseDate
+            ? new Date(s.releaseDate).getFullYear()
+            : s.createdAt
+              ? new Date(s.createdAt).getFullYear()
+              : ''
+        };
+      })
     );
   }
 
@@ -164,11 +190,17 @@ export class HomeComponent {
       this.recentItems.set(
         queue.slice(0, 6).map((s: any) => ({
           id: s.id,
+          dbSongId: s.dbSongId,
+          videoId: s.videoId,
+          sourceType: s.sourceType,
           name: s.name,
           artist: s.artist,
           duration: s.duration,
           url: s.url,
           imgUrl: s.imgUrl,
+          like: s.like,
+          view: s.view,
+          isLiked: s.isLiked,
           albumIds: s.albumIds,
           views: s.view,
           color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
@@ -201,12 +233,16 @@ export class HomeComponent {
       this.trendingTracks.set(
         queue.map((s: any) => ({
           id: s.id,
+          dbSongId: s.dbSongId,
+          videoId: s.videoId,
+          sourceType: s.sourceType,
           name: s.name,
           artist: s.artist,
           duration: s.duration,
           url: s.url,
           like: s.like,
           view: s.view,
+          isLiked: s.isLiked,
           plays: s.view.toLocaleString(),
           imgUrl: s.imgUrl,
           albumIds: s.albumIds,
@@ -236,12 +272,16 @@ export class HomeComponent {
       this.newestTracks.set(
         queue.map((s: any) => ({
           id: s.id,
+          dbSongId: s.dbSongId,
+          videoId: s.videoId,
+          sourceType: s.sourceType,
           name: s.name,
           artist: s.artist,
           duration: s.duration,
           url: s.url,
           like: s.like,
           view: s.view,
+          isLiked: s.isLiked,
           plays: s.view.toLocaleString(),
           imgUrl: s.imgUrl,
           albumIds: s.albumIds,
@@ -251,7 +291,6 @@ export class HomeComponent {
       );
     });
   }
-
   openAddToAlbum(songId: number, event: Event) {
 
     event.stopPropagation();
@@ -263,7 +302,7 @@ export class HomeComponent {
     ];
 
     const clickedSong = allSongs.find(
-      t => t.id === songId
+      t => t.dbSongId === songId || t.id === songId
     );
 
     if (!this.isLoggedIn()) {
@@ -281,7 +320,7 @@ export class HomeComponent {
       clickedSong?.albumIds ?? []
     );
 
-    this.selectedSongId.set(songId);
+    this.selectedSongId.set(clickedSong?.dbSongId ?? songId);
 
     this.selectedAlbumId.set(null);
 
@@ -372,6 +411,10 @@ export class HomeComponent {
 
   private getRealDuration(url: string): Promise<number> {
 
+    if (!url) {
+      return Promise.resolve(0);
+    }
+
     return new Promise((resolve) => {
 
       const audio = new Audio();
@@ -427,11 +470,11 @@ export class HomeComponent {
       .padStart(2, '0')}`;
   }
 
-  playRecentSong(id: number) {
+  playRecentSong(id: any) {
 
     const clickedSong =
       this.recentQueue()
-        .find(x => x.id === id);
+        .find(x => x.id === id || x.dbSongId === id);
 
     if (!clickedSong) return;
 
@@ -450,14 +493,19 @@ export class HomeComponent {
       this.recentQueue()
     );
 
-    this.player.playSong(id);
+    if (clickedSong.videoId) {
+      this.player.playYoutubeSong(clickedSong.id);
+      return;
+    }
+
+    this.player.playSong(clickedSong.id);
   }
 
-  playTrendingSong(id: number) {
+  playTrendingSong(id: any) {
 
     const clickedSong =
       this.trendingQueue()
-        .find(x => x.id === id);
+        .find(x => x.id === id || x.dbSongId === id);
 
     if (!clickedSong) return;
 
@@ -476,14 +524,19 @@ export class HomeComponent {
       this.trendingQueue()
     );
 
-    this.player.playSong(id);
+    if (clickedSong.videoId) {
+      this.player.playYoutubeSong(clickedSong.id);
+      return;
+    }
+
+    this.player.playSong(clickedSong.id);
   }
 
-  playNewestSong(id: number) {
+  playNewestSong(id: any) {
 
     const clickedSong =
       this.newestQueue()
-        .find(x => x.id === id);
+        .find(x => x.id === id || x.dbSongId === id);
 
     if (!clickedSong) return;
 
@@ -502,7 +555,12 @@ export class HomeComponent {
       this.newestQueue()
     );
 
-    this.player.playSong(id);
+    if (clickedSong.videoId) {
+      this.player.playYoutubeSong(clickedSong.id);
+      return;
+    }
+
+    this.player.playSong(clickedSong.id);
   }
 
   goLogin() {

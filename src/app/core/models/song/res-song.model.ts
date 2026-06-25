@@ -17,6 +17,8 @@ export interface SongResponse {
   typeSong: string;
   syncedLyrics?: LyricsLine[];
   lyrics?: string;
+  youtubeVideoId?: string;
+  sourceType?: number;
   createdAt?: string;
   createdBy?: number;
   isActived?: boolean;

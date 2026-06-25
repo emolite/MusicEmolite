@@ -28,3 +28,11 @@ export interface SongLyricsCreateRequest {
   lyrics: string;
   syncedLyrics: LyricsLine[];
 }
+
+export interface AddSongHistoryRequest {
+  videoId: string;
+  title: string;
+  channel: string;
+  thumbnailHigh: string;
+  duration: number;
+}

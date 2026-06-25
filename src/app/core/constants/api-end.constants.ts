@@ -32,12 +32,13 @@ export const API_END = {
     SONG_TO_ALBUMS: `${BASE_URL}songs/albums`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,
-    HISTORY: (id: number) => `${BASE_URL}songs/${id}/history`,
+    HISTORY: `${BASE_URL}songs/history`,
     LIKE: (id: number) => `${BASE_URL}songs/${id}/like`,
     LYRICS: `${BASE_URL}songs/lyrics`,
     LYRICS_SEARCH: `${BASE_URL}songs/lyrics/search`,
     LYRICS_BY_ID: (id: number) => `${BASE_URL}songs/lyrics/${id}`,
-    LYRICS_PUBLISH: `${BASE_URL}songs/publish`
+    LYRICS_PUBLISH: `${BASE_URL}songs/publish`,
+    YOUTUBE_SEARCH: `${BASE_URL}songs/youtube/search`
   },
 
   ALBUM: {
