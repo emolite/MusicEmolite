@@ -4,7 +4,7 @@ import { API_SERVICE } from "./commons/api.service";
 import { API_END } from "../constants/api-end.constants";
 import { BaseTableResponse } from "../models/base/base-table-res.model";
 import { AlbumResponse } from "../models/album/res-album.model";
-import { AlbumRequest } from "../models/album/req-album.model";
+import { AlbumCreateRequest, AlbumRequest } from "../models/album/req-album.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
 
 @Injectable({
@@ -37,6 +37,20 @@ export class AlbumService {
     >(
       API_END.ALBUM.SEARCH_PUBLIC,
       data
+    );
+  }
+
+  createAlbum(data: AlbumCreateRequest) {
+    const formData = new FormData();
+
+    formData.append('Title', data.title);
+    formData.append('ReleaseDate', data.releaseDate);
+    formData.append('AlbumType', data.albumType.toString());
+    formData.append('Image', data.image);
+
+    return this.api.postData<any, FormData>(
+      API_END.ALBUM.BASE,
+      formData
     );
   }
 }

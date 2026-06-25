@@ -47,10 +47,7 @@ export class LoginComponent {
                     this.errorMessage.set('Lỗi hệ thống');
                     return;
                 }
-                localStorage.setItem(
-                    'token',
-                    data.accessToken
-                );
+                this.authService.setToken(data.accessToken);
                 this.authService.getCurrentUser().subscribe({
                     next: (userRes: any) => {
                         const user = userRes?.data;
@@ -106,7 +103,7 @@ export class LoginComponent {
                     return;
                 }
 
-                localStorage.setItem('token', data.accessToken);
+                this.authService.setToken(data.accessToken);
 
                 if (data.isNewUser) {
                     this.router.navigate(['/auth/welcome'], {

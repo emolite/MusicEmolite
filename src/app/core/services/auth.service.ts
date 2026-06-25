@@ -15,7 +15,7 @@ import { BaseResponse } from '../models/base/base-res.model';
 export class AuthService {
 
   private api = inject(API_SERVICE);
-
+  private TOKEN_KEY = 'token';
   user = signal<CurrentUserResponse | null>(null);
   loading = signal(false);
   error = signal<string | null>(null);
@@ -28,6 +28,18 @@ export class AuthService {
     return this.api.getData<BaseResponse<CurrentUserResponse>>(
       API_END.AUTH.CURRENT_USER
     );
+  }
+
+  setToken(token: string) {
+    localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  clearToken() {
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 
   login(payload: LoginRequest) {
@@ -69,7 +81,7 @@ export class AuthService {
       })
     );
   }
-  
+
   completeProfile(payload: any) {
     return this.api.postData<BaseResponse<boolean>, any>(
       API_END.AUTH.COMPLETE_PROFILE,

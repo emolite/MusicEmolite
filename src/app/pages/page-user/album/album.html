@@ -1,34 +1,37 @@
 <div class="pb-28 min-h-screen bg-[#0f0d1a] text-white font-sans">
-    <div class="px-8 py-6 flex items-center justify-between border-b border-white/5">
+    <div
+        class="px-4 sm:px-8 py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-white/5">
         <div>
             <p class="text-sm text-violet-400 font-medium mb-1">Thư viện âm nhạc</p>
-            <h1 class="text-3xl font-bold tracking-tight">Albums</h1>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Albums</h1>
         </div>
-
-        <button class="h-11 px-5 rounded-xl bg-violet-600 hover:bg-violet-500 flex items-center gap-2 text-sm font-semibold transition-all">
+        <button (click)="showCreateAlbum.set(true)"
+            class="h-11 px-5 rounded-xl bg-violet-600 hover:bg-violet-500 flex items-center justify-center sm:justify-start gap-2 text-sm font-semibold transition-all w-full sm:w-auto">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M12 5v14M5 12h14" />
             </svg>
             Thêm album
         </button>
     </div>
-    <div class="px-8 py-8">
-        <div class="flex items-center justify-between mb-8">
-            <div class="inline-flex p-1 rounded-xl bg-white/[0.03] border border-white/5">
+
+    <div class="px-4 sm:px-8 py-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+            <div class="inline-flex p-1 rounded-xl bg-white/[0.03] border border-white/5 w-full sm:w-auto">
                 <button (click)="changeTab('public')" [class]="selectedTab() === 'public'
-                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'"
-                    class="px-6 py-2 rounded-lg text-sm font-medium transition-all">
+? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+: 'text-white/60 hover:text-white hover:bg-white/5'"
+                    class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all">
                     Công khai
                 </button>
                 <button (click)="changeTab('private')" [class]="selectedTab() === 'private'
-                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
-                    : 'text-white/60 hover:text-white hover:bg-white/5'"
-                    class="px-6 py-2 rounded-lg text-sm font-medium transition-all">
+? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
+: 'text-white/60 hover:text-white hover:bg-white/5'"
+                    class="flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all">
                     Của tôi
                 </button>
             </div>
-            <div class="relative w-[320px]">
+
+            <div class="relative w-full sm:w-[320px]">
                 <input #searchInput type="text" placeholder="Tìm album..."
                     class="w-full h-11 pl-11 pr-4 rounded-xl bg-white/[0.03] border border-white/5 focus:outline-none focus:border-violet-500/50 text-sm"
                     (input)="onSearch(searchInput.value)">
@@ -40,42 +43,56 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-5 gap-5">
-            @for (album of albums(); track album.id) {
-           <div class="group cursor-pointer" [routerLink]="['/users/album', album.id]">
-                <div class="relative aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-violet-700/40 to-[#1d1633] border border-white/5 mb-3">
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <svg class="w-14 h-14 text-white/10" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+            @for(album of albums();track album.id){
+            <div class="group cursor-pointer" [routerLink]="['/users/album',album.id]">
+                <div
+                    class="relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden border border-white/5 mb-2 sm:mb-3">
+                    @if(album.uri){
+                    <img [src]="album.uri" class="w-full h-full object-cover">
+                    }@else{
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-violet-700/40 to-[#1d1633] flex items-center justify-center">
+                        <svg class="w-10 sm:w-14 h-10 sm:h-14 text-white/10" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                         </svg>
                     </div>
-                    <button class="absolute bottom-3 right-3 w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg shadow-violet-600/30 opacity-0 translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
+                    }
+                    <button
+                        class="absolute bottom-2 sm:bottom-3 right-2 sm:right-3 w-8 sm:w-10 h-8 sm:h-10 rounded-full bg-violet-600 flex items-center justify-center shadow-lg shadow-violet-600/30 opacity-0 translate-y-2 group-hover:translate-y-0 group-hover:opacity-100 transition-all">
                         <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M8 5v14l11-7z" />
                         </svg>
                     </button>
                 </div>
                 <div>
-                    <p class="text-sm font-semibold truncate">{{ album.title }}</p>
+                    <p class="text-xs sm:text-sm font-semibold truncate">{{album.title}}</p>
                     <div class="flex items-center gap-2 mt-1">
-                        <span class="text-xs text-white/40">{{ album.albumTypeName }}</span>
+                        <span class="text-[10px] sm:text-xs text-white/40">{{album.albumTypeName}}</span>
                         <span class="text-white/20">•</span>
-                        <span class="text-xs text-white/40">{{ album.createdAt | date:'yyyy' }}</span>
+                        <span class="text-[10px] sm:text-xs text-white/40">{{album.createdAt|date:'yyyy'}}</span>
                     </div>
                 </div>
             </div>
             }
         </div>
-        @if(albums().length === 0) {
-        <div class="h-[400px] flex flex-col items-center justify-center text-center">
-            <div class="w-20 h-20 rounded-3xl bg-white/[0.03] flex items-center justify-center mb-5">
-                <svg class="w-10 h-10 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+
+        @if(albums().length===0){
+        <div class="h-[300px] sm:h-[400px] flex flex-col items-center justify-center text-center">
+            <div
+                class="w-16 sm:w-20 h-16 sm:h-20 rounded-3xl bg-white/[0.03] flex items-center justify-center mb-4 sm:mb-5">
+                <svg class="w-8 sm:w-10 h-8 sm:h-10 text-white/20" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
                 </svg>
             </div>
-            <h3 class="text-lg font-semibold mb-2">Không tìm thấy album nào</h3>
-            <p class="text-white/40 text-sm">Album bạn tạo hoặc tìm kiếm sẽ hiển thị tại đây.</p>
+            <h3 class="text-base sm:text-lg font-semibold mb-2">Không tìm thấy album nào</h3>
+            <p class="text-white/40 text-xs sm:text-sm">Album bạn tạo hoặc tìm kiếm sẽ hiển thị tại đây.</p>
         </div>
         }
+
+        @if(showCreateAlbum()){
+        <app-create-album-popup (close)="showCreateAlbum.set(false)"
+            (submitAlbum)="createAlbum($event)"></app-create-album-popup>
+        }
     </div>
-</div>

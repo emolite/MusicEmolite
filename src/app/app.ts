@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router'
+import { Router, RouterOutlet } from '@angular/router'
 import { AuthService } from './core/services/auth.service';
 import { ToastComponent } from './shared/components/toast/toast';
 import { UserService } from './core/services/user.service';
@@ -12,11 +12,12 @@ import { UserService } from './core/services/user.service';
 })
 export class App {
   private authService = inject(AuthService);
-  private userService = inject(UserService)
+  private userService = inject(UserService);
+  private router = inject(Router);
   protected readonly title = signal('MusicEmolite');
 
   ngOnInit(): void {
-    const token = localStorage.getItem('token');
+    const token = this.authService.getToken();
     if (!token) return;
     this.authService.getCurrentUser().subscribe({
       next: (res: any) => {
@@ -25,6 +26,7 @@ export class App {
       error: () => {
         localStorage.removeItem('token');
         this.authService.user.set(null);
+        this.router.navigate(['/auth/login']);
       }
     });
     this.userService.getUserProfile().subscribe();

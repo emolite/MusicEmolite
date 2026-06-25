@@ -176,6 +176,24 @@ export class DiscoverComponent implements OnInit, OnDestroy {
     });
   }
 
+  formatViews(v: number): string {
+    if (v == null) return '0';
+
+    if (v >= 1_000_000_000) {
+      return (v / 1_000_000_000).toFixed(1).replace(/\.0$/, '') + 'B';
+    }
+
+    if (v >= 1_000_000) {
+      return (v / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+
+    if (v >= 1_000) {
+      return (v / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+
+    return v.toString();
+  }
+
   private mapYoutubeSong(s: YoutubeVideoResponse): SongRow {
     return {
       id: s.videoId,

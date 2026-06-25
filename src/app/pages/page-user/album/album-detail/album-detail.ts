@@ -21,8 +21,10 @@ export class AlbumDetailComponent {
 
   private route = inject(ActivatedRoute);
   private songService = inject(SongService);
-
   player = inject(PlayerService);
+  
+  currentTrack = this.player.currentTrack;
+
   authService = inject(AuthService);
 
   songs = signal<any[]>([]);
@@ -39,9 +41,7 @@ export class AlbumDetailComponent {
   ngOnInit() {
     this.route.params.subscribe(params => {
       const id = Number(params['id']);
-
       this.albumId.set(id);
-
       this.loadSongs();
     });
   }
@@ -58,21 +58,18 @@ export class AlbumDetailComponent {
         albumId: this.albumId()
       }
     }).subscribe(res => {
+
       const data = res.data ?? [];
 
       const songs = data.map((s: SongResponse) => {
-        const isYoutube = s.sourceType === 3 || !!s.youtubeVideoId;
+        const isYoutube = s.sourceType === 3 && !!s.youtubeVideoId;
 
         return {
-          id: isYoutube
-            ? s.youtubeVideoId
-            : s.id,
+          id: s.id,
 
           dbSongId: s.id,
 
-          songId: s.id,
-
-          videoId: s.youtubeVideoId,
+          videoId: s.youtubeVideoId ?? null,
 
           sourceType: s.sourceType,
 
@@ -84,9 +81,7 @@ export class AlbumDetailComponent {
 
           duration: s.duration,
 
-          url: isYoutube
-            ? ''
-            : s.fileUrl,
+          url: isYoutube ? null : s.fileUrl,
 
           imgUrl: s.imgUrl,
 
@@ -110,26 +105,24 @@ export class AlbumDetailComponent {
     });
   }
 
-  playSong(id: any) {
-    const clickedSong = this.songs()
-      .find(x => x.id === id || x.dbSongId === id);
-
-    if (!clickedSong) return;
+  playSong(id: number) {
+    const song = this.songs().find(x => x.id === id);
+    if (!song) return;
 
     if (!this.isLoggedIn()) {
-      this.selectedPreviewSong.set(clickedSong);
+      this.selectedPreviewSong.set(song);
       this.showLoginMessage.set(true);
       return;
     }
 
     this.player.setQueue(this.songs());
 
-    if (clickedSong.videoId) {
-      this.player.playYoutubeSong(clickedSong.videoId);
+    if (song.videoId) {
+      this.player.playYoutubeSong(song.id);
       return;
     }
 
-    this.player.playSong(clickedSong.dbSongId);
+    this.player.playSong(song.id);
   }
 
   currentTrackId() {
