@@ -4,10 +4,11 @@ import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlbumService } from "../../../core/services/album.service";
 import { AlbumResponse } from "../../../core/models/album/res-album.model";
+import { CreateAlbumPayload, CreateAlbumPopupComponent } from "./album-create-popup/album-create-popup";
 
 @Component({
     selector: "app-album",
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, CreateAlbumPopupComponent],
     templateUrl: "./album.html"
 })
 export class AlbumComponent {
@@ -16,6 +17,7 @@ export class AlbumComponent {
     albums = signal<AlbumResponse[]>([]);
     keyword = signal('');
     selectedTab = signal<'public' | 'private'>('public');
+    showCreateAlbum = signal(false);
 
     ngOnInit() {
         this.loadAlbums();
@@ -44,6 +46,21 @@ export class AlbumComponent {
         api.subscribe(res => {
             this.albums.set(res.data ?? []);
         });
+    }
+
+    createAlbum(payload: CreateAlbumPayload) {
+        this.albumService.createAlbum({
+            title: payload.title,
+            releaseDate: payload.releaseDate,
+            albumType: payload.albumType,
+            image: payload.image
+        })
+            .subscribe({
+                next: () => {
+                    this.showCreateAlbum.set(false);
+                    this.loadAlbums();
+                }
+            });
     }
 
     onSearch(value: string) {

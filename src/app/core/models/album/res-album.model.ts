@@ -3,6 +3,7 @@ export interface AlbumResponse {
   title: string;
   releaseDate?: string;
   artistId: number;
+  uri?: string;
   albumType?: number;
   albumTypeName?: string;
   isActived: boolean;

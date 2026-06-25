@@ -1,0 +1,109 @@
+<div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+
+    <div class="w-full max-w-xl bg-[#151222] border border-white/5 rounded-md overflow-hidden">
+
+        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+
+            <div>
+                <h2 class="text-lg font-semibold text-white">Tạo album mới</h2>
+                <p class="text-xs text-white/40 mt-1">
+                    Tải ảnh bìa và thiết lập thông tin album
+                </p>
+            </div>
+
+            <button (click)="onClose()"
+                class="w-8 h-8 rounded-md hover:bg-white/5 transition flex items-center justify-center">
+
+                <svg class="w-4 h-4 text-white/60" fill="none" stroke="currentColor" stroke-width="2"
+                    viewBox="0 0 24 24">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+
+            </button>
+
+        </div>
+
+        <div class="p-6">
+            <div class="flex gap-6">
+                <div class="w-48 flex-shrink-0">
+                    <label class="block text-sm font-medium text-white mb-2">Ảnh album</label>
+                    <label class="block cursor-pointer relative">
+                        <input hidden type="file" accept="image/*" (change)="onFileChange($event)">
+                        @if(imagePreview()){
+                        <div class="aspect-square w-48 rounded-md overflow-hidden border border-white/10 relative">
+                            <img [src]="imagePreview()" class="w-full h-full object-cover">
+                            <button type="button" (click)="imagePreview.set(null); imageFile.set(null)"
+                                class="absolute top-2 right-2 w-7 h-7 rounded-md bg-black/60 hover:bg-black/80 flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path d="M6 6l12 12M18 6L6 18" />
+                                </svg>
+                            </button>
+                        </div>
+                        }@else{
+                        <div
+                            class="aspect-square w-48 rounded-md border border-dashed border-white/10 bg-white/[0.03] flex flex-col items-center justify-center">
+                            <svg class="w-8 h-8 text-white/30 mb-2" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path d="M12 5v14M5 12h14" />
+                            </svg>
+                            <span class="text-xs text-white/40">Chọn ảnh</span>
+                        </div>
+                        }
+                    </label>
+                </div>
+                <div class="flex-1 space-y-4">
+                    <div>
+                        <label class="block text-sm text-white mb-2">Tên album</label>
+                        <input [ngModel]="title()" (ngModelChange)="title.set($event)" type="text"
+                            placeholder="Nhập tên album"
+                            class="w-full h-11 px-4 rounded-md bg-white/[0.03] border border-white/5 text-white focus:outline-none focus:border-violet-500"
+                            [class.border-red-500]="titleError()">
+                        @if(titleError()){
+                        <p class="text-xs text-red-500 mt-1">Vui lòng nhập tên album</p>
+                        }
+                    </div>
+                    <div>
+                        <label class="block text-sm text-white mb-2">Ngày phát hành</label>
+                        <input [ngModel]="releaseDate()" (ngModelChange)="releaseDate.set($event)" type="date" disabled
+                            class="w-full h-11 px-4 rounded-md bg-white/[0.03] border border-white/5 text-white/40 cursor-not-allowed">
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <label class="block text-sm text-white mb-3">Quyền riêng tư</label>
+                <div
+                    class="flex items-center justify-between rounded-md border border-white/5 bg-white/[0.03] px-4 py-3">
+                    <div>
+                        <p class="text-sm font-medium text-white">{{ albumType() === 1 ? 'Công khai' : 'Riêng tư' }}</p>
+                        <p class="text-xs text-white/40 mt-1">{{ albumType() === 1 ? 'Mọi người có thể xem album này' :
+                            'Chỉ bạn mới có thể xem album này' }}</p>
+                    </div>
+                    <button type="button" (click)="albumType.set(albumType() === 1 ? 2 : 1)"
+                        class="relative w-12 h-7 rounded-full transition-all duration-200"
+                        [class.bg-violet-600]="albumType() === 1" [class.bg-white/10]="albumType() === 2">
+                        <span class="absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-all duration-200"
+                            [class.translate-x-5]="albumType() === 1"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
+
+            <button (click)="onClose()"
+                class="h-10 px-5 rounded-md border border-white/10 text-white/70 hover:bg-white/5 transition">
+
+                Hủy
+
+            </button>
+
+            <button (click)="createAlbum()"
+                class="h-10 px-5 rounded-md bg-violet-600 hover:bg-violet-500 text-white font-medium transition">
+
+                Tạo album
+
+            </button>
+        </div>
+    </div>
+</div>
