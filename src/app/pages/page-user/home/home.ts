@@ -478,17 +478,6 @@ export class HomeComponent {
 
     if (!clickedSong) return;
 
-    if (!this.isLoggedIn()) {
-
-      this.selectedPreviewSong.set(
-        clickedSong
-      );
-
-      this.showLoginMessage.set(true);
-
-      return;
-    }
-
     this.player.setQueue(
       this.recentQueue()
     );
@@ -509,17 +498,6 @@ export class HomeComponent {
 
     if (!clickedSong) return;
 
-    if (!this.isLoggedIn()) {
-
-      this.selectedPreviewSong.set(
-        clickedSong
-      );
-
-      this.showLoginMessage.set(true);
-
-      return;
-    }
-
     this.player.setQueue(
       this.trendingQueue()
     );
@@ -539,17 +517,6 @@ export class HomeComponent {
         .find(x => x.id === id || x.dbSongId === id);
 
     if (!clickedSong) return;
-
-    if (!this.isLoggedIn()) {
-
-      this.selectedPreviewSong.set(
-        clickedSong
-      );
-
-      this.showLoginMessage.set(true);
-
-      return;
-    }
 
     this.player.setQueue(
       this.newestQueue()

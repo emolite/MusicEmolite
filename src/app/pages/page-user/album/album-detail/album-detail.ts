@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { SongService } from '../../../../core/services/song.service';
 import { PlayerService } from '../../../../core/services/player.service';
-import { AuthService } from '../../../../core/services/auth.service';
 
 import { SongResponse } from '../../../../core/models/song/res-song.model';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
@@ -25,18 +24,12 @@ export class AlbumDetailComponent {
   
   currentTrack = this.player.currentTrack;
 
-  authService = inject(AuthService);
-
   songs = signal<any[]>([]);
   albumId = signal<number>(0);
   currentAlbum = signal<any>(null);
   isLoading = signal(false);
   page = signal(PAGINATION.DEFAULT_PAGE);
   totalPages = signal(0);
-  selectedPreviewSong = signal<any>(null);
-  showLoginMessage = signal(false);
-
-  isLoggedIn = computed(() => !!this.authService.user());
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -97,8 +90,6 @@ export class AlbumDetailComponent {
 
       this.songs.set(songs);
 
-      this.player.setQueue(songs);
-
       this.totalPages.set(res.totalPages ?? 0);
 
       this.isLoading.set(false);
@@ -108,12 +99,6 @@ export class AlbumDetailComponent {
   playSong(id: number) {
     const song = this.songs().find(x => x.id === id);
     if (!song) return;
-
-    if (!this.isLoggedIn()) {
-      this.selectedPreviewSong.set(song);
-      this.showLoginMessage.set(true);
-      return;
-    }
 
     this.player.setQueue(this.songs());
 

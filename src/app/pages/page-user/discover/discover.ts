@@ -9,11 +9,7 @@ import {
 
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AlbumService } from '../../../core/services/album.service';
-import { AlbumResponse } from '../../../core/models/album/res-album.model';
-import { AlbumRequest } from '../../../core/models/album/req-album.model';
-import { BaseSearchDto } from '../../../core/models/base/base-search.model';
-import { debounceTime, distinctUntilChanged, Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil } from 'rxjs';
 
 import { PlayerService } from '../../../core/services/player.service';
 import { SongService } from '../../../core/services/song.service';
@@ -51,10 +47,8 @@ export class DiscoverComponent implements OnInit, OnDestroy {
 
   private songService = inject(SongService);
   private route = inject(ActivatedRoute);
-  private albumService = inject(AlbumService);
 
   private destroy$ = new Subject<void>();
-  private albumSearch$ = new Subject<string>();
   songs = signal<SongRow[]>([]);
   isLoading = signal(false);
 
@@ -63,28 +57,12 @@ export class DiscoverComponent implements OnInit, OnDestroy {
 
   page = signal(PAGINATION_USER.DEFAULT_PAGE);
   totalPages = signal(1);
-  showAddToAlbum = signal(false);
-  selectedSongId = signal<number | null>(null);
-  selectedAlbumId = signal<number | null>(null);
-  albumList = signal<AlbumResponse[]>([]);
-  selectedSongAlbumIds = signal<number[]>([]);
-  albumKeyword = signal('');
-  isAddingToAlbum = signal(false);
 
   currentTrackId = computed(
     () => this.player.currentTrack()?.id ?? null
   );
 
   ngOnInit(): void {
-    this.albumSearch$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(keyword => {
-        this.fetchAlbums(keyword);
-      });
     this.route.queryParams
       .pipe(takeUntil(this.destroy$))
       .subscribe(params => {
@@ -143,13 +121,13 @@ export class DiscoverComponent implements OnInit, OnDestroy {
 
           this.songs.set(items);
           this.totalPages.set(res.totalPages || 1);
-          this.player.setQueue(items);
           this.isLoading.set(false);
 
           if (hId) {
             const selected = items.find(x => x.id === hId);
 
             if (selected) {
+              this.player.setQueue(items, { autoAdvance: false });
               this.player.playYoutubeSong(selected.id);
             }
           }
@@ -162,7 +140,7 @@ export class DiscoverComponent implements OnInit, OnDestroy {
   }
 
   playSong(id: string): void {
-    this.player.setQueue(this.songs());
+    this.player.setQueue(this.songs(), { autoAdvance: false });
     this.player.playYoutubeSong(id);
   }
 
@@ -223,76 +201,4 @@ export class DiscoverComponent implements OnInit, OnDestroy {
     return `${m}:${s < 10 ? '0' + s : s}`;
   }
 
-  openAddToAlbum(song: SongRow, event: Event): void {
-    event.stopPropagation();
-
-    if (!song.songId) return;
-
-    this.selectedSongAlbumIds.set([]);
-    this.selectedSongId.set(song.songId);
-    this.selectedAlbumId.set(null);
-    this.albumKeyword.set('');
-    this.showAddToAlbum.set(true);
-
-    this.fetchAlbums('');
-  }
-
-  closeAddToAlbum(): void {
-    this.showAddToAlbum.set(false);
-    this.selectedSongId.set(null);
-    this.selectedAlbumId.set(null);
-  }
-
-  selectAlbum(album: AlbumResponse): void {
-    if (this.selectedSongAlbumIds().includes(album.id)) return;
-
-    this.selectedAlbumId.set(album.id);
-  }
-
-  onAlbumSearch(event: Event): void {
-    const keyword = (event.target as HTMLInputElement).value;
-
-    this.albumKeyword.set(keyword);
-    this.albumSearch$.next(keyword);
-  }
-
-  private fetchAlbums(keyword: string): void {
-    const payload: BaseSearchDto<AlbumRequest> = {
-      page: 1,
-      pageSize: 20,
-      asc: false,
-      searchParams: {
-        keyword
-      }
-    };
-
-    this.albumService
-      .searchAlbums(payload)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(res => {
-        this.albumList.set(res.data ?? []);
-      });
-  }
-
-  confirmAddToAlbum(): void {
-    const songId = this.selectedSongId();
-    const albumId = this.selectedAlbumId();
-
-    if (!songId || !albumId) return;
-
-    this.isAddingToAlbum.set(true);
-
-    this.songService
-      .addSongToAlbum(songId, albumId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.isAddingToAlbum.set(false);
-          this.closeAddToAlbum();
-        },
-        error: () => {
-          this.isAddingToAlbum.set(false);
-        }
-      });
-  }
 }

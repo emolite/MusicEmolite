@@ -1,8 +1,8 @@
 <div class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
 
-    <div class="w-full max-w-xl bg-[#151222] border border-white/5 rounded-md overflow-hidden">
+    <div class="w-full max-w-xl max-h-[90vh] flex flex-col bg-[#151222] border border-white/5 rounded-md overflow-hidden">
 
-        <div class="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+        <div class="px-4 sm:px-6 py-4 border-b border-white/5 flex items-center justify-between shrink-0">
 
             <div>
                 <h2 class="text-lg font-semibold text-white">Tạo album mới</h2>
@@ -23,14 +23,14 @@
 
         </div>
 
-        <div class="p-6">
-            <div class="flex gap-6">
-                <div class="w-48 flex-shrink-0">
+        <div class="p-4 sm:p-6 overflow-y-auto">
+            <div class="flex flex-col md:flex-row gap-4 md:gap-6">
+                <div class="w-40 sm:w-48 mx-auto md:mx-0 flex-shrink-0">
                     <label class="block text-sm font-medium text-white mb-2">Ảnh album</label>
                     <label class="block cursor-pointer relative">
                         <input hidden type="file" accept="image/*" (change)="onFileChange($event)">
                         @if(imagePreview()){
-                        <div class="aspect-square w-48 rounded-md overflow-hidden border border-white/10 relative">
+                        <div class="aspect-square w-40 sm:w-48 rounded-md overflow-hidden border border-white/10 relative">
                             <img [src]="imagePreview()" class="w-full h-full object-cover">
                             <button type="button" (click)="imagePreview.set(null); imageFile.set(null)"
                                 class="absolute top-2 right-2 w-7 h-7 rounded-md bg-black/60 hover:bg-black/80 flex items-center justify-center">
@@ -42,7 +42,7 @@
                         </div>
                         }@else{
                         <div
-                            class="aspect-square w-48 rounded-md border border-dashed border-white/10 bg-white/[0.03] flex flex-col items-center justify-center">
+                            class="aspect-square w-40 sm:w-48 rounded-md border border-dashed border-white/10 bg-white/[0.03] flex flex-col items-center justify-center">
                             <svg class="w-8 h-8 text-white/30 mb-2" fill="none" stroke="currentColor" stroke-width="2"
                                 viewBox="0 0 24 24">
                                 <path d="M12 5v14M5 12h14" />
@@ -52,7 +52,7 @@
                         }
                     </label>
                 </div>
-                <div class="flex-1 space-y-4">
+                <div class="flex-1 space-y-4 min-w-0">
                     <div>
                         <label class="block text-sm text-white mb-2">Tên album</label>
                         <input [ngModel]="title()" (ngModelChange)="title.set($event)" type="text"
@@ -89,17 +89,17 @@
             </div>
         </div>
 
-        <div class="px-6 py-4 border-t border-white/5 flex justify-end gap-3">
+        <div class="px-4 sm:px-6 py-4 border-t border-white/5 flex flex-col-reverse sm:flex-row justify-end gap-3 shrink-0">
 
             <button (click)="onClose()"
-                class="h-10 px-5 rounded-md border border-white/10 text-white/70 hover:bg-white/5 transition">
+                class="h-10 px-5 w-full sm:w-auto rounded-md border border-white/10 text-white/70 hover:bg-white/5 transition">
 
                 Hủy
 
             </button>
 
             <button (click)="createAlbum()"
-                class="h-10 px-5 rounded-md bg-violet-600 hover:bg-violet-500 text-white font-medium transition">
+                class="h-10 px-5 w-full sm:w-auto rounded-md bg-violet-600 hover:bg-violet-500 text-white font-medium transition">
 
                 Tạo album
 
