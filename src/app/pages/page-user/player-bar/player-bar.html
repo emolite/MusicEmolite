@@ -87,6 +87,18 @@
           d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
     </button>
+
+    <button
+      class="hidden md:block shrink-0 text-white/40 hover:text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+      [disabled]="!player.currentTrack()?.dbSongId"
+      (click)="player.openAddToAlbum()">
+
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <circle cx="5" cy="12" r="2" />
+        <circle cx="12" cy="12" r="2" />
+        <circle cx="19" cy="12" r="2" />
+      </svg>
+    </button>
   </div>
 
   <div class="flex flex-col items-end md:items-center gap-0 md:gap-2 shrink-0 md:flex-1">
@@ -197,4 +209,127 @@
     </div>
   </div>
 </footer>
+}
+
+@if (player.showAddToAlbum()) {
+<div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+  (click)="player.closeAddToAlbum()">
+  <div class="relative w-full md:w-[480px] max-w-[92%] rounded-[24px] bg-gradient-to-br from-[#1e1b2e] to-[#0f0d1a]
+  border border-white/10 p-5 md:p-8 shadow-2xl" (click)="$event.stopPropagation()">
+    <button (click)="player.closeAddToAlbum()"
+      class="absolute top-4 right-5 text-white/50 hover:text-white text-xl transition cursor-pointer">
+      ✕
+    </button>
+
+    <h3 class="text-xl font-bold text-white mb-1">Thêm vào Album</h3>
+    <p class="text-white/40 text-sm mb-5">Chọn album bạn muốn thêm bài hát vào</p>
+
+    <input type="text" placeholder="Tìm album..." [value]="player.albumKeyword()" (input)="player.onAlbumSearch($event)"
+      class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder-white/30 outline-none focus:border-violet-500/50 mb-4 transition" />
+
+    <div class="max-h-60 overflow-y-auto space-y-2 pr-1 custom-scroll">
+      @for (album of player.albumList(); track album.id) {
+      <div (click)="player.selectAlbum(album)"
+        class="flex items-center gap-3 p-3 rounded-xl transition-all duration-150 border" [class]="player.selectedSongAlbumIds().includes(album.id)
+          ? 'opacity-40 cursor-not-allowed bg-white/3 border-white/5'
+          : player.selectedAlbumId() === album.id
+            ? 'bg-violet-600/20 border-violet-500/40 cursor-pointer'
+            : 'bg-white/3 border-white/5 hover:bg-white/7 hover:border-white/10 cursor-pointer'">
+        <div
+          class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-800 to-purple-900 shrink-0 flex items-center justify-center">
+          <svg class="w-5 h-5 text-violet-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+        </div>
+
+        <div class="min-w-0">
+          <p class="text-sm font-semibold text-white truncate">{{ album.title }}</p>
+          <p class="text-xs text-white/40">{{ album.albumTypeName ?? 'Album' }}</p>
+        </div>
+
+        @if (player.selectedSongAlbumIds().includes(album.id)) {
+        <span class="text-xs text-white/40 ml-auto shrink-0">Đã có</span>
+        }
+        @else if (player.selectedAlbumId() === album.id) {
+        <svg class="w-5 h-5 text-violet-400 ml-auto shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+        </svg>
+        }
+      </div>
+      }
+
+      @empty {
+      <p class="text-center text-white/30 text-sm py-6">
+        Không tìm thấy album
+      </p>
+      }
+    </div>
+
+    <div class="flex gap-3 mt-6">
+      <button (click)="player.closeAddToAlbum()"
+        class="flex-1 h-11 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/30 text-sm font-medium transition-all cursor-pointer">
+        Hủy
+      </button>
+
+      <button (click)="player.confirmAddToAlbum()" [disabled]="!player.selectedAlbumId() || player.isAddingToAlbum()"
+        class="flex-1 h-11 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+        {{ player.isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' }}
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (player.showLoginMessage()) {
+<div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+  (click)="player.closeLoginMessage()">
+  <div class="relative w-full md:w-[820px] max-w-[92%] rounded-[28px]
+         bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+         p-6 md:p-10 shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
+    <button (click)="player.closeLoginMessage()"
+      class="absolute top-5 right-5 text-white/60 hover:text-white text-xl transition cursor-pointer">
+      ✕
+    </button>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 items-center">
+      <div class="flex justify-center">
+        <div class="w-[180px] h-[180px] md:w-[300px] md:h-[300px] rounded-2xl overflow-hidden shadow-2xl">
+          <img [src]="player.currentTrack()?.imgUrl || 'assets/images/default-song.jpg'" alt=""
+            class="w-full h-full object-cover" />
+        </div>
+      </div>
+
+      <div class="text-white text-center md:text-left">
+        <h2 class="text-3xl md:text-5xl font-extrabold leading-tight">
+          Đăng nhập tài khoản trên
+          <span class="text-violet-300">Song with me</span>
+        </h2>
+
+        <p class="mt-5 text-white/70 text-sm md:text-base leading-relaxed">
+          Đăng nhập để lưu lượt thích, lịch sử nghe nhạc
+          và trải nghiệm âm nhạc không giới hạn
+        </p>
+
+        <div class="mt-8 flex flex-col gap-4">
+          <button routerLink="/auth/login" (click)="player.closeLoginMessage()"
+            class="h-14 rounded-full bg-violet-500 hover:bg-violet-400 cursor-pointer
+                   text-white font-bold text-lg transition-all">
+            Đăng nhập ngay
+          </button>
+
+          <button routerLink="/auth/register" (click)="player.closeLoginMessage()"
+            class="h-14 rounded-full border border-white/20 cursor-pointer
+                   hover:border-white/50 hover:bg-white/5
+                   text-white font-semibold transition-all">
+            Tạo tài khoản miễn phí
+          </button>
+        </div>
+
+        <p class="mt-6 text-sm text-white/50">
+          Khám phá âm nhạc theo cách của riêng bạn.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 }

@@ -6,7 +6,7 @@ import { PlayerBarDetailComponent } from "./player-bar-detail/player-bar-detail"
 @Component({
   selector: 'app-player-bar',
   standalone: true,
-  imports: [],
+  imports: [RouterLink],
   styleUrl: './player-bar.css',
   templateUrl: './player-bar.html',
   changeDetection: ChangeDetectionStrategy.OnPush

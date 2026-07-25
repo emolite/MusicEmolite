@@ -6,12 +6,12 @@ import { SongResponse } from '../../../core/models/song/res-song.model';
 import { PAGINATION, PAGINATION_USER } from '../../../core/constants/pagination.constants';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination';
 import { AuthService } from '../../../core/services/auth.service';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-playlist',
   standalone: true,
-  imports: [CommonModule, PaginationComponent, RouterLink],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './playlist.html',
   styleUrl: './playlist.css',
 })
@@ -27,8 +27,6 @@ export class PlaylistComponent implements OnInit {
   isLoading = signal(true);
   page = signal(PAGINATION.DEFAULT_PAGE);
   totalPages = signal(0);
-  showLoginMessage = signal(false);
-  selectedPreviewSong = signal<any>(null);
 
   isLoggedIn = computed(() => !!this.authService.user());
 
@@ -151,8 +149,6 @@ export class PlaylistComponent implements OnInit {
 
       this.songs.set(mapped);
 
-      this.player.setQueue(mapped);
-
       this.isLoading.set(false);
     });
   }
@@ -162,12 +158,6 @@ export class PlaylistComponent implements OnInit {
       .find(x => x.id === id || x.dbSongId === id);
 
     if (!clickedSong) return;
-
-    if (!this.isLoggedIn()) {
-      this.selectedPreviewSong.set(clickedSong);
-      this.showLoginMessage.set(true);
-      return;
-    }
 
     this.player.setQueue(this.songs());
 

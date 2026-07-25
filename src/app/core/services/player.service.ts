@@ -1,5 +1,11 @@
 import { Injectable, NgZone, inject, signal } from '@angular/core';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { SongService } from './song.service';
+import { AlbumService } from './album.service';
+import { AuthService } from './auth.service';
+import { AlbumResponse } from '../models/album/res-album.model';
+import { BaseSearchDto } from '../models/base/base-search.model';
+import { AlbumRequest } from '../models/album/req-album.model';
 
 declare global {
   interface Window {
@@ -11,6 +17,8 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class PlayerService {
   private songService = inject(SongService);
+  private albumService = inject(AlbumService);
+  private authService = inject(AuthService);
   private zone = inject(NgZone);
 
   private audio = new Audio();
@@ -46,10 +54,26 @@ export class PlayerService {
 
   isYoutubeMode = signal(false);
   youtubeVideoId = signal<string | null>(null);
+  private autoAdvance = true;
+
+  showLoginMessage = signal(false);
+
+  showAddToAlbum = signal(false);
+  selectedAlbumId = signal<number | null>(null);
+  albumList = signal<AlbumResponse[]>([]);
+  selectedSongAlbumIds = signal<number[]>([]);
+  albumKeyword = signal('');
+  isAddingToAlbum = signal(false);
+
+  private albumSearch$ = new Subject<string>();
 
   constructor() {
     this.initAudioEvents();
     this.initYoutubePlayer();
+
+    this.albumSearch$
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(keyword => this.fetchAlbums(keyword));
   }
 
   togglePlayerBar() {
@@ -62,6 +86,78 @@ export class PlayerService {
 
   closeDetail() {
     this.isDetailOpen.set(false);
+  }
+
+  closeLoginMessage() {
+    this.showLoginMessage.set(false);
+  }
+
+  openAddToAlbum() {
+    const current = this.currentTrack();
+    if (!current?.dbSongId) return;
+
+    this.selectedSongAlbumIds.set(current.albumIds ?? []);
+    this.selectedAlbumId.set(null);
+    this.albumKeyword.set('');
+    this.showAddToAlbum.set(true);
+
+    this.fetchAlbums('');
+  }
+
+  closeAddToAlbum() {
+    this.showAddToAlbum.set(false);
+    this.selectedAlbumId.set(null);
+  }
+
+  selectAlbum(album: AlbumResponse) {
+    if (this.selectedSongAlbumIds().includes(album.id)) return;
+
+    this.selectedAlbumId.set(album.id);
+  }
+
+  onAlbumSearch(event: Event) {
+    const keyword = (event.target as HTMLInputElement).value;
+
+    this.albumKeyword.set(keyword);
+    this.albumSearch$.next(keyword);
+  }
+
+  private fetchAlbums(keyword: string) {
+    const payload: BaseSearchDto<AlbumRequest> = {
+      page: 1,
+      pageSize: 20,
+      asc: false,
+      searchParams: { keyword }
+    };
+
+    this.albumService.searchAlbums(payload).subscribe(res => {
+      this.albumList.set(res.data ?? []);
+    });
+  }
+
+  confirmAddToAlbum() {
+    const songId = this.currentTrack()?.dbSongId;
+    const albumId = this.selectedAlbumId();
+
+    if (!songId || !albumId) return;
+
+    this.isAddingToAlbum.set(true);
+
+    this.songService.addSongToAlbum(songId, albumId).subscribe({
+      next: () => {
+        this.isAddingToAlbum.set(false);
+
+        this.currentTrack.update((track: any) => ({
+          ...track,
+          albumIds: [...(track.albumIds ?? []), albumId]
+        }));
+
+        this.closeAddToAlbum();
+      },
+      error: () => {
+        this.isAddingToAlbum.set(false);
+      }
+    });
   }
 
   startVolumeDrag(event: MouseEvent) {
@@ -106,8 +202,9 @@ export class PlayerService {
     this.updateVolume(event.clientX);
   }
 
-  setQueue(queue: any[]) {
+  setQueue(queue: any[], options?: { autoAdvance?: boolean }) {
     this.queue = queue;
+    this.autoAdvance = options?.autoAdvance ?? true;
   }
 
   stop() {
@@ -195,10 +292,40 @@ export class PlayerService {
 
     this.addYoutubeHistory(track);
     this.loadYoutubeVideo(track.videoId);
+    this.fetchLyrics(track.id, track.name, track.artist);
+  }
+
+  private fetchLyrics(trackId: string | number, title: string, artist: string) {
+    if (!title) return;
+
+    this.songService.searchLyrics({
+      page: 1,
+      pageSize: 20,
+      searchParams: { query: title, artist }
+    }).subscribe({
+      next: res => {
+        const current = this.currentTrack();
+        if (!current || current.id !== trackId) return;
+
+        const results = res.data ?? [];
+        const lyrics = results.find(
+          r => r.artist?.toLowerCase() === artist?.toLowerCase()
+        ) ?? results[0];
+
+        this.currentTrack.update((track: any) => ({
+          ...track,
+          syncedLyrics: lyrics?.syncedLyrics ?? [],
+          lyrics: lyrics?.lyrics ?? track.lyrics
+        }));
+      },
+      error: () => {
+        // No lyrics available for this track - keep syncedLyrics empty.
+      }
+    });
   }
 
   private addYoutubeHistory(track: any) {
-    if (this.hasAddedHistory) return;
+    if (this.hasAddedHistory || !this.authService.isLoggedIn()) return;
 
     this.hasAddedHistory = true;
 
@@ -225,7 +352,8 @@ export class PlayerService {
             isLiked: currentLiked,
             youtubeVideoId: song.youtubeVideoId,
             playCount: song.playCount,
-            sourceType: song.sourceType
+            sourceType: song.sourceType,
+            albumIds: song.albumIds ?? current.albumIds ?? []
           }));
 
           this.isLiked.set(currentLiked);
@@ -259,6 +387,7 @@ export class PlayerService {
         imgUrl: detail?.imgUrl,
         releaseDate: detail?.releaseDate,
         syncedLyrics: detail?.syncedLyrics ?? [],
+        albumIds: detail?.albumIds ?? [],
       });
 
       this.isLiked.set(detail?.isLiked ?? false);
@@ -269,7 +398,7 @@ export class PlayerService {
 
       this.isPlaying.set(true);
 
-      if (!this.hasAddedHistory) {
+      if (!this.hasAddedHistory && this.authService.isLoggedIn()) {
         this.hasAddedHistory = true;
 
         this.songService
@@ -309,6 +438,11 @@ export class PlayerService {
   }
 
   toggleLike() {
+    if (!this.authService.isLoggedIn()) {
+      this.showLoginMessage.set(true);
+      return;
+    }
+
     const current = this.currentTrack();
     if (!current) return;
 
@@ -433,7 +567,7 @@ export class PlayerService {
 
           const listenedPercent = (this.listenedSeconds / this.audio.duration) * 100;
 
-          if (!this.hasIncrementedView && listenedPercent >= 70) {
+          if (!this.hasIncrementedView && listenedPercent >= 70 && this.authService.isLoggedIn()) {
             this.hasIncrementedView = true;
 
             const currentTrack = this.currentTrack();
@@ -471,11 +605,23 @@ export class PlayerService {
           this.audio.currentTime = 0;
           this.audio.play();
         } else {
-          if (this.currentIndex + 1 < this.queue.length) {
+          if (this.autoAdvance && this.currentIndex + 1 < this.queue.length) {
             this.nextTrack();
           } else {
             this.isPlaying.set(false);
           }
+        }
+      });
+    };
+
+    this.audio.onerror = () => {
+      this.zone.run(() => {
+        if (this.isYoutubeMode() || !this.audio.src) return;
+
+        this.isPlaying.set(false);
+
+        if (this.autoAdvance && this.currentIndex + 1 < this.queue.length) {
+          this.nextTrack();
         }
       });
     };
@@ -522,6 +668,9 @@ export class PlayerService {
           },
           onStateChange: (event: any) => {
             this.zone.run(() => this.handleYoutubeStateChange(event.data));
+          },
+          onError: (event: any) => {
+            this.zone.run(() => this.handleYoutubeError(event.data));
           }
         }
       });
@@ -590,11 +739,22 @@ export class PlayerService {
         return;
       }
 
-      if (this.currentIndex + 1 < this.queue.length) {
+      if (this.autoAdvance && this.currentIndex + 1 < this.queue.length) {
         this.nextTrack();
       } else {
         this.isPlaying.set(false);
       }
+    }
+  }
+
+  private handleYoutubeError(_code: number) {
+    if (!this.isYoutubeMode()) return;
+
+    this.stopYoutubeTimer();
+    this.isPlaying.set(false);
+
+    if (this.autoAdvance && this.currentIndex + 1 < this.queue.length) {
+      this.nextTrack();
     }
   }
 
@@ -635,7 +795,7 @@ export class PlayerService {
 
       const listenedPercent = (this.listenedSeconds / duration) * 100;
 
-      if (!this.hasIncrementedView && listenedPercent >= 70) {
+      if (!this.hasIncrementedView && listenedPercent >= 70 && this.authService.isLoggedIn()) {
         this.hasIncrementedView = true;
 
         const currentTrack = this.currentTrack();
