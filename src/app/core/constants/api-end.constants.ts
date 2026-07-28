@@ -29,6 +29,8 @@ export const API_END = {
     TRENDINGS: `${BASE_URL}songs/public/trending`,
     NEWEST: `${BASE_URL}songs/public/newest`,
     RECENTS: `${BASE_URL}songs/recent`,
+    MOST_PLAYED: `${BASE_URL}songs/most-played`,
+    MOST_PLAYED_MIX: `${BASE_URL}songs/mixes/most-played`,
     SONG_TO_ALBUMS: `${BASE_URL}songs/albums`,
     DETAIL: (id: number) => `${BASE_URL}songs/${id}`,
     VIEW: (id: number) => `${BASE_URL}songs/${id}/view`,
@@ -50,6 +52,7 @@ export const API_END = {
   ARTIST: {
     BASE: `${BASE_URL}artists`,
     SEARCH: `${BASE_URL}artists/search`,
+    DETAIL: (id: number) => `${BASE_URL}artists/${id}`,
     EDIT: (id: number) => `${BASE_URL}artists/${id}`,
   },
 

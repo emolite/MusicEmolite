@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -n \"mic-vocal\\\\|from '\\\\.\\\\/icons\" \"/d/Project/MusicEmolite/FE/node_modules/lucide-angular/public-api.d.ts\")"
+    ]
+  }
+}
