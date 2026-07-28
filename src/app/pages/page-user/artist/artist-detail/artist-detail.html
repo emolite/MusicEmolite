@@ -1,0 +1,160 @@
+<div class="artist-detail-page min-h-screen bg-[#0f0d1a] text-white pb-32 md:pb-0">
+    <div class="flex flex-col md:flex-row min-h-screen">
+
+        <div
+            class="md:sticky md:top-0 md:h-screen md:w-[280px] md:min-w-[280px] shrink-0 flex items-center justify-center pt-8 md:pt-16 px-5 md:px-0">
+
+            <div class="vinyl-wrapper w-full max-w-[240px] md:max-w-none">
+
+                <div class="vinyl-ring mx-auto" [class.spinning]="player.isPlaying()">
+
+                    <div class="vinyl-img">
+                        @if(player.currentTrack()?.imgUrl){
+                        <img [src]="player.currentTrack()?.imgUrl" class="w-full h-full object-cover rounded-full"
+                            draggable="false">
+                        }@else{
+                        <div
+                            class="w-full h-full rounded-full bg-gradient-to-br from-violet-900/60 to-[#0f0d1a] flex items-center justify-center">
+                            <svg class="w-16 h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                            </svg>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="vinyl-center-dot"></div>
+                </div>
+
+                @if(player.currentTrack()){
+                <div class="mt-5 md:mt-6 text-center w-full">
+                    <p class="text-white font-semibold text-sm truncate">
+                        {{player.currentTrack()?.name}}
+                    </p>
+                    <p class="text-white/40 text-xs mt-1 truncate">
+                        {{player.currentTrack()?.artist}}
+                    </p>
+
+                    <div class="mt-4 w-full">
+                        <div class="h-0.5 w-full bg-white/10 rounded-full cursor-pointer overflow-hidden"
+                            (click)="player.seek($event)">
+                            <div class="h-full bg-violet-500 rounded-full transition-all"
+                                [style.width]="player.progressPercent() + '%'"></div>
+                        </div>
+
+                        <div class="flex justify-between mt-1">
+                            <span class="text-[10px] text-white/30">{{player.currentTime()}}</span>
+                            <span class="text-[10px] text-white/30">{{player.duration()}}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-center gap-4">
+
+                        <button (click)="player.prevTrack()" class="text-white/40 hover:text-white">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" />
+                            </svg>
+                        </button>
+
+                        <button (click)="player.togglePlay()"
+                            class="w-10 h-10 bg-violet-600 hover:bg-violet-500 rounded-full flex items-center justify-center">
+                            @if(player.isPlaying()){
+                            <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                            </svg>
+                            }@else{
+                            <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            }
+                        </button>
+
+                        <button (click)="player.nextTrack()" class="text-white/40 hover:text-white">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" />
+                            </svg>
+                        </button>
+
+                    </div>
+                </div>
+                }
+
+            </div>
+        </div>
+
+        <div class="flex-1 px-4 md:px-10 py-8 md:py-16 overflow-y-auto">
+
+            <div class="mb-7 md:mb-10 text-center md:text-left">
+                <p class="text-[11px] uppercase tracking-[6px] text-violet-400/60 mb-2">Nghệ sĩ</p>
+                <h1 class="text-3xl md:text-4xl font-black">
+                    {{currentArtist()?.stageName || currentArtist()?.name}}
+                </h1>
+                <p class="text-white/30 text-sm mt-2">{{songs().length}} bài hát</p>
+            </div>
+
+            @if(isLoading()){
+            <div class="flex justify-center py-20">
+                <div class="w-8 h-8 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            }@else{
+
+            <div class="flex flex-col gap-2">
+
+                <div class="hidden md:grid gap-4 px-4 py-2" style="grid-template-columns: 2rem 1fr 1fr 5rem 4rem">
+                    <span class="text-white/20 text-xs">#</span>
+                    <span class="text-white/20 text-xs">Bài hát</span>
+                    <span class="text-white/20 text-xs">Album</span>
+                    <span class="text-white/20 text-xs text-center">Lượt nghe</span>
+                    <span class="text-white/20 text-xs text-right">Thời lượng</span>
+                </div>
+
+                <div class="hidden md:block w-full h-px bg-white/5"></div>
+
+                @for(song of songs(); track song.id; let i=$index){
+                <div (click)="playSong(song.id)"
+                    class="md:grid flex items-center gap-3 px-3 md:px-4 py-3 rounded-xl hover:bg-white/5 cursor-pointer"
+                    style="grid-template-columns: 2rem 1fr 1fr 5rem 4rem"
+                    [class.active-row]="song.id===currentTrack()?.id">
+
+                    <div class="hidden md:block text-white/30 text-sm">
+                        {{i+1}}
+                    </div>
+
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
+                            <img [src]="song.imgUrl" class="w-full h-full object-cover">
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-semibold truncate">{{song.name}}</p>
+                        </div>
+                    </div>
+
+                    <p class="hidden md:block text-white/40 truncate">{{song.albumName}}</p>
+
+                    <div class="hidden md:flex justify-center text-white/30 text-xs">
+                        {{song.views}}
+                    </div>
+
+                    <div class="text-right text-white/30 text-sm">
+                        {{formatDuration(song.duration)}}
+                    </div>
+
+                </div>
+                }
+
+                @empty {
+                <p class="text-center text-white/30 text-sm py-10">
+                    Nghệ sĩ này chưa có bài hát nào
+                </p>
+                }
+
+            </div>
+
+            }
+
+        </div>
+    </div>
+
+    <app-pagination [currentPage]="page()" [totalPages]="totalPages()" variant="user" (pageChange)="onPageChange($event)">
+    </app-pagination>
+</div>

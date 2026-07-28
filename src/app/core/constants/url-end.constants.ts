@@ -4,6 +4,7 @@ export const URL_END = {
     HOME: 'home',
     ALBUM: 'album',
     ALBUM_DETAIL: 'album/:id',
+    ARTIST_DETAIL: 'artist/:id',
     PLAYER_DETAIL: 'detail',
     DISCOVER: 'discover',
     PLAYLIST: 'playlist',

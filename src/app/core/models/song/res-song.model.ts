@@ -18,6 +18,7 @@ export interface SongResponse {
   syncedLyrics?: LyricsLine[];
   lyrics?: string;
   youtubeVideoId?: string;
+  playCount?: number;
   sourceType?: number;
   createdAt?: string;
   createdBy?: number;

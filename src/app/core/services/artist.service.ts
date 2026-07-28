@@ -26,6 +26,12 @@ export class ArtistService {
       data
     );
   }
+  getArtistDetail(id: number): Observable<BaseResponse<ArtistResponse>> {
+    return this.api.getData<BaseResponse<ArtistResponse>>(
+      API_END.ARTIST.DETAIL(id)
+    );
+  }
+
   createArtist(data: ArtistCreateRequest)
     : Observable<BaseResponse<ArtistResponse>> {
 

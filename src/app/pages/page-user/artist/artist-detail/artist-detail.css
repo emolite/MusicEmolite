@@ -1,0 +1,57 @@
+.vinyl-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+}
+
+.vinyl-ring {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, 0.2),
+    0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.vinyl-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  will-change: transform;
+}
+
+.vinyl-ring.spinning .vinyl-img {
+  animation: spin 8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.vinyl-center-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a0f2e 60%, rgba(139, 92, 246, 0.4) 100%);
+  border: 2px solid rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.5);
+  z-index: 10;
+}
+
+.active-row {
+  background: rgba(139, 92, 246, 0.08) !important;
+  border: 1px solid rgba(139, 92, 246, 0.15);
+}

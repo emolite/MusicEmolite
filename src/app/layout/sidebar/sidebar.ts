@@ -3,6 +3,8 @@ import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { LucideAngularModule, LogOut, HomeIcon, ChevronDown, Settings } from "lucide-angular";
 import { AuthService } from "../../core/services/auth.service";
 import { PlayerService } from "../../core/services/player.service";
+import { ArtistService } from "../../core/services/artist.service";
+import { ArtistResponse } from "../../core/models/artist/res-artist.model";
 
 @Component({
     selector: 'app-sidebar',
@@ -18,9 +20,28 @@ export class SidebarComponent {
     private router = inject(Router);
     public authService = inject(AuthService)
     private player = inject(PlayerService);
+    private artistService = inject(ArtistService);
 
     user = this.authService.user;
     openMenu = signal(false);
+    artists = signal<ArtistResponse[]>([]);
+
+    ngOnInit() {
+        this.loadArtists();
+    }
+
+    private loadArtists() {
+        this.artistService.searchArtists({
+            page: 1,
+            pageSize: 50,
+            asc: false,
+            searchParams: {
+                keyword: ''
+            }
+        }).subscribe(res => {
+            this.artists.set(res.data ?? []);
+        });
+    }
 
     get displayName(): string {
         const user = this.authService.user();

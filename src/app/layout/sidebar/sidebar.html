@@ -13,7 +13,7 @@
     </div>
   </div>
 
-  <nav class="px-3 flex-1">
+  <nav class="px-3 flex-1 flex flex-col min-h-0">
     <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Menu</p>
 
     <a routerLink="/users/home" routerLinkActive="bg-violet-500/15 text-violet-300"
@@ -43,6 +43,26 @@
       </svg>
       <span class="text-sm font-medium">Albums</span>
     </a>
+
+    <div class="my-4 border-t border-white/5"></div>
+
+    <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Nghệ sĩ</p>
+
+    <div class="flex flex-col flex-1 min-h-0 overflow-y-auto custom-scroll pr-1">
+      @for (artist of artists(); track artist.id) {
+      <a [routerLink]="['/users/artist', artist.id]" routerLinkActive="bg-violet-500/15 text-violet-300"
+        class="flex items-center gap-3 px-3 py-2 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
+        <div
+          class="w-6 h-6 rounded-full bg-violet-600/30 flex items-center justify-center text-[10px] font-bold text-violet-300 shrink-0">
+          {{ (artist.stageName || artist.name).charAt(0) }}
+        </div>
+        <span class="text-sm font-medium truncate">{{ artist.stageName || artist.name }}</span>
+      </a>
+      }
+      @empty {
+      <p class="text-xs text-white/20 px-3">Chưa có nghệ sĩ nào</p>
+      }
+    </div>
   </nav>
 
   <div class="px-4 py-5 border-t border-white/5">
@@ -97,7 +117,7 @@
   </a>
 
   @if (authService.user()) {
-  <button (click)="toggleMenu(); $event.stopPropagation()"
+  <a routerLink="/setting/profile" routerLinkActive="bg-violet-500/15 text-violet-300 rounded-sm"
     class="flex flex-col items-center justify-center gap-1 text-white/50 min-w-0 flex-1">
     @if(profileUri) {
     <img [src]="profileUri" class="w-6 h-6 rounded-full object-cover border border-white/10">
@@ -107,7 +127,7 @@
     </div>
     }
     <span class="text-[11px] font-medium truncate">Tôi</span>
-  </button>
+  </a>
   } @else {
   <a routerLink="/auth/login" routerLinkActive="text-violet-400"
     class="flex flex-col items-center justify-center gap-1 text-white/50 min-w-0 flex-1">

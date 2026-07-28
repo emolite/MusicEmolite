@@ -60,6 +60,47 @@
     </section>
     }
 
+    @if(isLoggedIn() && mostPlayedMix(); as mix) {
+    <section class="mb-8 md:mb-10">
+      <div class="flex items-center justify-between mb-4 md:mb-5">
+        <h2 class="text-lg md:text-xl font-bold text-white">{{ mix.title }}</h2>
+        <a (click)="goToPlaylist('most-played')"
+          class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium whitespace-nowrap">
+          Xem tất cả
+        </a>
+      </div>
+
+      <div (click)="playMostPlayedMix()"
+        class="flex items-center gap-4 md:gap-6 bg-white/5 hover:bg-white/8 border border-white/5 hover:border-violet-500/20 rounded-xl p-4 cursor-pointer transition-all duration-200 group">
+
+        <div class="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden shrink-0 grid grid-cols-2 grid-rows-2 bg-white/5">
+          @for (img of mix.coverImages; track img) {
+          <img [src]="img" class="w-full h-full object-cover">
+          }
+          @empty {
+          <div class="col-span-2 row-span-2 flex items-center justify-center">
+            <svg class="w-8 h-8 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+            </svg>
+          </div>
+          }
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm md:text-base font-semibold text-white truncate">{{ mix.title }}</p>
+          <p class="text-xs md:text-sm text-white/40 truncate mt-0.5">{{ mix.description }}</p>
+        </div>
+
+        <div
+          class="w-11 h-11 md:w-12 md:h-12 bg-violet-600 rounded-full flex items-center justify-center shadow-lg shadow-violet-600/40 shrink-0 transition-transform group-hover:scale-105">
+          <svg class="w-5 h-5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
+    </section>
+    }
+
     @if(isLoggedIn()) {
     <section class="mb-8 md:mb-10">
       <div class="flex items-center justify-between mb-4 md:mb-5">

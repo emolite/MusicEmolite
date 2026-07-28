@@ -11,6 +11,7 @@ import { LyricsResponseDto } from "../models/song/res-lyrics.model";
 import { LyricsRequestDto, LyricsSearchRequestDto, PublishLyricsRequest } from "../models/song/req-lyrics.model";
 import { YoutubeVideoResponse } from "../models/youtube/youtube-res.model";
 import { YoutubeSearchRequest } from "../models/youtube/youtube-req.model";
+import { MixPlaylistResponse } from "../models/song/res-mix.model";
 
 @Injectable({
   providedIn: 'root'
@@ -76,6 +77,18 @@ export class SongService {
     >(
       API_END.SONG.NEWEST,
       data
+    );
+  }
+
+  getMostPlayedSongs(top: number = 20): Observable<BaseTableResponse<SongResponse>> {
+    return this.api.getData<BaseTableResponse<SongResponse>>(
+      `${API_END.SONG.MOST_PLAYED}?top=${top}`
+    );
+  }
+
+  getMostPlayedMix(top: number = 20): Observable<BaseResponse<MixPlaylistResponse>> {
+    return this.api.getData<BaseResponse<MixPlaylistResponse>>(
+      `${API_END.SONG.MOST_PLAYED_MIX}?top=${top}`
     );
   }
 

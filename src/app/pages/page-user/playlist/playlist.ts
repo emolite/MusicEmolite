@@ -22,7 +22,7 @@ export class PlaylistComponent implements OnInit {
 
   player = inject(PlayerService);
 
-  activeTab = signal<'recent' | 'trending' | 'newest'>('recent');
+  activeTab = signal<'recent' | 'trending' | 'newest' | 'most-played'>('recent');
   songs = signal<any[]>([]);
   isLoading = signal(true);
   page = signal(PAGINATION.DEFAULT_PAGE);
@@ -53,6 +53,9 @@ export class PlaylistComponent implements OnInit {
         else if (tab === 'newest') {
           this.activeTab.set('newest');
         }
+        else if (tab === 'most-played') {
+          this.activeTab.set('most-played');
+        }
         else {
           this.activeTab.set('recent');
         }
@@ -62,7 +65,7 @@ export class PlaylistComponent implements OnInit {
     });
   }
 
-  setTab(tab: 'recent' | 'trending' | 'newest') {
+  setTab(tab: 'recent' | 'trending' | 'newest' | 'most-played') {
     if (this.activeTab() === tab) return;
 
     this.activeTab.set(tab);
@@ -71,7 +74,7 @@ export class PlaylistComponent implements OnInit {
   }
 
   private loadSongs() {
-    if (!this.isLoggedIn() && this.activeTab() === 'recent') {
+    if (!this.isLoggedIn() && (this.activeTab() === 'recent' || this.activeTab() === 'most-played')) {
       this.songs.set([]);
       this.totalPages.set(0);
       this.isLoading.set(false);
@@ -98,6 +101,10 @@ export class PlaylistComponent implements OnInit {
 
       case 'newest':
         api$ = this.songService.getNewestSongs(request);
+        break;
+
+      case 'most-played':
+        api$ = this.songService.getMostPlayedSongs(20);
         break;
 
       default:

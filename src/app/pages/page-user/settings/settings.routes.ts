@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { SettingsComponent } from './settings';
 import { Profile } from './profile/profile';
+import { SettingsArtists } from './artists/artists';
 
 export const SETTINGS_ROUTES: Routes = [
   {
@@ -10,6 +11,10 @@ export const SETTINGS_ROUTES: Routes = [
       {
         path: 'profile',
         component: Profile
+      },
+      {
+        path: 'artists',
+        component: SettingsArtists
       },
       {
         path: '',

@@ -46,6 +46,10 @@ export class HomeComponent {
 
   recentItems = signal<any[]>([]);
 
+  mostPlayedMix = signal<any>(null);
+
+  mostPlayedMixQueue = signal<any[]>([]);
+
   trendingTracks = signal<any[]>([]);
 
   newestTracks = signal<any[]>([]);
@@ -117,9 +121,36 @@ export class HomeComponent {
         clearInterval(interval);
 
         this.loadRecentSongs();
+
+        this.loadMostPlayedMix();
       }
 
     }, 200);
+  }
+
+  private loadMostPlayedMix() {
+
+    this.songService.getMostPlayedMix(20).subscribe(async res => {
+
+      const mix = res.data;
+
+      if (!mix || !mix.songs?.length) {
+        this.mostPlayedMix.set(null);
+        return;
+      }
+
+      const queue = await this.mapSongQueue(mix.songs);
+
+      this.mostPlayedMixQueue.set(queue);
+
+      this.mostPlayedMix.set({
+        key: mix.key,
+        title: mix.title,
+        description: mix.description,
+        coverImages: mix.coverImages ?? [],
+        totalSongs: mix.totalSongs
+      });
+    });
   }
   private async mapSongQueue(data: SongResponse[]) {
 
@@ -490,6 +521,24 @@ export class HomeComponent {
     this.player.playSong(clickedSong.id);
   }
 
+  playMostPlayedMix() {
+
+    const queue = this.mostPlayedMixQueue();
+
+    if (!queue.length) return;
+
+    this.player.setQueue(queue);
+
+    const first = queue[0];
+
+    if (first.videoId) {
+      this.player.playYoutubeSong(first.id);
+      return;
+    }
+
+    this.player.playSong(first.id);
+  }
+
   playTrendingSong(id: any) {
 
     const clickedSong =
@@ -538,7 +587,7 @@ export class HomeComponent {
   }
 
   goToPlaylist(
-    tab: 'recent' | 'trending' | 'newest' = 'recent'
+    tab: 'recent' | 'trending' | 'newest' | 'most-played' = 'recent'
   ) {
 
     this.router.navigate(
