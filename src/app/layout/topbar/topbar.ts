@@ -32,6 +32,7 @@ import {
 import { AuthService } from '../../core/services/auth.service';
 import { PlayerService } from '../../core/services/player.service';
 import { SongService } from '../../core/services/song.service';
+import { ChatHubService } from '../../core/services/chat-hub.service';
 import { YoutubeVideoResponse } from '../../core/models/youtube/youtube-res.model';
 
 @Component({
@@ -51,6 +52,7 @@ export class TopbarComponent implements OnDestroy, OnInit {
   public authService = inject(AuthService);
   private player = inject(PlayerService);
   private songService = inject(SongService);
+  private chatHubService = inject(ChatHubService);
 
   readonly UserIcon = User;
   readonly LogoutIcon = LogOut;
@@ -227,11 +229,11 @@ export class TopbarComponent implements OnDestroy, OnInit {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
     localStorage.removeItem('currentUser');
 
+    this.authService.logout();
+    this.chatHubService.stop();
     this.player.stop();
-    this.authService.user.set(null);
     this.router.navigate(['/auth/login']);
   }
 }

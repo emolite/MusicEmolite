@@ -48,6 +48,9 @@ export class LoginComponent {
                     return;
                 }
                 this.authService.setToken(data.accessToken);
+                if (data.refreshToken) {
+                    this.authService.setRefreshToken(data.refreshToken);
+                }
                 this.authService.getCurrentUser().subscribe({
                     next: (userRes: any) => {
                         const user = userRes?.data;
@@ -104,6 +107,9 @@ export class LoginComponent {
                 }
 
                 this.authService.setToken(data.accessToken);
+                if (data.refreshToken) {
+                    this.authService.setRefreshToken(data.refreshToken);
+                }
 
                 if (data.isNewUser) {
                     this.router.navigate(['/auth/welcome'], {

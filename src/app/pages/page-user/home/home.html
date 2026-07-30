@@ -33,7 +33,7 @@
             Phát ngay
           </button>
 
-          <button
+          <button (click)="openAddToAlbum(song.id, $event)"
             class="hidden md:flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-medium px-6 py-2.5 rounded-full transition-all text-sm border border-white/10">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path d="M12 5v14M5 12h14" />
@@ -60,16 +60,30 @@
     </section>
     }
 
-    @if(isLoggedIn() && mostPlayedMix(); as mix) {
+    @if(isLoggedIn()) {
     <section class="mb-8 md:mb-10">
       <div class="flex items-center justify-between mb-4 md:mb-5">
-        <h2 class="text-lg md:text-xl font-bold text-white">{{ mix.title }}</h2>
+        <h2 class="text-lg md:text-xl font-bold text-white">
+          {{ mostPlayedMix()?.title || 'Nghe nhiều nhất' }}
+        </h2>
+        @if(mostPlayedMix()) {
         <a (click)="goToPlaylist('most-played')"
           class="cursor-pointer text-sm text-violet-400 hover:text-violet-300 transition-colors font-medium whitespace-nowrap">
           Xem tất cả
         </a>
+        }
       </div>
 
+      @if(loadingMostPlayed()) {
+      <div class="flex items-center gap-4 md:gap-6 bg-white/5 border border-white/5 rounded-xl p-4 animate-pulse">
+        <div class="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-white/10 shrink-0"></div>
+        <div class="min-w-0 flex-1 space-y-2">
+          <div class="h-4 w-2/5 rounded bg-white/10"></div>
+          <div class="h-3 w-3/5 rounded bg-white/10"></div>
+        </div>
+        <div class="w-11 h-11 md:w-12 md:h-12 rounded-full bg-white/10 shrink-0"></div>
+      </div>
+      } @else if (mostPlayedMix(); as mix) {
       <div (click)="playMostPlayedMix()"
         class="flex items-center gap-4 md:gap-6 bg-white/5 hover:bg-white/8 border border-white/5 hover:border-violet-500/20 rounded-xl p-4 cursor-pointer transition-all duration-200 group">
 
@@ -98,6 +112,16 @@
           </svg>
         </div>
       </div>
+      } @else {
+      <div class="flex items-center gap-4 bg-white/3 border border-white/5 rounded-xl p-4 text-center justify-center py-8">
+        <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+        <p class="text-sm text-white/40">Nghe nhiều hơn để mở khóa mix cá nhân của bạn</p>
+      </div>
+      }
     </section>
     }
 
@@ -111,6 +135,19 @@
         </a>
       </div>
 
+      @if (loadingRecent()) {
+      <div class="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+        @for (i of skeletonRow; track i) {
+        <div class="shrink-0 w-[230px] md:w-auto flex items-center gap-3 bg-white/5 border border-white/5 rounded-xl p-3 animate-pulse">
+          <div class="w-14 h-14 rounded-xl shrink-0 bg-white/10"></div>
+          <div class="min-w-0 flex-1 space-y-2">
+            <div class="h-3.5 w-3/4 rounded bg-white/10"></div>
+            <div class="h-3 w-1/2 rounded bg-white/10"></div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else if (recentItems().length) {
       <div
         class="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (item of recentItems(); track item.id) {
@@ -137,6 +174,16 @@
         </div>
         }
       </div>
+      } @else {
+      <div class="flex flex-col items-center justify-center gap-3 bg-white/3 border border-white/5 rounded-xl py-10 px-4 text-center">
+        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+        </div>
+        <p class="text-sm text-white/40">Bạn chưa nghe bài hát nào gần đây</p>
+      </div>
+      }
     </section>
     }
 
@@ -149,6 +196,17 @@
         </a>
       </div>
 
+      @if (loadingTrending()) {
+      <div class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+        @for (i of skeletonGrid; track i) {
+        <div class="shrink-0 w-[150px] md:w-auto bg-white/3 border border-white/5 rounded-2xl p-3 md:p-4 animate-pulse">
+          <div class="w-full aspect-square rounded-xl bg-white/10 mb-3 md:mb-4"></div>
+          <div class="h-3.5 w-4/5 rounded bg-white/10 mb-2"></div>
+          <div class="h-3 w-1/2 rounded bg-white/10"></div>
+        </div>
+        }
+      </div>
+      } @else if (trendingTracks().length) {
       <div
         class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (track of trendingTracks(); track track.id; let i = $index) {
@@ -207,6 +265,16 @@
         </div>
         }
       </div>
+      } @else {
+      <div class="flex flex-col items-center justify-center gap-3 bg-white/3 border border-white/5 rounded-xl py-10 px-4 text-center">
+        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+        </div>
+        <p class="text-sm text-white/40">Chưa có bài hát thịnh hành nào</p>
+      </div>
+      }
     </section>
 
     <section class="mb-8 md:mb-10">
@@ -218,6 +286,17 @@
         </a>
       </div>
 
+      @if (loadingNewest()) {
+      <div class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0">
+        @for (i of skeletonGrid; track i) {
+        <div class="shrink-0 w-[150px] md:w-auto bg-white/3 border border-white/5 rounded-2xl p-3 md:p-4 animate-pulse">
+          <div class="w-full aspect-square rounded-xl bg-white/10 mb-3 md:mb-4"></div>
+          <div class="h-3.5 w-4/5 rounded bg-white/10 mb-2"></div>
+          <div class="h-3 w-1/2 rounded bg-white/10"></div>
+        </div>
+        }
+      </div>
+      } @else if (newestTracks().length) {
       <div
         class="flex md:grid md:grid-cols-7 gap-3 md:gap-2 overflow-x-auto md:overflow-visible pb-2 md:pb-0 snap-x snap-mandatory custom-scroll">
         @for (track of newestTracks(); track track.id) {
@@ -285,6 +364,16 @@
         </div>
         }
       </div>
+      } @else {
+      <div class="flex flex-col items-center justify-center gap-3 bg-white/3 border border-white/5 rounded-xl py-10 px-4 text-center">
+        <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center">
+          <svg class="w-6 h-6 text-white/25" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+        </div>
+        <p class="text-sm text-white/40">Chưa có bài hát mới phát hành nào</p>
+      </div>
+      }
     </section>
 
     @if(showLoginMessage()) {

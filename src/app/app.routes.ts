@@ -13,6 +13,8 @@ import { PlaylistComponent } from './pages/page-user/playlist/playlist';
 import { AlbumDetailComponent } from './pages/page-user/album/album-detail/album-detail';
 import { ArtistDetailComponent } from './pages/page-user/artist/artist-detail/artist-detail';
 import { WelcomeComponent } from './pages/page-login/welcome/welcome';
+import { ForgotPasswordComponent } from './pages/page-login/forgot-password/forgot-password';
+import { MessagesComponent } from './pages/page-user/messages/messages';
 
 export const routes: Routes = [
     {
@@ -35,6 +37,10 @@ export const routes: Routes = [
             {
                 path: URL_END.AUTH.WELCOME,
                 component: WelcomeComponent
+            },
+            {
+                path: URL_END.AUTH.FORGOT_PASSWORD,
+                component: ForgotPasswordComponent
             }
         ]
     },
@@ -65,6 +71,10 @@ export const routes: Routes = [
             {
                 path: URL_END.USER.DISCOVER,
                 component: DiscoverComponent
+            },
+            {
+                path: URL_END.USER.MESSAGES,
+                component: MessagesComponent
             }
         ]
     },

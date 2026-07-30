@@ -27,6 +27,7 @@
     "@capacitor/android": "^8.4.0",
     "@capacitor/cli": "^8.4.0",
     "@capacitor/core": "^8.4.0",
+    "@microsoft/signalr": "^10.0.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@tauri-apps/api": "^2.11.0",
     "@tauri-apps/cli": "^2.11.2",

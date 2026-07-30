@@ -1,4 +1,5 @@
 export const ENVI = {
     production: true,
-    apiUrl: 'https://musicemolite-be-dev.onrender.com/api/'
+    apiUrl: 'https://musicemolite-be-dev.onrender.com/api/',
+    hubUrl: 'https://musicemolite-be-dev.onrender.com/hubs/chat'
 }
