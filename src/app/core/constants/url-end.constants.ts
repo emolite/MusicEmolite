@@ -8,7 +8,8 @@ export const URL_END = {
     PLAYER_DETAIL: 'detail',
     DISCOVER: 'discover',
     PLAYLIST: 'playlist',
-    SETTING: 'setting'
+    SETTING: 'setting',
+    MESSAGES: 'messages'
   },
 
   ADMIN: {
@@ -21,6 +22,7 @@ export const URL_END = {
     BASE: 'auth',
     LOGIN: 'login',
     REGISTER: 'register',
-    WELCOME: 'welcome'
+    WELCOME: 'welcome',
+    FORGOT_PASSWORD: 'forgot-password'
   }
 };

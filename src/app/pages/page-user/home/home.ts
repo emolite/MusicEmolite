@@ -54,6 +54,18 @@ export class HomeComponent {
 
   newestTracks = signal<any[]>([]);
 
+  loadingRecent = signal(true);
+
+  loadingMostPlayed = signal(true);
+
+  loadingTrending = signal(true);
+
+  loadingNewest = signal(true);
+
+  skeletonRow = Array.from({ length: 6 });
+
+  skeletonGrid = Array.from({ length: 7 });
+
   playlists = signal<any[]>([]);
 
   featuredSong = signal<any>(null);
@@ -130,26 +142,35 @@ export class HomeComponent {
 
   private loadMostPlayedMix() {
 
-    this.songService.getMostPlayedMix(20).subscribe(async res => {
+    this.songService.getMostPlayedMix(20).subscribe({
+      next: async res => {
 
-      const mix = res.data;
+        const mix = res.data;
 
-      if (!mix || !mix.songs?.length) {
+        if (!mix || !mix.songs?.length) {
+          this.mostPlayedMix.set(null);
+          this.loadingMostPlayed.set(false);
+          return;
+        }
+
+        const queue = await this.mapSongQueue(mix.songs);
+
+        this.mostPlayedMixQueue.set(queue);
+
+        this.mostPlayedMix.set({
+          key: mix.key,
+          title: mix.title,
+          description: mix.description,
+          coverImages: mix.coverImages ?? [],
+          totalSongs: mix.totalSongs
+        });
+
+        this.loadingMostPlayed.set(false);
+      },
+      error: () => {
         this.mostPlayedMix.set(null);
-        return;
+        this.loadingMostPlayed.set(false);
       }
-
-      const queue = await this.mapSongQueue(mix.songs);
-
-      this.mostPlayedMixQueue.set(queue);
-
-      this.mostPlayedMix.set({
-        key: mix.key,
-        title: mix.title,
-        description: mix.description,
-        coverImages: mix.coverImages ?? [],
-        totalSongs: mix.totalSongs
-      });
     });
   }
   private async mapSongQueue(data: SongResponse[]) {
@@ -210,33 +231,40 @@ export class HomeComponent {
       searchParams: {
         keyword: ''
       }
-    }).subscribe(async res => {
+    }).subscribe({
+      next: async res => {
 
-      const queue = await this.mapSongQueue(
-        res.data ?? []
-      );
+        const queue = await this.mapSongQueue(
+          res.data ?? []
+        );
 
-      this.recentQueue.set(queue);
+        this.recentQueue.set(queue);
 
-      this.recentItems.set(
-        queue.slice(0, 6).map((s: any) => ({
-          id: s.id,
-          dbSongId: s.dbSongId,
-          videoId: s.videoId,
-          sourceType: s.sourceType,
-          name: s.name,
-          artist: s.artist,
-          duration: s.duration,
-          url: s.url,
-          imgUrl: s.imgUrl,
-          like: s.like,
-          view: s.view,
-          isLiked: s.isLiked,
-          albumIds: s.albumIds,
-          views: s.view,
-          color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
-        }))
-      );
+        this.recentItems.set(
+          queue.slice(0, 6).map((s: any) => ({
+            id: s.id,
+            dbSongId: s.dbSongId,
+            videoId: s.videoId,
+            sourceType: s.sourceType,
+            name: s.name,
+            artist: s.artist,
+            duration: s.duration,
+            url: s.url,
+            imgUrl: s.imgUrl,
+            like: s.like,
+            view: s.view,
+            isLiked: s.isLiked,
+            albumIds: s.albumIds,
+            views: s.view,
+            color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
+          }))
+        );
+
+        this.loadingRecent.set(false);
+      },
+      error: () => {
+        this.loadingRecent.set(false);
+      }
     });
   }
 
@@ -249,37 +277,44 @@ export class HomeComponent {
       searchParams: {
         keyword: ''
       }
-    }).subscribe(async res => {
+    }).subscribe({
+      next: async res => {
 
-      const queue = await this.mapSongQueue(
-        res.data ?? []
-      );
+        const queue = await this.mapSongQueue(
+          res.data ?? []
+        );
 
-      this.trendingQueue.set(queue);
+        this.trendingQueue.set(queue);
 
-      this.featuredSong.set(
-        queue[0] ?? null
-      );
+        this.featuredSong.set(
+          queue[0] ?? null
+        );
 
-      this.trendingTracks.set(
-        queue.map((s: any) => ({
-          id: s.id,
-          dbSongId: s.dbSongId,
-          videoId: s.videoId,
-          sourceType: s.sourceType,
-          name: s.name,
-          artist: s.artist,
-          duration: s.duration,
-          url: s.url,
-          like: s.like,
-          view: s.view,
-          isLiked: s.isLiked,
-          plays: s.view.toLocaleString(),
-          imgUrl: s.imgUrl,
-          albumIds: s.albumIds,
-          color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
-        }))
-      );
+        this.trendingTracks.set(
+          queue.map((s: any) => ({
+            id: s.id,
+            dbSongId: s.dbSongId,
+            videoId: s.videoId,
+            sourceType: s.sourceType,
+            name: s.name,
+            artist: s.artist,
+            duration: s.duration,
+            url: s.url,
+            like: s.like,
+            view: s.view,
+            isLiked: s.isLiked,
+            plays: s.view.toLocaleString(),
+            imgUrl: s.imgUrl,
+            albumIds: s.albumIds,
+            color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
+          }))
+        );
+
+        this.loadingTrending.set(false);
+      },
+      error: () => {
+        this.loadingTrending.set(false);
+      }
     });
   }
 
@@ -292,34 +327,41 @@ export class HomeComponent {
       searchParams: {
         keyword: ''
       }
-    }).subscribe(async res => {
+    }).subscribe({
+      next: async res => {
 
-      const queue = await this.mapSongQueue(
-        res.data ?? []
-      );
+        const queue = await this.mapSongQueue(
+          res.data ?? []
+        );
 
-      this.newestQueue.set(queue);
+        this.newestQueue.set(queue);
 
-      this.newestTracks.set(
-        queue.map((s: any) => ({
-          id: s.id,
-          dbSongId: s.dbSongId,
-          videoId: s.videoId,
-          sourceType: s.sourceType,
-          name: s.name,
-          artist: s.artist,
-          duration: s.duration,
-          url: s.url,
-          like: s.like,
-          view: s.view,
-          isLiked: s.isLiked,
-          plays: s.view.toLocaleString(),
-          imgUrl: s.imgUrl,
-          albumIds: s.albumIds,
-          year: s.year,
-          color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
-        }))
-      );
+        this.newestTracks.set(
+          queue.map((s: any) => ({
+            id: s.id,
+            dbSongId: s.dbSongId,
+            videoId: s.videoId,
+            sourceType: s.sourceType,
+            name: s.name,
+            artist: s.artist,
+            duration: s.duration,
+            url: s.url,
+            like: s.like,
+            view: s.view,
+            isLiked: s.isLiked,
+            plays: s.view.toLocaleString(),
+            imgUrl: s.imgUrl,
+            albumIds: s.albumIds,
+            year: s.year,
+            color: 'linear-gradient(135deg, #8b5cf6, #0f0d1a)'
+          }))
+        );
+
+        this.loadingNewest.set(false);
+      },
+      error: () => {
+        this.loadingNewest.set(false);
+      }
     });
   }
   openAddToAlbum(songId: number, event: Event) {

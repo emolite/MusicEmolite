@@ -11,7 +11,33 @@ export const API_END = {
     CHECK_EMAIL: `${BASE_URL}auth/check-email`,
     CHECK_USERNAME: `${BASE_URL}auth/check-username`,
     CHECK_IP: `${BASE_URL}auth/check-ip`,
-    CURRENT_USER: `${BASE_URL}auth/current-user`
+    CURRENT_USER: `${BASE_URL}auth/current-user`,
+    RESET_PASSWORD: `${BASE_URL}auth/reset-password`,
+    REFRESH_TOKEN: `${BASE_URL}auth/refresh-token`,
+    LOGOUT: `${BASE_URL}auth/logout`
+  },
+
+  OTP: {
+    SEND: `${BASE_URL}otp/send`,
+    VERIFY: `${BASE_URL}otp/verify`
+  },
+
+  FRIEND: {
+    BASE: `${BASE_URL}friends`,
+    REQUESTS: `${BASE_URL}friends/requests`,
+    REQUESTS_SENT: `${BASE_URL}friends/requests/sent`,
+    SEARCH: `${BASE_URL}friends/search`,
+    ACCEPT: (friendshipId: number) => `${BASE_URL}friends/requests/${friendshipId}/accept`,
+    REJECT: (friendshipId: number) => `${BASE_URL}friends/requests/${friendshipId}/reject`,
+    REMOVE: (friendUserId: number) => `${BASE_URL}friends/${friendUserId}`,
+  },
+
+  MESSAGE: {
+    BASE: `${BASE_URL}messages`,
+    CONVERSATIONS: `${BASE_URL}messages/conversations`,
+    CONVERSATION: (otherUserId: number) => `${BASE_URL}messages/${otherUserId}`,
+    MARK_READ: (otherUserId: number) => `${BASE_URL}messages/${otherUserId}/read`,
+    UPLOAD_IMAGE: `${BASE_URL}messages/upload-image`,
   },
 
   USER: {

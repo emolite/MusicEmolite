@@ -70,10 +70,75 @@ export class PlayerService {
   constructor() {
     this.initAudioEvents();
     this.initYoutubePlayer();
+    this.initMediaSession();
+    this.initBackgroundPlaybackGuard();
 
     this.albumSearch$
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(keyword => this.fetchAlbums(keyword));
+  }
+
+  /**
+   * Tab/app backgrounding is the same `visibilitychange` event on every
+   * device - there is no web API to tell "phone locked" apart from
+   * "desktop tab switched". Uninterrupted background playback is a
+   * Premium perk, so free accounts get paused here instead.
+   */
+  private initBackgroundPlaybackGuard() {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) return;
+      if (this.authService.isPremium()) return;
+      if (!this.isPlaying()) return;
+
+      if (this.isYoutubeMode()) {
+        this.youtubePlayer?.pauseVideo?.();
+      } else {
+        this.audio.pause();
+      }
+
+      this.isPlaying.set(false);
+      this.syncPlaybackState();
+    });
+  }
+
+  private initMediaSession() {
+    if (!('mediaSession' in navigator)) return;
+
+    navigator.mediaSession.setActionHandler('play', () => this.togglePlay());
+    navigator.mediaSession.setActionHandler('pause', () => this.togglePlay());
+    navigator.mediaSession.setActionHandler('previoustrack', () => this.prevTrack());
+    navigator.mediaSession.setActionHandler('nexttrack', () => this.nextTrack());
+  }
+
+  /**
+   * Lock-screen/notification media controls (and the OS signal that keeps
+   * background audio alive) are only worth wiring up for Premium accounts,
+   * since free accounts get paused as soon as the app is backgrounded.
+   */
+  private updateMediaSession(track: any) {
+    if (!('mediaSession' in navigator)) return;
+
+    if (!this.authService.isPremium()) {
+      navigator.mediaSession.metadata = null;
+      return;
+    }
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track?.name ?? '',
+      artist: track?.artist ?? '',
+      artwork: track?.imgUrl
+        ? [{ src: track.imgUrl, sizes: '512x512', type: 'image/png' }]
+        : []
+    });
+
+    this.syncPlaybackState();
+  }
+
+  private syncPlaybackState() {
+    if (!('mediaSession' in navigator)) return;
+    if (!this.authService.isPremium()) return;
+
+    navigator.mediaSession.playbackState = this.isPlaying() ? 'playing' : 'paused';
   }
 
   togglePlayerBar() {
@@ -290,6 +355,8 @@ export class PlayerService {
     this.currentTimeRaw.set(0);
     this.progressPercent.set(0);
 
+    this.updateMediaSession(this.currentTrack());
+
     this.addYoutubeHistory(track);
     this.loadYoutubeVideo(track.videoId);
     this.fetchLyrics(track.id, track.name, track.artist);
@@ -397,6 +464,7 @@ export class PlayerService {
       this.audio.play();
 
       this.isPlaying.set(true);
+      this.updateMediaSession(this.currentTrack());
 
       if (!this.hasAddedHistory && this.authService.isLoggedIn()) {
         this.hasAddedHistory = true;
@@ -417,11 +485,13 @@ export class PlayerService {
       if (state === window.YT?.PlayerState?.PLAYING) {
         this.youtubePlayer.pauseVideo();
         this.isPlaying.set(false);
+        this.syncPlaybackState();
         return;
       }
 
       this.youtubePlayer.playVideo();
       this.isPlaying.set(true);
+      this.syncPlaybackState();
       this.startYoutubeTimer();
       return;
     }
@@ -435,6 +505,8 @@ export class PlayerService {
       this.audio.pause();
       this.isPlaying.set(false);
     }
+
+    this.syncPlaybackState();
   }
 
   toggleLike() {
@@ -720,12 +792,14 @@ export class PlayerService {
 
     if (state === window.YT.PlayerState.PLAYING) {
       this.isPlaying.set(true);
+      this.syncPlaybackState();
       this.startYoutubeTimer();
       return;
     }
 
     if (state === window.YT.PlayerState.PAUSED) {
       this.isPlaying.set(false);
+      this.syncPlaybackState();
       return;
     }
 

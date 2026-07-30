@@ -6,13 +6,12 @@ import { SongService } from '../../../../core/services/song.service';
 import { PlayerService } from '../../../../core/services/player.service';
 
 import { SongResponse } from '../../../../core/models/song/res-song.model';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
 import { PAGINATION } from '../../../../core/constants/pagination.constants';
 
 @Component({
   selector: 'app-album-detail',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule],
   templateUrl: './album-detail.html',
   styleUrl: './album-detail.css'
 })

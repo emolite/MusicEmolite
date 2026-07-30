@@ -2,9 +2,9 @@
     <div class="flex flex-col md:flex-row min-h-screen">
 
         <div
-            class="md:sticky md:top-0 md:h-screen md:w-[280px] md:min-w-[280px] shrink-0 flex items-center justify-center pt-8 md:pt-16 px-5 md:px-0">
+            class="md:sticky md:top-0 md:h-screen md:w-70 md:min-w-70 shrink-0 flex items-center justify-center pt-8 md:pt-16 px-5 md:px-0">
 
-            <div class="vinyl-wrapper w-full max-w-[240px] md:max-w-none">
+            <div class="vinyl-wrapper w-full max-w-60 md:max-w-none">
 
                 <div class="vinyl-ring mx-auto" [class.spinning]="player.isPlaying()">
 
@@ -14,7 +14,7 @@
                             draggable="false">
                         }@else{
                         <div
-                            class="w-full h-full rounded-full bg-gradient-to-br from-violet-900/60 to-[#0f0d1a] flex items-center justify-center">
+                            class="w-full h-full rounded-full bg-linear-to-br from-violet-900/60 to-[#0f0d1a] flex items-center justify-center">
                             <svg class="w-16 h-16 text-violet-400/30" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />

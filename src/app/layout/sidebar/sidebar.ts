@@ -4,6 +4,7 @@ import { LucideAngularModule, LogOut, HomeIcon, ChevronDown, Settings } from "lu
 import { AuthService } from "../../core/services/auth.service";
 import { PlayerService } from "../../core/services/player.service";
 import { ArtistService } from "../../core/services/artist.service";
+import { ChatHubService } from "../../core/services/chat-hub.service";
 import { ArtistResponse } from "../../core/models/artist/res-artist.model";
 
 @Component({
@@ -21,6 +22,7 @@ export class SidebarComponent {
     public authService = inject(AuthService)
     private player = inject(PlayerService);
     private artistService = inject(ArtistService);
+    public chatHubService = inject(ChatHubService);
 
     user = this.authService.user;
     openMenu = signal(false);
@@ -66,10 +68,11 @@ export class SidebarComponent {
     }
 
     logout() {
-        localStorage.removeItem('token');
         localStorage.removeItem('currentUser');
+
+        this.authService.logout();
+        this.chatHubService.stop();
         this.player.stop();
-        this.authService.user.set(null);
         this.router.navigate(['/auth/login']);
     }
 }
