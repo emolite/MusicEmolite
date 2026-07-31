@@ -22,9 +22,13 @@ export class ChatHubService {
   incomingMessage = signal<ChatMessage | null>(null);
   incomingFriendRequest = signal<FriendUser | null>(null);
   friendRequestAccepted = signal<FriendUser | null>(null);
+  typingUserId = signal<number | null>(null);
+  messageDeleted = signal<{ messageId: number } | null>(null);
 
   /** Conversation currently open on screen - suppresses its own notification. */
   private activeConversationUserId: number | null = null;
+
+  private typingTimer: ReturnType<typeof setTimeout> | null = null;
 
   start(): void {
     if (this.hubConnection) return;
@@ -61,6 +65,21 @@ export class ChatHubService {
       this.toastService.success(`${friend.fullName || friend.username} đã chấp nhận lời mời kết bạn`);
     });
 
+    this.hubConnection.on('UserTyping', (payload: { senderId: number }) => {
+      this.typingUserId.set(payload.senderId);
+
+      if (this.typingTimer) clearTimeout(this.typingTimer);
+
+      this.typingTimer = setTimeout(() => {
+        this.typingUserId.set(null);
+        this.typingTimer = null;
+      }, 3000);
+    });
+
+    this.hubConnection.on('MessageDeleted', (payload: { messageId: number }) => {
+      this.messageDeleted.set(payload);
+    });
+
     this.hubConnection.start().catch(() => {
       // Best-effort - REST endpoints still work without the realtime channel.
     });
@@ -72,6 +91,16 @@ export class ChatHubService {
     this.hubConnection?.stop();
     this.hubConnection = null;
     this.totalUnreadCount.set(0);
+
+    if (this.typingTimer) clearTimeout(this.typingTimer);
+    this.typingTimer = null;
+    this.typingUserId.set(null);
+  }
+
+  sendTyping(receiverId: number): void {
+    this.hubConnection?.invoke('Typing', receiverId).catch(() => {
+      // Best-effort - typing indicator is a nice-to-have, not worth surfacing errors for.
+    });
   }
 
   refreshUnreadCount(): void {

@@ -6,4 +6,11 @@ export interface ChatMessage {
   imageUrl: string | null;
   isRead: boolean;
   createdAt: string | null;
+  isDeleted: boolean;
+  replyToMessageId: number | null;
+  replyToContent: string | null;
+  replyToHasImage: boolean;
+  replyToSenderId: number | null;
+  replyToIsDeleted: boolean;
+  forwardedFromMessageId: number | null;
 }

@@ -78,9 +78,13 @@
               }
             </div>
             <p class="text-xs truncate mt-0.5" [class.text-white/40]="conv.unreadCount === 0" [class.text-white/70]="conv.unreadCount > 0" [class.font-medium]="conv.unreadCount > 0">
-              @if(conv.isLastMessageMine) {<span class="text-white/30">Bạn: </span>}
-              @if(conv.lastMessageHasImage) {📷 Hình ảnh}
-              @else {{{ conv.lastMessage || 'Bắt đầu trò chuyện' }}}
+              @if(conv.isLastMessageDeleted) {
+              <span class="italic text-white/30">Tin nhắn đã bị thu hồi</span>
+              } @else {
+                @if(conv.isLastMessageMine) {<span class="text-white/30">Bạn: </span>}
+                @if(conv.lastMessageHasImage) {📷 Hình ảnh}
+                @else {{{ conv.lastMessage || 'Bắt đầu trò chuyện' }}}
+              }
             </p>
           </div>
           @if(conv.unreadCount > 0) {
@@ -248,42 +252,131 @@
       </div>
     </div>
 
-    <div class="flex-1 min-h-0 overflow-y-auto custom-scroll px-4 md:px-6 py-4 space-y-3">
-      @if(loadingMessages()) {
-      <div class="flex flex-col gap-3">
-        @for(i of [1,2,3]; track i) {
-        <div class="h-10 w-1/3 rounded-2xl bg-white/5 animate-pulse" [class.ml-auto]="i % 2 === 0"></div>
-        }
-      </div>
-      } @else {
-        @for(message of messages(); track message.id) {
-        <div class="flex" [class.justify-end]="isMine(message)">
-          <div class="max-w-[75%] md:max-w-[60%]">
-            @if(message.imageUrl) {
-            <img [src]="message.imageUrl" class="rounded-2xl max-h-72 object-cover mb-1"
-              [class.ml-auto]="isMine(message)">
-            }
-            @if(message.content) {
-            <div class="px-4 py-2.5 rounded-2xl text-sm"
-              [class.bg-violet-600]="isMine(message)"
-              [class.text-white]="isMine(message)"
-              [class.bg-white/8]="!isMine(message)">
-              {{ message.content }}
+    <div class="relative flex-1 min-h-0">
+      <div #messagesScroll (scroll)="onMessagesScroll()"
+        class="h-full overflow-y-auto custom-scroll px-4 md:px-6 py-4 space-y-3">
+        @if(loadingMessages()) {
+        <div class="flex flex-col gap-3">
+          @for(i of [1,2,3]; track i) {
+          <div class="h-10 w-1/3 rounded-2xl bg-white/5 animate-pulse" [class.ml-auto]="i % 2 === 0"></div>
+          }
+        </div>
+        } @else {
+          @for(message of messages(); track message.id) {
+          <div [id]="'msg-' + message.id" class="group flex items-end gap-1.5 rounded-xl transition-colors duration-500"
+            [class.justify-end]="isMine(message)"
+            [class.flex-row-reverse]="!isMine(message)"
+            [class.bg-violet-500/15]="highlightedMessageId() === message.id">
+
+            @if(!message.isDeleted) {
+            <div class="relative shrink-0 self-end mb-4 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition">
+              <button (click)="toggleMessageMenu(message.id, $event)"
+                class="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white cursor-pointer">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 10a2 2 0 110 4 2 2 0 010-4zm6 0a2 2 0 110 4 2 2 0 010-4zm6 0a2 2 0 110 4 2 2 0 010-4z" />
+                </svg>
+              </button>
+
+              @if(openMessageMenuId() === message.id) {
+              <div (click)="$event.stopPropagation()"
+                class="absolute bottom-full mb-1 w-36 rounded-xl bg-[#1a1825] border border-white/10 shadow-xl overflow-hidden z-20"
+                [class.right-0]="isMine(message)" [class.left-0]="!isMine(message)">
+                <button (click)="startReply(message)"
+                  class="w-full px-3 py-2 text-left text-xs text-white hover:bg-white/5 cursor-pointer">Trả lời</button>
+                <button (click)="startForward(message)"
+                  class="w-full px-3 py-2 text-left text-xs text-white hover:bg-white/5 cursor-pointer">Chuyển tiếp</button>
+                @if(isMine(message)) {
+                <button (click)="removeMessage(message)"
+                  class="w-full px-3 py-2 text-left text-xs text-red-400 hover:bg-white/5 cursor-pointer">Thu hồi</button>
+                }
+              </div>
+              }
             </div>
             }
-            <p class="text-[10px] text-white/30 mt-1" [class.text-right]="isMine(message)">{{ formatTime(message.createdAt) }}</p>
+
+            <div class="max-w-[75%] md:max-w-[60%]">
+              @if(message.isDeleted) {
+              <p class="italic text-white/30 text-sm px-4 py-2.5">Tin nhắn đã bị thu hồi</p>
+              } @else {
+                @if(message.forwardedFromMessageId) {
+                <p class="text-[10px] text-white/30 italic mb-1" [class.text-right]="isMine(message)">↪ Đã chuyển tiếp</p>
+                }
+
+                @if(message.replyToMessageId) {
+                <div (click)="scrollToMessage(message.replyToMessageId!)"
+                  class="mb-1 px-3 py-1.5 rounded-xl bg-white/5 border-l-2 border-violet-500 text-xs text-white/50 truncate cursor-pointer hover:bg-white/10 transition">
+                  @if(message.replyToIsDeleted) {
+                  <span class="italic">Tin nhắn đã bị thu hồi</span>
+                  } @else {
+                  <span class="font-medium text-white/70">
+                    {{ message.replyToSenderId === currentUserId ? 'Bạn' : (activeConversation()?.fullName || activeConversation()?.username) }}:
+                  </span>
+                  @if(message.replyToHasImage) {📷 Hình ảnh} @else {{{ message.replyToContent }}}
+                  }
+                </div>
+                }
+
+                @if(message.imageUrl) {
+                <img [src]="message.imageUrl" (load)="onMessageImageLoad()" class="rounded-2xl max-h-72 object-cover mb-1"
+                  [class.ml-auto]="isMine(message)">
+                }
+                @if(message.content) {
+                <div class="px-4 py-2.5 rounded-2xl text-sm"
+                  [class.bg-violet-600]="isMine(message)"
+                  [class.text-white]="isMine(message)"
+                  [class.bg-white/8]="!isMine(message)">
+                  {{ message.content }}
+                </div>
+                }
+              }
+              <p class="text-[10px] text-white/30 mt-1" [class.text-right]="isMine(message)">{{ formatTime(message.createdAt) }}</p>
+            </div>
           </div>
-        </div>
+          }
+          @empty {
+          <div class="h-full flex items-center justify-center">
+            <p class="text-sm text-white/30">Chưa có tin nhắn nào, hãy bắt đầu trò chuyện!</p>
+          </div>
+          }
+
+          @if(isFriendTyping()) {
+          <div class="flex">
+            <div class="px-4 py-3 rounded-2xl bg-white/8 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style="animation-delay: 0ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style="animation-delay: 150ms"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-white/40 animate-bounce" style="animation-delay: 300ms"></span>
+            </div>
+          </div>
+          }
         }
-        @empty {
-        <div class="h-full flex items-center justify-center">
-          <p class="text-sm text-white/30">Chưa có tin nhắn nào, hãy bắt đầu trò chuyện!</p>
-        </div>
-        }
+      </div>
+
+      @if(showScrollToBottom()) {
+      <button (click)="scrollToBottom(true)"
+        class="absolute bottom-3 right-4 w-9 h-9 rounded-full bg-violet-600 hover:bg-violet-500 shadow-lg flex items-center justify-center transition cursor-pointer">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
       }
     </div>
 
     <div class="px-4 md:px-6 py-4 border-t border-white/5 shrink-0 bg-[#0f0d1a]">
+      @if(replyingTo(); as reply) {
+      <div class="mb-3 px-3 py-2 rounded-xl bg-white/5 border-l-2 border-violet-500 flex items-center justify-between gap-2">
+        <div class="min-w-0">
+          <p class="text-xs font-medium text-violet-400">
+            Trả lời {{ reply.senderId === currentUserId ? 'chính mình' : (activeConversation()?.fullName || activeConversation()?.username) }}
+          </p>
+          <p class="text-xs text-white/50 truncate">{{ reply.imageUrl ? '📷 Hình ảnh' : reply.content }}</p>
+        </div>
+        <button (click)="cancelReply()"
+          class="shrink-0 w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      }
+
       @if(selectedImagePreviewUrl(); as preview) {
       <div class="relative inline-block mb-3">
         <img [src]="preview" class="h-20 rounded-xl object-cover">
@@ -302,7 +395,7 @@
           </svg>
         </label>
 
-        <input type="text" [(ngModel)]="messageText" (keydown.enter)="sendMessage()"
+        <input type="text" [(ngModel)]="messageText" (keydown.enter)="sendMessage()" (input)="onMessageInput()"
           placeholder="Nhập tin nhắn..."
           class="flex-1 px-4 py-2.5 rounded-full bg-white/5 border border-white/10 focus:border-violet-500 outline-none text-sm placeholder:text-white/30 transition">
 
@@ -330,4 +423,61 @@
     </div>
     }
   </section>
+
+  @if(forwardingMessage()) {
+  <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60 px-4" (click)="cancelForward()">
+    <div class="w-full max-w-sm rounded-2xl bg-[#1a1825] border border-white/10 shadow-xl overflow-hidden" (click)="$event.stopPropagation()">
+      <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+        <p class="text-sm font-semibold">Chuyển tiếp tới</p>
+        <button (click)="cancelForward()" [disabled]="forwardingInProgress()"
+          class="w-7 h-7 rounded-full hover:bg-white/10 flex items-center justify-center text-white/40 hover:text-white cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </div>
+      <div class="max-h-80 overflow-y-auto custom-scroll py-2">
+        @for(friend of friends(); track friend.userId) {
+        <button (click)="toggleForwardFriend(friend.userId)" [disabled]="forwardingInProgress()"
+          class="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/5 cursor-pointer text-left disabled:cursor-not-allowed">
+          <div class="w-9 h-9 rounded-full shrink-0 overflow-hidden bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-xs font-bold">
+            @if(friend.avatarUrl) {<img [src]="friend.avatarUrl" class="w-full h-full object-cover">}
+            @else {{{ (friend.fullName || friend.username).charAt(0) | uppercase }}}
+          </div>
+          <p class="text-sm truncate flex-1">{{ friend.fullName || friend.username }}</p>
+          <div class="w-5 h-5 rounded-full border shrink-0 flex items-center justify-center transition"
+            [class.bg-violet-600]="selectedForwardFriendIds().includes(friend.userId)"
+            [class.border-violet-600]="selectedForwardFriendIds().includes(friend.userId)"
+            [class.border-white/20]="!selectedForwardFriendIds().includes(friend.userId)">
+            @if(selectedForwardFriendIds().includes(friend.userId)) {
+            <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            }
+          </div>
+        </button>
+        }
+        @empty {
+        <p class="text-sm text-white/30 text-center py-6">Chưa có bạn bè để chuyển tiếp</p>
+        }
+      </div>
+
+      @if(friends().length) {
+      <div class="px-4 py-3 border-t border-white/10 flex items-center gap-2">
+        <button (click)="cancelForward()" [disabled]="forwardingInProgress()"
+          class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition">
+          Huỷ
+        </button>
+        <button (click)="confirmForwardSelection()" [disabled]="selectedForwardFriendIds().length === 0 || forwardingInProgress()"
+          class="flex-1 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-sm font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center justify-center gap-2">
+          @if(forwardingInProgress()) {
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+          </svg>
+          } @else {
+          <span>Xác nhận{{ selectedForwardFriendIds().length ? ' (' + selectedForwardFriendIds().length + ')' : '' }}</span>
+          }
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
 </div>
