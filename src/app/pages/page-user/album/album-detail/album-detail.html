@@ -144,6 +144,10 @@
 
             </div>
 
+            <app-pagination [currentPage]="page()" [totalPages]="totalPages()" variant="user"
+                (pageChange)="onPageChange($event)">
+            </app-pagination>
+
             }
 
         </div>

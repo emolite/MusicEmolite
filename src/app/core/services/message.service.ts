@@ -37,6 +37,10 @@ export class MessageService {
     );
   }
 
+  deleteMessage(id: number) {
+    return this.api.deleteData<BaseResponse<boolean>>(API_END.MESSAGE.DELETE(id));
+  }
+
   uploadImage(file: File) {
     const formData = new FormData();
     formData.append('file', file);

@@ -5,6 +5,7 @@ export interface Conversation {
   avatarUrl: string | null;
   lastMessage: string | null;
   lastMessageHasImage: boolean;
+  isLastMessageDeleted: boolean;
   isLastMessageMine: boolean;
   lastMessageAt: string | null;
   unreadCount: number;

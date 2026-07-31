@@ -6,12 +6,13 @@ import { SongService } from '../../../../core/services/song.service';
 import { PlayerService } from '../../../../core/services/player.service';
 
 import { SongResponse } from '../../../../core/models/song/res-song.model';
-import { PAGINATION } from '../../../../core/constants/pagination.constants';
+import { PAGINATION_USER } from '../../../../core/constants/pagination.constants';
+import { PaginationComponent } from '../../../../shared/components/pagination/pagination';
 
 @Component({
   selector: 'app-album-detail',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './album-detail.html',
   styleUrl: './album-detail.css'
 })
@@ -27,7 +28,7 @@ export class AlbumDetailComponent {
   albumId = signal<number>(0);
   currentAlbum = signal<any>(null);
   isLoading = signal(false);
-  page = signal(PAGINATION.DEFAULT_PAGE);
+  page = signal(PAGINATION_USER.DEFAULT_PAGE);
   totalPages = signal(0);
 
   ngOnInit() {
@@ -43,7 +44,7 @@ export class AlbumDetailComponent {
 
     this.songService.searchPublicSongs({
       page: this.page(),
-      pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+      pageSize: PAGINATION_USER.DEFAULT_PAGE_SIZE,
       asc: false,
       searchParams: {
         keyword: '',

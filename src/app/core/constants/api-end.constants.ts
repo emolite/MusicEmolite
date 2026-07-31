@@ -38,6 +38,7 @@ export const API_END = {
     CONVERSATION: (otherUserId: number) => `${BASE_URL}messages/${otherUserId}`,
     MARK_READ: (otherUserId: number) => `${BASE_URL}messages/${otherUserId}/read`,
     UPLOAD_IMAGE: `${BASE_URL}messages/upload-image`,
+    DELETE: (id: number) => `${BASE_URL}messages/${id}`,
   },
 
   USER: {
