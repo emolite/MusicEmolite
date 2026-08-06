@@ -34,6 +34,7 @@ export interface AddSongHistoryRequest {
   videoId: string;
   title: string;
   channel: string;
+  channelThumbnail: string;
   thumbnailHigh: string;
   duration: number;
 }

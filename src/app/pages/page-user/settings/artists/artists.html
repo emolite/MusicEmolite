@@ -12,10 +12,14 @@
     @for (artist of artists(); track artist.id) {
     <a [routerLink]="['/users/artist', artist.id]"
       class="flex items-center gap-3 bg-white/[0.03] border border-white/10 rounded-xl p-4 hover:bg-white/5 hover:border-violet-500/25 transition-all">
+      @if (artist.url) {
+      <img [src]="artist.url" class="w-10 h-10 rounded-full object-cover shrink-0">
+      } @else {
       <div
         class="w-10 h-10 rounded-full bg-violet-600/30 flex items-center justify-center text-sm font-bold text-violet-300 shrink-0">
         {{ (artist.stageName || artist.name).charAt(0) }}
       </div>
+      }
       <div class="min-w-0">
         <p class="text-sm font-semibold text-white truncate">{{ artist.stageName || artist.name }}</p>
         @if (artist.country) {
