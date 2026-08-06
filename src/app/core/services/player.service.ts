@@ -401,6 +401,7 @@ export class PlayerService {
         videoId: track.videoId,
         title: track.name,
         channel: track.artist,
+        channelThumbnail: track.channelThumbnail ?? '',
         thumbnailHigh: track.imgUrl ?? '',
         duration: track.duration ?? 0
       })

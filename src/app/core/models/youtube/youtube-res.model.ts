@@ -8,6 +8,7 @@ export interface YoutubeVideoResponse {
   description: string;
   channelId: string;
   channel: string;
+  channelThumbnail: string;
   publishedAt: string | null;
 
   thumbnailDefault: string;

@@ -24,6 +24,7 @@ interface SongRow {
   songId?: number | null;
   name: string;
   artist: string;
+  channelThumbnail?: string;
   duration: number;
   imgUrl?: string;
   views: number;
@@ -179,6 +180,7 @@ export class DiscoverComponent implements OnInit, OnDestroy {
       videoId: s.videoId,
       name: s.title,
       artist: s.channel,
+      channelThumbnail: s.channelThumbnail,
       duration: s.duration ?? 0,
       imgUrl:
         s.thumbnailMedium ||

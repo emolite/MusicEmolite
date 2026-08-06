@@ -3,6 +3,7 @@ export interface ArtistResponse {
   name: string;
   stageName: string;
   country: string;
+  url?: string;
 
   isActived?: boolean;
   isDeleted?: boolean;
