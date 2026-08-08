@@ -1,0 +1,169 @@
+.auth-bg {
+  background: radial-gradient(circle at 18% 20%, #2c1461 0%, #150b30 45%, #060310 100%);
+}
+
+/*
+ * Half-circle "speaker" sitting flush against the auth panel's left edge
+ * (max-w-lg = 32rem, matched below) - only its left half is visible, the
+ * right half is geometrically behind the panel and gets covered by the
+ * panel's own opaque/blurred background, no clipping needed. ~half the
+ * viewport tall, styled as the same spinning-disc motif already used in
+ * playlist.css/player-bar (.vinyl-ring/.vinyl-img/.vinyl-center-dot) - a
+ * gradient label standing in for album art since there's no track playing.
+ */
+.speaker {
+  position: absolute;
+  top: 50%;
+  right: 32rem;
+  width: 50vh;
+  height: 50vh;
+  transform: translate(50%, -50%);
+  pointer-events: none;
+}
+
+.speaker-disc {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #c4b5fd, #7c3aed 55%, #3b0764 100%);
+  box-shadow:
+    0 0 0 1px rgba(139, 92, 246, .25),
+    0 0 90px rgba(124, 58, 237, .35),
+    0 25px 70px rgba(0, 0, 0, .5);
+  animation: vinyl-spin 18s linear infinite;
+}
+
+.speaker-disc-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8%;
+  height: 8%;
+  transform: translate(-50%, -50%);
+  border-radius: 9999px;
+  background: radial-gradient(circle, #1a0f2e 60%, rgba(139, 92, 246, .4) 100%);
+  border: 2px solid rgba(167, 139, 250, .4);
+  box-shadow: 0 0 8px rgba(139, 92, 246, .5);
+}
+
+.speaker-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 2px solid rgba(216, 180, 254, .55);
+  animation: speaker-ripple 2.6s ease-out infinite;
+}
+
+.speaker-ring.r2 { animation-delay: .85s; }
+.speaker-ring.r3 { animation-delay: 1.7s; }
+
+@keyframes speaker-ripple {
+  0% { transform: scale(.92); opacity: .6; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.aurora-blob.a1 {
+  top: -10rem;
+  left: -8rem;
+  width: 34rem;
+  height: 34rem;
+  background: radial-gradient(circle, rgba(124, 58, 237, .55), transparent 70%);
+  animation: aurora-drift-1 22s ease-in-out infinite;
+}
+
+.aurora-blob.a2 {
+  bottom: -12rem;
+  left: 15%;
+  width: 30rem;
+  height: 30rem;
+  background: radial-gradient(circle, rgba(217, 70, 239, .4), transparent 70%);
+  animation: aurora-drift-2 27s ease-in-out infinite;
+}
+
+.aurora-blob.a3 {
+  top: 25%;
+  right: -10rem;
+  width: 28rem;
+  height: 28rem;
+  background: radial-gradient(circle, rgba(67, 56, 202, .5), transparent 70%);
+  animation: aurora-drift-3 31s ease-in-out infinite;
+}
+
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(7%, 9%) scale(1.12); }
+  66% { transform: translate(-5%, 4%) scale(0.94); }
+}
+
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-9%, -7%) scale(1.15); }
+}
+
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40% { transform: translate(-6%, 7%) scale(1.08); }
+  75% { transform: translate(5%, -5%) scale(0.92); }
+}
+
+/* Spawn point sits just past the big disc's visible left edge (disc center
+   is at right: 32rem, radius 25vh ~= 14rem on a typical desktop viewport),
+   offset per-note by --top-offset so they don't all launch from one pixel. */
+.note {
+  position: absolute;
+  top: calc(50% + var(--top-offset, 0px));
+  right: 45rem;
+  filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 3px 5px rgba(0, 0, 0, .5));
+  animation-name: note-fly;
+  animation-timing-function: cubic-bezier(.25, .7, .4, 1);
+  animation-iteration-count: infinite;
+  /* Without this, the element sits at its plain (fully visible) state for
+     the whole animation-delay before the animation actually starts, so on
+     first paint every note appears bunched up and solid next to the
+     speaker instead of hidden until its turn. `both` holds the 0% keyframe
+     (opacity: 0) during the delay too, not just after the last iteration. */
+  animation-fill-mode: both;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+/* Shot out of the speaker, flies left across the screen and fades - real
+   right-to-left motion, no curve. --fly-y (per note) spreads the exit
+   height so they spray out instead of all riding one flat line. */
+@keyframes note-fly {
+  0%   { transform: translate(0, 0) scale(.4) rotate(0deg); opacity: 0; }
+  8%   { opacity: 1; transform: translate(-3vw, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(-125vw, var(--fly-y, 0px)) scale(1) rotate(-14deg); opacity: 0; }
+}
+
+/* Scattered, non-moving background notes - varied size/blur/opacity is what
+   actually reads as depth (near vs. far), which the flying notes alone can't give. */
+.ambient-note {
+  position: absolute;
+  animation: ambient-breathe 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ambient-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob, .note, .ambient-note, .speaker-disc, .speaker-ring {
+    animation: none;
+  }
+}

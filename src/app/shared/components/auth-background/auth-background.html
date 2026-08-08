@@ -1,0 +1,72 @@
+<div class="auth-bg absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="aurora-blob a1"></div>
+    <div class="aurora-blob a2"></div>
+    <div class="aurora-blob a3"></div>
+
+    @for(dot of ambientNotes; track $index) {
+    <svg class="ambient-note" viewBox="0 0 24 24" [style.top]="dot.top" [style.left]="dot.left"
+        [style.width]="dot.size" [style.height]="dot.size" [style.filter]="'blur(' + dot.blur + ')'"
+        [style.opacity]="dot.opacity" [style.animation-delay]="dot.delay">
+        @switch (dot.shape) {
+        @case ('quarter') {
+        <ellipse cx="7.5" cy="18" rx="3" ry="2.2" transform="rotate(-20 7.5 18)" [attr.fill]="dot.color" />
+        <rect x="9.7" y="4" width="1.4" height="14.5" [attr.fill]="dot.color" />
+        }
+        @case ('half') {
+        <ellipse cx="7.5" cy="18" rx="3" ry="2.2" transform="rotate(-20 7.5 18)" fill="none"
+            [attr.stroke]="dot.color" stroke-width="1.6" />
+        <rect x="9.7" y="4" width="1.4" height="14.5" [attr.fill]="dot.color" />
+        }
+        @case ('beamed') {
+        <ellipse cx="5" cy="19" rx="2.4" ry="1.8" transform="rotate(-15 5 19)" [attr.fill]="dot.color" />
+        <rect x="6.9" y="5" width="1.2" height="14" [attr.fill]="dot.color" />
+        <ellipse cx="14" cy="19" rx="2.4" ry="1.8" transform="rotate(-15 14 19)" [attr.fill]="dot.color" />
+        <rect x="15.9" y="5" width="1.2" height="14" [attr.fill]="dot.color" />
+        <rect x="6.9" y="5" width="10.2" height="2" [attr.fill]="dot.color" />
+        }
+        @default {
+        <path [attr.d]="noteIconPath" [attr.fill]="dot.color" />
+        }
+        }
+    </svg>
+    }
+
+    <div class="speaker">
+        <div class="speaker-ring r1"></div>
+        <div class="speaker-ring r2"></div>
+        <div class="speaker-ring r3"></div>
+        <div class="speaker-disc">
+            <div class="speaker-disc-dot"></div>
+        </div>
+    </div>
+
+    @for(note of notes; track $index) {
+    <svg class="note" viewBox="0 0 24 24" [style.width]="note.size" [style.height]="note.size"
+        [style.color]="note.color" [style.--top-offset]="note.topOffset" [style.--fly-y]="note.flyY"
+        [style.animation-duration]="note.duration" [style.animation-delay]="note.delay">
+        @switch (note.shape) {
+        @case ('quarter') {
+        <ellipse cx="7.5" cy="18" rx="3" ry="2.2" transform="rotate(-20 7.5 18)" [attr.fill]="note.color" />
+        <rect x="9.7" y="4" width="1.4" height="14.5" [attr.fill]="note.color" />
+        }
+        @case ('half') {
+        <ellipse cx="7.5" cy="18" rx="3" ry="2.2" transform="rotate(-20 7.5 18)" fill="none"
+            [attr.stroke]="note.color" stroke-width="1.6" />
+        <rect x="9.7" y="4" width="1.4" height="14.5" [attr.fill]="note.color" />
+        }
+        @case ('beamed') {
+        <ellipse cx="5" cy="19" rx="2.4" ry="1.8" transform="rotate(-15 5 19)" [attr.fill]="note.color" />
+        <rect x="6.9" y="5" width="1.2" height="14" [attr.fill]="note.color" />
+        <ellipse cx="14" cy="19" rx="2.4" ry="1.8" transform="rotate(-15 14 19)" [attr.fill]="note.color" />
+        <rect x="15.9" y="5" width="1.2" height="14" [attr.fill]="note.color" />
+        <rect x="6.9" y="5" width="10.2" height="2" [attr.fill]="note.color" />
+        }
+        @default {
+        <path [attr.d]="noteIconPath" [attr.fill]="note.color" />
+        }
+        }
+    </svg>
+    }
+
+    <div class="absolute inset-0 bg-black/20"></div>
+</div>
