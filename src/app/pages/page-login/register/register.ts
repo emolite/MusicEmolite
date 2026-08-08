@@ -5,10 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { OTP_PURPOSE } from '../../../core/constants/otp-purpose.constants';
 import { OtpInputComponent } from '../../../shared/components/otp-input/otp-input';
+import { AuthBackgroundComponent } from '../../../shared/components/auth-background/auth-background';
 
 @Component({
   selector: 'app-register',
-  imports: [FormsModule, OtpInputComponent],
+  imports: [FormsModule, OtpInputComponent, AuthBackgroundComponent],
   templateUrl: './register.html'
 })
 export class RegisterComponent implements OnDestroy {

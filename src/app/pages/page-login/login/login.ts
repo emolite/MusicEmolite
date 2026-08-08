@@ -3,10 +3,11 @@ import { Component, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { AuthService } from "../../../core/services/auth.service";
 import { Router } from "@angular/router";
+import { AuthBackgroundComponent } from "../../../shared/components/auth-background/auth-background";
 
 @Component({
     selector: 'app-login',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AuthBackgroundComponent],
     templateUrl: './login.html'
 })
 export class LoginComponent {

@@ -3,10 +3,11 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth.service';
+import { AuthBackgroundComponent } from '../../../shared/components/auth-background/auth-background';
 
 @Component({
     selector: 'app-welcome',
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, AuthBackgroundComponent],
     templateUrl: './welcome.html'
 })
 export class WelcomeComponent implements OnInit {

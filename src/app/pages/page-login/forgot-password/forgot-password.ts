@@ -5,12 +5,13 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { OTP_PURPOSE } from '../../../core/constants/otp-purpose.constants';
 import { OtpInputComponent } from '../../../shared/components/otp-input/otp-input';
+import { AuthBackgroundComponent } from '../../../shared/components/auth-background/auth-background';
 
 type Step = 'email' | 'reset' | 'done';
 
 @Component({
   selector: 'app-forgot-password',
-  imports: [CommonModule, FormsModule, OtpInputComponent],
+  imports: [CommonModule, FormsModule, OtpInputComponent, AuthBackgroundComponent],
   templateUrl: './forgot-password.html'
 })
 export class ForgotPasswordComponent implements OnDestroy {
