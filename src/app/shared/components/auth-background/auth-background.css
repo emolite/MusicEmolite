@@ -26,10 +26,11 @@
   inset: 0;
   border-radius: 9999px;
   background: radial-gradient(circle at 35% 35%, #c4b5fd, #7c3aed 55%, #3b0764 100%);
+  /* Two shadow layers, smaller blur radii than before - box-shadow blur is
+     still real rasterization work on a box this big, spinning continuously. */
   box-shadow:
     0 0 0 1px rgba(139, 92, 246, .25),
-    0 0 90px rgba(124, 58, 237, .35),
-    0 25px 70px rgba(0, 0, 0, .5);
+    0 0 40px rgba(124, 58, 237, .3);
   animation: vinyl-spin 18s linear infinite;
 }
 
@@ -62,10 +63,19 @@
   100% { transform: scale(1.35); opacity: 0; }
 }
 
+/*
+ * No `filter: blur()` here on purpose - that was the single most expensive
+ * thing on this page. Blurring a ~500px box every frame it moves is cheap
+ * on a GPU-accelerated browser (blur once into a layer, then just translate
+ * it) but on weak/integrated GPUs or software rendering it's recomputed per
+ * paint and tanks the frame rate - which is exactly what made this whole
+ * page appear "frozen" on slower machines. A radial-gradient that already
+ * fades to transparent gives the same soft-glow look for free (compositor
+ * only cares about `transform`, no filter pass at all).
+ */
 .aurora-blob {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(90px);
   will-change: transform;
   pointer-events: none;
 }
@@ -75,7 +85,7 @@
   left: -8rem;
   width: 34rem;
   height: 34rem;
-  background: radial-gradient(circle, rgba(124, 58, 237, .55), transparent 70%);
+  background: radial-gradient(circle, rgba(124, 58, 237, .5) 0%, rgba(124, 58, 237, .18) 40%, transparent 70%);
   animation: aurora-drift-1 22s ease-in-out infinite;
 }
 
@@ -84,7 +94,7 @@
   left: 15%;
   width: 30rem;
   height: 30rem;
-  background: radial-gradient(circle, rgba(217, 70, 239, .4), transparent 70%);
+  background: radial-gradient(circle, rgba(217, 70, 239, .35) 0%, rgba(217, 70, 239, .12) 40%, transparent 70%);
   animation: aurora-drift-2 27s ease-in-out infinite;
 }
 
@@ -93,7 +103,7 @@
   right: -10rem;
   width: 28rem;
   height: 28rem;
-  background: radial-gradient(circle, rgba(67, 56, 202, .5), transparent 70%);
+  background: radial-gradient(circle, rgba(67, 56, 202, .45) 0%, rgba(67, 56, 202, .15) 40%, transparent 70%);
   animation: aurora-drift-3 31s ease-in-out infinite;
 }
 
@@ -121,7 +131,10 @@
   position: absolute;
   top: calc(50% + var(--top-offset, 0px));
   right: 45rem;
-  filter: drop-shadow(0 0 12px currentColor) drop-shadow(0 3px 5px rgba(0, 0, 0, .5));
+  /* One small drop-shadow, not two stacked ones - each drop-shadow() is a
+     separate rasterize+blur+composite pass, and this runs on up to 6 of
+     these simultaneously while they're also animating transform/opacity. */
+  filter: drop-shadow(0 0 5px currentColor);
   animation-name: note-fly;
   animation-timing-function: cubic-bezier(.25, .7, .4, 1);
   animation-iteration-count: infinite;
@@ -144,8 +157,12 @@
   100% { transform: translate(-125vw, var(--fly-y, 0px)) scale(1) rotate(-14deg); opacity: 0; }
 }
 
-/* Scattered, non-moving background notes - varied size/blur/opacity is what
-   actually reads as depth (near vs. far), which the flying notes alone can't give. */
+/* Scattered, non-moving background notes - varied size/opacity is what reads
+   as depth (near vs. far). These used to also carry a small `blur()` filter
+   per element for extra depth, but that's a filter pass on up to 10
+   simultaneously-animating elements for a barely-visible effect - opacity
+   alone (a pure compositor property, no filter/rasterize cost) gets most of
+   the same read for a fraction of the cost. */
 .ambient-note {
   position: absolute;
   animation: ambient-breathe 6s ease-in-out infinite;

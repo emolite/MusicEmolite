@@ -1,12 +1,44 @@
-<div class="h-screen overflow-hidden bg-[#0f0d1a] text-white">
-  <app-sidebar></app-sidebar>
+<div class="h-screen overflow-hidden bg-[#0f0d1a] text-white flex flex-col">
+  @if (showBrowserWarning()) {
+  <div
+    class="shrink-0 z-50 w-full bg-violet-600/15 backdrop-blur-xl border-b border-violet-500/20 px-4 md:px-8 py-2.5 flex items-center gap-3">
+    <svg class="w-4.5 h-4.5 text-violet-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+      viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
 
-  <div class="h-full flex flex-col md:ml-64">
-    <app-topbar class=""></app-topbar>
+    <div class="flex-1 min-w-0 text-xs md:text-sm text-white leading-snug">
+      <p>Vui lòng sử dụng Chrome để có trải nghiệm tốt nhất. Nếu bạn đang dùng Cốc Cốc, vui lòng gỡ nó đi! Cảm ơn bạn.</p>
+      <p class="text-white/50">Please use Chrome for the best experience. If you're using Cốc Cốc, please remove it! Thank you.</p>
+    </div>
 
-    <main class="relative flex-1 overflow-y-auto app-content pb-32 md:pb-24">
-      <router-outlet></router-outlet>
-    </main>
+    <button type="button" (click)="dismissBrowserWarning()"
+      class="shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-violet-300/70 hover:text-white hover:bg-violet-500/20 transition-colors cursor-pointer">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+  }
+
+  <!--
+    `transform` here (a no-op translateZ(0)) makes this the containing block
+    for app-sidebar's `position: fixed`, per spec - fixed elements normally
+    anchor to the real viewport, ignoring flex/DOM position entirely, so
+    without this the sidebar would render pinned at the true top of the
+    screen and overlap the banner above instead of being pushed down by it.
+  -->
+  <div class="relative flex-1 min-h-0 flex" style="transform: translateZ(0);">
+    <app-sidebar></app-sidebar>
+
+    <div class="h-full flex-1 min-w-0 flex flex-col md:ml-64">
+      <app-topbar class=""></app-topbar>
+
+      <main class="relative flex-1 overflow-y-auto app-content pb-32 md:pb-24">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
   </div>
 
   <app-player-bar></app-player-bar>
