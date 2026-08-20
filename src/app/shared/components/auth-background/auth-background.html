@@ -5,7 +5,7 @@
 
     @for(dot of ambientNotes; track $index) {
     <svg class="ambient-note" viewBox="0 0 24 24" [style.top]="dot.top" [style.left]="dot.left"
-        [style.width]="dot.size" [style.height]="dot.size" [style.filter]="'blur(' + dot.blur + ')'"
+        [style.width]="dot.size" [style.height]="dot.size"
         [style.opacity]="dot.opacity" [style.animation-delay]="dot.delay">
         @switch (dot.shape) {
         @case ('quarter') {
