@@ -121,8 +121,17 @@
                     </div>
 
                     <div class="flex items-center gap-3 min-w-0">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden bg-white/5">
+                        <div class="w-12 h-12 md:w-10 md:h-10 rounded-lg shrink-0 overflow-hidden bg-white/5">
+                            @if(song.imgUrl) {
                             <img [src]="song.imgUrl" class="w-full h-full object-cover">
+                            } @else {
+                            <div class="w-full h-full flex items-center justify-center">
+                                <svg class="w-4 h-4 text-white/20" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                                </svg>
+                            </div>
+                            }
                         </div>
                         <div class="min-w-0">
                             <p class="text-sm font-semibold truncate">{{song.name}}</p>
