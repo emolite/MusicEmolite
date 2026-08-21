@@ -180,7 +180,26 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora-blob, .note, .ambient-note, .speaker-disc, .speaker-ring {
+  /*
+   * These four still look intentional frozen mid-cycle: aurora blobs just
+   * sit at their base position (soft static glows), the disc/rings freeze
+   * as a plain circle with a border ring around it, ambient notes freeze at
+   * their normal scale. None of that reads as broken.
+   */
+  .aurora-blob, .ambient-note, .speaker-disc, .speaker-ring {
     animation: none;
+  }
+
+  /*
+   * The flying notes are the opposite case: their un-animated resting state
+   * is a meaningless implementation detail (every note stacked at its
+   * pre-flight spawn point next to the speaker, fully opaque - see the
+   * note-fly 0% keyframe) with no sensible static appearance. Hide them
+   * outright instead of leaving them frozen mid-spawn, which is what made
+   * this look broken rather than just "static" on machines reporting
+   * prefers-reduced-motion.
+   */
+  .note {
+    display: none;
   }
 }
