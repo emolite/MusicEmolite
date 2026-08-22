@@ -3,15 +3,22 @@ import { CommonModule } from '@angular/common';
 import { PlayerService } from '../../../core/services/player.service';
 import { SongService } from '../../../core/services/song.service';
 import { SongResponse } from '../../../core/models/song/res-song.model';
-import { PAGINATION, PAGINATION_USER } from '../../../core/constants/pagination.constants';
-import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { PAGINATION } from '../../../core/constants/pagination.constants';
+import { InfiniteScrollDirective } from '../../../shared/directives/infinite-scroll.directive';
 import { AuthService } from '../../../core/services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+
+/**
+ * Local, not PAGINATION_USER.DEFAULT_PAGE_SIZE - that constant is shared with
+ * discover.ts's classic pagination, so changing it here would silently
+ * change that unrelated page's page size too.
+ */
+const PAGE_SIZE = 50;
 
 @Component({
   selector: 'app-playlist',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, InfiniteScrollDirective],
   templateUrl: './playlist.html',
   styleUrl: './playlist.css',
 })
@@ -25,8 +32,11 @@ export class PlaylistComponent implements OnInit {
   activeTab = signal<'recent' | 'trending' | 'newest' | 'most-played'>('recent');
   songs = signal<any[]>([]);
   isLoading = signal(true);
+  isLoadingMore = signal(false);
   page = signal(PAGINATION.DEFAULT_PAGE);
   totalPages = signal(0);
+
+  hasMore = computed(() => this.page() < this.totalPages());
 
   isLoggedIn = computed(() => !!this.authService.user());
 
@@ -61,6 +71,7 @@ export class PlaylistComponent implements OnInit {
         }
       }
 
+      this.page.set(1);
       this.loadSongs();
     });
   }
@@ -73,7 +84,15 @@ export class PlaylistComponent implements OnInit {
     this.loadSongs();
   }
 
-  private loadSongs() {
+  loadMore() {
+    if (this.isLoading() || this.isLoadingMore() || !this.hasMore()) return;
+
+    this.page.update(p => p + 1);
+    this.loadSongs(true);
+  }
+
+  /** `append` distinguishes infinite-scroll loads (add to the list) from a fresh tab/page-1 load (replace it). */
+  private loadSongs(append = false) {
     if (!this.isLoggedIn() && (this.activeTab() === 'recent' || this.activeTab() === 'most-played')) {
       this.songs.set([]);
       this.totalPages.set(0);
@@ -81,11 +100,15 @@ export class PlaylistComponent implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
 
     const request = {
       page: this.page(),
-      pageSize: PAGINATION_USER.DEFAULT_PAGE_SIZE,
+      pageSize: PAGE_SIZE,
       asc: false,
       searchParams: {
         keyword: ''
@@ -154,9 +177,13 @@ export class PlaylistComponent implements OnInit {
         };
       });
 
-      this.songs.set(mapped);
-
-      this.isLoading.set(false);
+      if (append) {
+        this.songs.update(list => [...list, ...mapped]);
+        this.isLoadingMore.set(false);
+      } else {
+        this.songs.set(mapped);
+        this.isLoading.set(false);
+      }
     });
   }
 
@@ -174,11 +201,6 @@ export class PlaylistComponent implements OnInit {
     }
 
     this.player.playSong(clickedSong.dbSongId);
-  }
-
-  onPageChange(page: number) {
-    this.page.set(page);
-    this.loadSongs();
   }
 
   formatDuration(sec: number): string {

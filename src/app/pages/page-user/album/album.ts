@@ -1,14 +1,17 @@
 import { CommonModule } from "@angular/common";
-import { Component, effect, inject, signal } from "@angular/core";
+import { Component, computed, effect, inject, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AlbumService } from "../../../core/services/album.service";
 import { AlbumResponse } from "../../../core/models/album/res-album.model";
 import { CreateAlbumPayload, CreateAlbumPopupComponent } from "./album-create-popup/album-create-popup";
+import { InfiniteScrollDirective } from "../../../shared/directives/infinite-scroll.directive";
+
+const PAGE_SIZE = 20;
 
 @Component({
     selector: "app-album",
-    imports: [CommonModule, FormsModule, RouterLink, CreateAlbumPopupComponent],
+    imports: [CommonModule, FormsModule, RouterLink, CreateAlbumPopupComponent, InfiniteScrollDirective],
     templateUrl: "./album.html"
 })
 export class AlbumComponent {
@@ -19,6 +22,12 @@ export class AlbumComponent {
     selectedTab = signal<'public' | 'private'>('public');
     showCreateAlbum = signal(false);
 
+    page = signal(1);
+    totalPages = signal(0);
+    isLoadingMore = signal(false);
+
+    hasMore = computed(() => this.page() < this.totalPages());
+
     ngOnInit() {
         this.loadAlbums();
     }
@@ -26,14 +35,27 @@ export class AlbumComponent {
     constructor() {
         effect(() => {
             this.selectedTab();
+            this.page.set(1);
             this.loadAlbums();
         });
     }
 
-    loadAlbums() {
+    loadMore() {
+        if (this.isLoadingMore() || !this.hasMore()) return;
+
+        this.page.update(p => p + 1);
+        this.loadAlbums(true);
+    }
+
+    /** `append` distinguishes infinite-scroll loads (add to the grid) from a fresh tab/search/page-1 load (replace it). */
+    loadAlbums(append = false) {
+        if (append) {
+            this.isLoadingMore.set(true);
+        }
+
         const request = {
-            page: 1,
-            pageSize: 20,
+            page: this.page(),
+            pageSize: PAGE_SIZE,
             asc: false,
             searchParams: {
                 keyword: this.keyword()
@@ -44,7 +66,14 @@ export class AlbumComponent {
                 ? this.albumService.searchPublicAlbums(request)
                 : this.albumService.searchAlbums(request);
         api.subscribe(res => {
-            this.albums.set(res.data ?? []);
+            this.totalPages.set(res.totalPages ?? 0);
+
+            if (append) {
+                this.albums.update(list => [...list, ...(res.data ?? [])]);
+                this.isLoadingMore.set(false);
+            } else {
+                this.albums.set(res.data ?? []);
+            }
         });
     }
 
@@ -58,6 +87,7 @@ export class AlbumComponent {
             .subscribe({
                 next: () => {
                     this.showCreateAlbum.set(false);
+                    this.page.set(1);
                     this.loadAlbums();
                 }
             });
@@ -65,11 +95,13 @@ export class AlbumComponent {
 
     onSearch(value: string) {
         this.keyword.set(value);
+        this.page.set(1);
         this.loadAlbums();
     }
 
     changeTab(tab: 'public' | 'private') {
+        // The selectedTab effect (constructor) already resets the page and
+        // reloads - calling loadAlbums() here too would just double-fetch.
         this.selectedTab.set(tab);
-        this.loadAlbums();
     }
 }
