@@ -71,34 +71,10 @@ export class PlayerService {
     this.initAudioEvents();
     this.initYoutubePlayer();
     this.initMediaSession();
-    this.initBackgroundPlaybackGuard();
 
     this.albumSearch$
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(keyword => this.fetchAlbums(keyword));
-  }
-
-  /**
-   * Tab/app backgrounding is the same `visibilitychange` event on every
-   * device - there is no web API to tell "phone locked" apart from
-   * "desktop tab switched". Uninterrupted background playback is a
-   * Premium perk, so free accounts get paused here instead.
-   */
-  private initBackgroundPlaybackGuard() {
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) return;
-      if (this.authService.isPremium()) return;
-      if (!this.isPlaying()) return;
-
-      if (this.isYoutubeMode()) {
-        this.youtubePlayer?.pauseVideo?.();
-      } else {
-        this.audio.pause();
-      }
-
-      this.isPlaying.set(false);
-      this.syncPlaybackState();
-    });
   }
 
   private initMediaSession() {
@@ -111,9 +87,9 @@ export class PlayerService {
   }
 
   /**
-   * Lock-screen/notification media controls (and the OS signal that keeps
-   * background audio alive) are only worth wiring up for Premium accounts,
-   * since free accounts get paused as soon as the app is backgrounded.
+   * Lock-screen/notification media controls are a Premium perk; free
+   * accounts still keep playing in the background, they just don't get
+   * OS-level playback controls for it.
    */
   private updateMediaSession(track: any) {
     if (!('mediaSession' in navigator)) return;
