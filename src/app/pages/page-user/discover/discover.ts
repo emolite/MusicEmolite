@@ -13,7 +13,7 @@ import { Subject, takeUntil } from 'rxjs';
 
 import { PlayerService } from '../../../core/services/player.service';
 import { SongService } from '../../../core/services/song.service';
-import { PaginationComponent } from '../../../shared/components/pagination/pagination';
+import { InfiniteScrollDirective } from '../../../shared/directives/infinite-scroll.directive';
 import { PAGINATION_USER } from '../../../core/constants/pagination.constants';
 
 import { YoutubeVideoResponse } from '../../../core/models/youtube/youtube-res.model';
@@ -33,12 +33,19 @@ interface SongRow {
   videoId: string;
 }
 
+/**
+ * Local, not PAGINATION_USER.DEFAULT_PAGE_SIZE - kept independent so tuning
+ * this page's page size never silently affects another page that happens to
+ * share the constant.
+ */
+const PAGE_SIZE = 50;
+
 @Component({
   selector: 'app-discover',
   standalone: true,
   imports: [
     CommonModule,
-    PaginationComponent
+    InfiniteScrollDirective
   ],
   templateUrl: './discover.html',
 })
@@ -52,12 +59,15 @@ export class DiscoverComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   songs = signal<SongRow[]>([]);
   isLoading = signal(false);
+  isLoadingMore = signal(false);
 
   keyword = signal('');
   highlightId = signal<string | null>(null);
 
   page = signal(PAGINATION_USER.DEFAULT_PAGE);
   totalPages = signal(1);
+
+  hasMore = computed(() => this.page() < this.totalPages());
 
   currentTrackId = computed(
     () => this.player.currentTrack()?.id ?? null
@@ -84,7 +94,15 @@ export class DiscoverComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadSongs(): void {
+  loadMore(): void {
+    if (this.isLoading() || this.isLoadingMore() || !this.hasMore()) return;
+
+    this.page.update(p => p + 1);
+    this.loadSongs(true);
+  }
+
+  /** `append` distinguishes infinite-scroll loads (add to the list) from a fresh keyword/page-1 load (replace it). */
+  loadSongs(append = false): void {
     const kw = this.keyword().trim();
 
     if (!kw) {
@@ -93,11 +111,15 @@ export class DiscoverComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.isLoading.set(true);
+    if (append) {
+      this.isLoadingMore.set(true);
+    } else {
+      this.isLoading.set(true);
+    }
 
     this.songService.searchYoutube({
       page: this.page(),
-      pageSize: PAGINATION_USER.DEFAULT_PAGE_SIZE,
+      pageSize: PAGE_SIZE,
       searchParams: {
         keyword: kw
       } as YoutubeSearchRequest
@@ -109,7 +131,8 @@ export class DiscoverComponent implements OnInit, OnDestroy {
             (s: YoutubeVideoResponse) => this.mapYoutubeSong(s)
           );
 
-          const hId = this.highlightId();
+          // Reorder/autoplay only makes sense on the first load, not on appended infinite-scroll pages.
+          const hId = !append ? this.highlightId() : null;
 
           if (hId) {
             const idx = items.findIndex(x => x.id === hId);
@@ -120,15 +143,21 @@ export class DiscoverComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.songs.set(items);
           this.totalPages.set(res.totalPages || 1);
-          this.isLoading.set(false);
+
+          if (append) {
+            this.songs.update(list => [...list, ...items]);
+            this.isLoadingMore.set(false);
+          } else {
+            this.songs.set(items);
+            this.isLoading.set(false);
+          }
 
           if (hId) {
             const selected = items.find(x => x.id === hId);
 
             if (selected) {
-              this.player.setQueue(items, { autoAdvance: false });
+              this.player.setQueue(this.songs(), { autoAdvance: false });
               this.player.playYoutubeSong(selected.id);
             }
           }
@@ -136,6 +165,7 @@ export class DiscoverComponent implements OnInit, OnDestroy {
 
         error: () => {
           this.isLoading.set(false);
+          this.isLoadingMore.set(false);
         }
       });
   }
@@ -143,16 +173,6 @@ export class DiscoverComponent implements OnInit, OnDestroy {
   playSong(id: string): void {
     this.player.setQueue(this.songs(), { autoAdvance: false });
     this.player.playYoutubeSong(id);
-  }
-
-  onPageChange(page: number): void {
-    this.page.set(page);
-    this.loadSongs();
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
   }
 
   formatViews(v: number): string {
