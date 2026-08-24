@@ -341,30 +341,58 @@ export class PlayerService {
   private fetchLyrics(trackId: string | number, title: string, artist: string) {
     if (!title) return;
 
+    // Ưu tiên tìm lyrics trong album EMOLITE_MUSIC trước.
+    this.songService.searchLyrics({
+      page: 1,
+      pageSize: 20,
+      searchParams: { query: title, artist, album: 'EMOLITE_MUSIC' }
+    }).subscribe({
+      next: res => {
+        const results = res.data ?? [];
+
+        if (results.length > 0) {
+          this.applyLyrics(trackId, artist, results);
+          return;
+        }
+
+        // Không có kết quả trong album EMOLITE_MUSIC -> gọi lại bỏ tham số album.
+        this.fetchLyricsFallback(trackId, title, artist);
+      },
+      error: () => {
+        this.fetchLyricsFallback(trackId, title, artist);
+      }
+    });
+  }
+
+  private fetchLyricsFallback(trackId: string | number, title: string, artist: string) {
     this.songService.searchLyrics({
       page: 1,
       pageSize: 20,
       searchParams: { query: title, artist }
     }).subscribe({
       next: res => {
-        const current = this.currentTrack();
-        if (!current || current.id !== trackId) return;
-
         const results = res.data ?? [];
-        const lyrics = results.find(
-          r => r.artist?.toLowerCase() === artist?.toLowerCase()
-        ) ?? results[0];
-
-        this.currentTrack.update((track: any) => ({
-          ...track,
-          syncedLyrics: lyrics?.syncedLyrics ?? [],
-          lyrics: lyrics?.lyrics ?? track.lyrics
-        }));
+        this.applyLyrics(trackId, artist, results);
       },
       error: () => {
         // No lyrics available for this track - keep syncedLyrics empty.
       }
     });
+  }
+
+  private applyLyrics(trackId: string | number, artist: string, results: any[]) {
+    const current = this.currentTrack();
+    if (!current || current.id !== trackId) return;
+
+    const lyrics = results.find(
+      r => r.artist?.toLowerCase() === artist?.toLowerCase()
+    ) ?? results[0];
+
+    this.currentTrack.update((track: any) => ({
+      ...track,
+      syncedLyrics: lyrics?.syncedLyrics ?? [],
+      lyrics: lyrics?.lyrics ?? track.lyrics
+    }));
   }
 
   private addYoutubeHistory(track: any) {

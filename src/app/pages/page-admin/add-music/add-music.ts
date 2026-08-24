@@ -252,7 +252,7 @@ export class AdminAddMusicComponent implements OnDestroy {
             pageSize: 20,
             searchParams: {
                 query: this.model.title,
-                album: ''
+                album: 'EMOLITE_MUSIC'
             }
         }).subscribe({
             next: (res) => {
