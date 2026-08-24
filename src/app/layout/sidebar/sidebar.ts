@@ -1,8 +1,7 @@
-import { Component, HostListener, inject, signal } from "@angular/core";
+import { Component, inject, signal } from "@angular/core";
 import { Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { LucideAngularModule, LogOut, HomeIcon, ChevronDown, Settings } from "lucide-angular";
 import { AuthService } from "../../core/services/auth.service";
-import { PlayerService } from "../../core/services/player.service";
 import { ArtistService } from "../../core/services/artist.service";
 import { ChatHubService } from "../../core/services/chat-hub.service";
 import { ArtistResponse } from "../../core/models/artist/res-artist.model";
@@ -20,12 +19,10 @@ export class SidebarComponent {
 
     private router = inject(Router);
     public authService = inject(AuthService)
-    private player = inject(PlayerService);
     private artistService = inject(ArtistService);
     public chatHubService = inject(ChatHubService);
 
     user = this.authService.user;
-    openMenu = signal(false);
     artists = signal<ArtistResponse[]>([]);
 
     ngOnInit() {
@@ -53,26 +50,16 @@ export class SidebarComponent {
     get profileUri(): string | null {
         return this.authService.user()?.profile?.uri ?? null;
     }
-    toggleMenu() {
-        this.openMenu.update(v => !v);
-    }
 
-    @HostListener('document:click')
-    closeMenu() {
-        this.openMenu.set(false);
-    }
+    /**
+     * The 3 "Xã giao" links all point at /users/messages, differing only by
+     * ?tab= - routerLinkActive can't distinguish them (it ignores query
+     * params), so this reads the tab straight off the current URL instead.
+     */
+    get activeMessagesTab(): string {
+        if (!this.router.url.startsWith('/users/messages')) return '';
 
-    goProfile() {
-        this.router.navigate(['/setting/profile']);
-        this.openMenu.set(false);
-    }
-
-    logout() {
-        localStorage.removeItem('currentUser');
-
-        this.authService.logout();
-        this.chatHubService.stop();
-        this.player.stop();
-        this.router.navigate(['/auth/login']);
+        const match = this.router.url.match(/[?&]tab=([^&]+)/);
+        return match ? match[1] : 'friends';
     }
 }
