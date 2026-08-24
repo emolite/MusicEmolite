@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef, HostListener, inject, signal, computed, effect, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged, throttleTime, forkJoin } from 'rxjs';
 
 import { FriendService } from '../../../core/services/friend.service';
@@ -31,6 +32,8 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   private messageService = inject(MessageService);
   private toastService = inject(ToastService);
   private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
   public chatHubService = inject(ChatHubService);
   public player = inject(PlayerService);
 
@@ -47,12 +50,12 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
    * whichever floating bars are actually visible right now.
    */
   get rootClass(): string {
-    const hasPlayer = !!this.player.currentTrack();
-    const clearance = hasPlayer ? 'pb-36 md:pb-24' : 'pb-16 md:pb-0';
+    const showsPlayer = !!this.player.currentTrack() && !this.player.isPlayerHidden();
+    const clearance = showsPlayer ? 'pb-36 md:pb-24' : 'pb-16 md:pb-0';
     return `absolute inset-0 flex overflow-hidden bg-[#0f0d1a] text-white ${clearance}`;
   }
 
-  activeTab = signal<Tab>('chats');
+  activeTab = signal<Tab>('friends');
 
   conversations = signal<Conversation[]>([]);
   loadingConversations = signal(true);
@@ -86,6 +89,11 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   selectedForwardFriendIds = signal<number[]>([]);
   forwardingInProgress = signal(false);
   highlightedMessageId = signal<number | null>(null);
+
+  viewingFriendInfo = signal<FriendUser | null>(null);
+
+  pinnedFriends = computed(() => this.friends().filter(f => f.isPinned));
+  otherFriends = computed(() => this.friends().filter(f => !f.isPinned));
 
   isFriendTyping = computed(() => {
     const conv = this.activeConversation();
@@ -153,6 +161,13 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   ngOnInit(): void {
     this.loadConversations();
     this.loadFriendsData();
+
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab === 'chats' || tab === 'search' || tab === 'friends') {
+        this.activeTab.set(tab);
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -168,6 +183,7 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   setTab(tab: Tab): void {
     this.activeTab.set(tab);
+    this.router.navigate([], { relativeTo: this.route, queryParams: { tab }, queryParamsHandling: 'merge' });
   }
 
   @HostListener('document:click')
@@ -568,6 +584,37 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.activeConversation()?.friendUserId === friend.userId) {
           this.activeConversation.set(null);
         }
+
+        if (this.viewingFriendInfo()?.userId === friend.userId) {
+          this.viewingFriendInfo.set(null);
+        }
+      },
+      error: (err) => this.toastService.error(err?.error?.message || 'Có lỗi xảy ra')
+    });
+  }
+
+  showFriendInfo(friend: FriendUser): void {
+    this.viewingFriendInfo.set(friend);
+  }
+
+  closeFriendInfo(): void {
+    this.viewingFriendInfo.set(null);
+  }
+
+  togglePinFriend(friend: FriendUser): void {
+    this.friendService.togglePin(friend.userId).subscribe({
+      next: res => {
+        const isPinned = res.data ?? !friend.isPinned;
+
+        this.friends.update(list =>
+          list
+            .map(f => f.userId === friend.userId ? { ...f, isPinned } : f)
+            .sort((a, b) => Number(b.isPinned) - Number(a.isPinned))
+        );
+
+        if (this.viewingFriendInfo()?.userId === friend.userId) {
+          this.viewingFriendInfo.update(f => f ? { ...f, isPinned } : f);
+        }
       },
       error: (err) => this.toastService.error(err?.error?.message || 'Có lỗi xảy ra')
     });
@@ -602,7 +649,7 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.conversations.update(list => [conv as Conversation, ...list]);
     }
 
-    this.activeTab.set('chats');
+    this.setTab('chats');
     this.selectConversation(conv);
   }
 }

@@ -25,14 +25,32 @@
     </a>
 
     @if (authService.user()) {
-    <a routerLink="/users/messages" routerLinkActive="bg-violet-500/15 text-violet-300"
-      class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-white/50 hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    <div class="my-4 border-t border-white/5"></div>
+    <p class="text-[10px] text-white/30 uppercase tracking-widest px-3 mb-3">Xã giao</p>
+
+    <a routerLink="/users/messages" [queryParams]="{tab: 'friends'}"
+      [class.bg-violet-500/15]="activeMessagesTab === 'friends'"
+      [class.text-violet-300]="activeMessagesTab === 'friends'" [class.text-white/50]="activeMessagesTab !== 'friends'"
+      class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
       </svg>
-      <span class="text-sm font-medium flex-1">Tin nhắn</span>
+      <span class="text-sm font-medium flex-1">Bạn bè</span>
+    </a>
+
+    <a routerLink="/users/messages" [queryParams]="{tab: 'chats'}"
+      [class.bg-violet-500/15]="activeMessagesTab === 'chats'" [class.text-violet-300]="activeMessagesTab === 'chats'"
+      [class.text-white/50]="activeMessagesTab !== 'chats'"
+      class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:text-white hover:bg-white/5 mb-1 transition-all duration-200">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      </svg>
+      <span class="text-sm font-medium flex-1">Nhắn tin</span>
       @if (chatHubService.totalUnreadCount() > 0) {
-      <span class="min-w-[18px] h-[18px] px-1 rounded-full bg-violet-600 text-[10px] font-bold flex items-center justify-center">
+      <span
+        class="min-w-[18px] h-[18px] px-1 rounded-full bg-violet-600 text-[10px] font-bold flex items-center justify-center">
         {{ chatHubService.totalUnreadCount() }}
       </span>
       }
@@ -83,30 +101,6 @@
       }
     </div>
   </nav>
-
-  <div class="px-4 py-5 border-t border-white/5">
-    @if (authService.user()) {
-    <div class="relative">
-      <button (click)="toggleMenu(); $event.stopPropagation()"
-        class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-all">
-        <div
-          class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
-          @if(profileUri) {
-          <img [src]="profileUri" class="w-10 h-10 rounded-full object-cover border border-white/10">
-          } @else {
-          <div class="w-10 h-10 rounded-full bg-violet-600 flex items-center justify-center">
-            {{ displayName.charAt(0) || 'U' }}
-          </div>
-          }
-        </div>
-        <div class="flex-1 min-w-0 text-left">
-          <p class="text-sm font-medium text-white truncate">{{ displayName }}</p>
-          <p class="text-xs text-white/40 truncate">{{ user()?.userType }}</p>
-        </div>
-      </button>
-    </div>
-    }
-  </div>
 </aside>
 
 <nav
@@ -139,11 +133,13 @@
   <a routerLink="/users/messages" routerLinkActive="bg-violet-500/15 text-violet-300 rounded-sm"
     class="relative flex flex-col items-center justify-center gap-1 text-white/50 min-w-0 flex-1">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
     </svg>
-    <span class="text-[11px] font-medium truncate">Tin nhắn</span>
+    <span class="text-[11px] font-medium truncate">Bạn bè</span>
     @if (chatHubService.totalUnreadCount() > 0) {
-    <span class="absolute top-0 right-1/4 min-w-[16px] h-[16px] px-1 rounded-full bg-red-500 text-[9px] font-bold flex items-center justify-center">
+    <span
+      class="absolute top-0 right-1/4 min-w-[16px] h-[16px] px-1 rounded-full bg-red-500 text-[9px] font-bold flex items-center justify-center">
       {{ chatHubService.totalUnreadCount() }}
     </span>
     }
@@ -166,7 +162,8 @@
   <a routerLink="/auth/login" routerLinkActive="text-violet-400"
     class="flex flex-col items-center justify-center gap-1 text-white/50 min-w-0 flex-1">
     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+      <path
+        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
     </svg>
     <span class="text-[11px] font-medium truncate">Login</span>
   </a>

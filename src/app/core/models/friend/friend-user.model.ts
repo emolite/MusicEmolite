@@ -6,4 +6,5 @@ export interface FriendUser {
   avatarUrl: string | null;
   status: string;
   createdAt: string | null;
+  isPinned: boolean;
 }

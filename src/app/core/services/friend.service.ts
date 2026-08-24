@@ -57,4 +57,11 @@ export class FriendService {
       API_END.FRIEND.REMOVE(friendUserId)
     );
   }
+
+  togglePin(friendUserId: number) {
+    return this.api.putData<BaseResponse<boolean>, {}>(
+      API_END.FRIEND.PIN(friendUserId),
+      {}
+    );
+  }
 }

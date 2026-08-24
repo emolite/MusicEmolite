@@ -30,6 +30,7 @@ export const API_END = {
     ACCEPT: (friendshipId: number) => `${BASE_URL}friends/requests/${friendshipId}/accept`,
     REJECT: (friendshipId: number) => `${BASE_URL}friends/requests/${friendshipId}/reject`,
     REMOVE: (friendUserId: number) => `${BASE_URL}friends/${friendUserId}`,
+    PIN: (friendUserId: number) => `${BASE_URL}friends/${friendUserId}/pin`,
   },
 
   MESSAGE: {
