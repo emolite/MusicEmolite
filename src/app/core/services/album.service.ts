@@ -3,6 +3,7 @@ import { Observable } from "rxjs";
 import { API_SERVICE } from "./commons/api.service";
 import { API_END } from "../constants/api-end.constants";
 import { BaseTableResponse } from "../models/base/base-table-res.model";
+import { BaseResponse } from "../models/base/base-res.model";
 import { AlbumResponse } from "../models/album/res-album.model";
 import { AlbumCreateRequest, AlbumRequest } from "../models/album/req-album.model";
 import { BaseSearchDto } from "../models/base/base-search.model";
@@ -38,6 +39,10 @@ export class AlbumService {
       API_END.ALBUM.SEARCH_PUBLIC,
       data
     );
+  }
+
+  getAlbumById(id: number): Observable<BaseResponse<AlbumResponse>> {
+    return this.api.getData<BaseResponse<AlbumResponse>>(API_END.ALBUM.DETAIL(id));
   }
 
   createAlbum(data: AlbumCreateRequest) {

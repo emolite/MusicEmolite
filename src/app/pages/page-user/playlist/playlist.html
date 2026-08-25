@@ -73,10 +73,25 @@
     </div>
 
     <div class="flex-1 px-4 md:px-10 py-8 md:py-16 overflow-y-auto">
-      <div class="mb-7 md:mb-10 text-center md:text-left">
-        <p class="text-[11px] uppercase tracking-[6px] text-violet-400/60 mb-2 font-medium">Thư viện</p>
-        <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight">Danh sách nhạc</h1>
-        <p class="text-white/30 text-sm mt-2">{{ songs().length }} bài hát</p>
+      <div class="mb-7 md:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-4 text-center md:text-left">
+        <div>
+          <p class="text-[11px] uppercase tracking-[6px] text-violet-400/60 mb-2 font-medium">Thư viện</p>
+          <h1 class="text-3xl md:text-4xl font-black text-white tracking-tight">Danh sách nhạc</h1>
+          <p class="text-white/30 text-sm mt-2">{{ songs().length }} bài hát</p>
+        </div>
+
+        @if(activeTab() !== 'most-played') {
+        <div class="relative w-full md:w-70 shrink-0">
+          <input #searchInput type="text" placeholder="Tìm bài hát..."
+            class="w-full h-11 pl-11 pr-4 rounded-xl bg-white/5 border border-white/10 focus:outline-none focus:border-violet-500/50 text-sm"
+            (input)="onSearch(searchInput.value)">
+          <svg class="w-4 h-4 text-white/30 absolute left-4 top-1/2 -translate-y-1/2" fill="none"
+            stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+        </div>
+        }
       </div>
 
       <div class="flex items-center gap-2 md:gap-3 mb-6 md:mb-8 overflow-x-auto pb-2 md:pb-0">
@@ -119,7 +134,7 @@
       </div>
       } @else {
 
-      <div class="flex flex-col gap-2 md:gap-1">
+      <div class="flex flex-col gap-2 md:gap-1 transition-opacity duration-300" [class.opacity-40]="isSearching()">
         <div class="hidden md:grid gap-4 px-4 py-2 mb-2"
           style="grid-template-columns: 2rem 1fr 1fr 5rem 4rem">
           <span class="text-white/20 text-xs uppercase tracking-widest">#</span>

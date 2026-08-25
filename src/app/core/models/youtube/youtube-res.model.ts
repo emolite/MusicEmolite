@@ -31,6 +31,7 @@ export interface YoutubeVideoResponse {
 
   views: number;
   isLiked: boolean;
+  albumIds: number[];
   likeCount: number;
   commentCount: number;
 

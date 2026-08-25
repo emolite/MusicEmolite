@@ -1,0 +1,88 @@
+@if(popupService.state(); as state) {
+<div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+  (click)="popupService.respond(false)">
+
+  @if(state.options.imageUrl) {
+  <!-- With image: two-column layout, matching the home page's login prompt -->
+  <div class="relative w-full max-w-md rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+    p-5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150" (click)="$event.stopPropagation()">
+    <button (click)="popupService.respond(false)"
+      class="absolute top-4 right-4 text-white/60 hover:text-white text-lg transition cursor-pointer z-10">
+      ✕
+    </button>
+
+    <div class="grid grid-cols-2 gap-4 items-center">
+      <div class="aspect-square rounded-2xl overflow-hidden shadow-xl">
+        <img [src]="state.options.imageUrl" class="w-full h-full object-cover" alt="">
+      </div>
+
+      <div class="flex flex-col items-center text-center gap-3">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center"
+          [class.bg-red-500/15]="state.options.danger" [class.bg-white/10]="!state.options.danger">
+          <svg class="w-6 h-6" [class.text-red-400]="state.options.danger"
+            [class.text-white/70]="!state.options.danger" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+
+        <p class="text-sm text-white/80 leading-relaxed whitespace-pre-line">{{ state.options.message }}</p>
+
+        <div class="flex gap-2 w-full mt-1">
+          <button (click)="popupService.respond(false)"
+            class="flex-1 h-10 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 text-xs font-semibold transition-all cursor-pointer">
+            {{ state.options.cancelText || 'Huỷ' }}
+          </button>
+
+          <button (click)="popupService.respond(true)"
+            class="flex-1 h-10 rounded-full text-white text-xs font-bold transition-all cursor-pointer"
+            [class.bg-red-500]="state.options.danger" [class.hover:bg-red-400]="state.options.danger"
+            [class.bg-violet-500]="!state.options.danger" [class.hover:bg-violet-400]="!state.options.danger">
+            {{ state.options.confirmText || 'Xác nhận' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <!-- No image: simple single-column layout -->
+  <div class="relative w-full max-w-sm rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+    p-6 md:p-8 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150" (click)="$event.stopPropagation()">
+    <button (click)="popupService.respond(false)"
+      class="absolute top-5 right-5 text-white/60 hover:text-white text-lg transition cursor-pointer">
+      ✕
+    </button>
+
+    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-5 mx-auto"
+      [class.bg-red-500/15]="state.options.danger" [class.bg-white/10]="!state.options.danger">
+      <svg class="w-7 h-7" [class.text-red-400]="state.options.danger"
+        [class.text-white/70]="!state.options.danger" fill="none" stroke="currentColor" stroke-width="2"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 9v3.75m0 3.75h.008v.008H12v-.008zM21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+
+    @if(state.options.title) {
+    <h3 class="text-xl font-extrabold text-white text-center leading-snug">{{ state.options.title }}</h3>
+    }
+    <p class="mt-2 text-sm text-white/70 text-center leading-relaxed whitespace-pre-line">{{ state.options.message }}</p>
+
+    <div class="mt-7 flex gap-3">
+      <button (click)="popupService.respond(false)"
+        class="flex-1 h-11 rounded-full border border-white/20 text-white/70 hover:text-white hover:border-white/40 text-sm font-semibold transition-all cursor-pointer">
+        {{ state.options.cancelText || 'Huỷ' }}
+      </button>
+
+      <button (click)="popupService.respond(true)"
+        class="flex-1 h-11 rounded-full text-white text-sm font-bold transition-all cursor-pointer"
+        [class.bg-red-500]="state.options.danger" [class.hover:bg-red-400]="state.options.danger"
+        [class.bg-violet-500]="!state.options.danger" [class.hover:bg-violet-400]="!state.options.danger">
+        {{ state.options.confirmText || 'Xác nhận' }}
+      </button>
+    </div>
+  </div>
+  }
+</div>
+}

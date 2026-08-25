@@ -9,6 +9,7 @@ import { MessageService } from '../../../core/services/message.service';
 import { ChatHubService } from '../../../core/services/chat-hub.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
+import { PopupService } from '../../../core/services/popup.service';
 import { PlayerService } from '../../../core/services/player.service';
 
 import { FriendUser } from '../../../core/models/friend/friend-user.model';
@@ -31,6 +32,7 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
   private friendService = inject(FriendService);
   private messageService = inject(MessageService);
   private toastService = inject(ToastService);
+  private popupService = inject(PopupService);
   private authService = inject(AuthService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -499,10 +501,16 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
-  removeMessage(message: ChatMessage): void {
+  async removeMessage(message: ChatMessage): Promise<void> {
     this.openMessageMenuId.set(null);
 
-    if (!confirm('Thu hồi tin nhắn này?')) return;
+    const confirmed = await this.popupService.confirm({
+      title: 'Thu hồi tin nhắn',
+      message: 'Thu hồi tin nhắn này?',
+      confirmText: 'Thu hồi',
+      danger: true
+    });
+    if (!confirmed) return;
 
     this.messageService.deleteMessage(message.id).subscribe({
       next: () => {
@@ -573,8 +581,14 @@ export class MessagesComponent implements OnInit, OnDestroy, AfterViewChecked {
     });
   }
 
-  removeFriend(friend: FriendUser): void {
-    if (!confirm(`Hủy kết bạn với ${friend.fullName || friend.username}?`)) return;
+  async removeFriend(friend: FriendUser): Promise<void> {
+    const confirmed = await this.popupService.confirm({
+      title: 'Huỷ kết bạn',
+      message: `Hủy kết bạn với ${friend.fullName || friend.username}?`,
+      confirmText: 'Huỷ kết bạn',
+      danger: true
+    });
+    if (!confirmed) return;
 
     this.friendService.removeFriend(friend.userId).subscribe({
       next: () => {

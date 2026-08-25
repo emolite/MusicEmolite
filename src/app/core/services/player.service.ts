@@ -1,5 +1,5 @@
 import { Injectable, NgZone, inject, signal } from '@angular/core';
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, forkJoin, Subject } from 'rxjs';
 import { SongService } from './song.service';
 import { AlbumService } from './album.service';
 import { AuthService } from './auth.service';
@@ -59,7 +59,7 @@ export class PlayerService {
   showLoginMessage = signal(false);
 
   showAddToAlbum = signal(false);
-  selectedAlbumId = signal<number | null>(null);
+  selectedAlbumIds = signal<number[]>([]);
   albumList = signal<AlbumResponse[]>([]);
   selectedSongAlbumIds = signal<number[]>([]);
   albumKeyword = signal('');
@@ -138,7 +138,7 @@ export class PlayerService {
     if (!current?.dbSongId) return;
 
     this.selectedSongAlbumIds.set(current.albumIds ?? []);
-    this.selectedAlbumId.set(null);
+    this.selectedAlbumIds.set([]);
     this.albumKeyword.set('');
     this.showAddToAlbum.set(true);
 
@@ -146,14 +146,18 @@ export class PlayerService {
   }
 
   closeAddToAlbum() {
+    if (this.isAddingToAlbum()) return;
+
     this.showAddToAlbum.set(false);
-    this.selectedAlbumId.set(null);
+    this.selectedAlbumIds.set([]);
   }
 
   selectAlbum(album: AlbumResponse) {
-    if (this.selectedSongAlbumIds().includes(album.id)) return;
+    if (this.selectedSongAlbumIds().includes(album.id) || this.isAddingToAlbum()) return;
 
-    this.selectedAlbumId.set(album.id);
+    this.selectedAlbumIds.update(ids =>
+      ids.includes(album.id) ? ids.filter(id => id !== album.id) : [...ids, album.id]
+    );
   }
 
   onAlbumSearch(event: Event) {
@@ -178,22 +182,25 @@ export class PlayerService {
 
   confirmAddToAlbum() {
     const songId = this.currentTrack()?.dbSongId;
-    const albumId = this.selectedAlbumId();
+    const albumIds = this.selectedAlbumIds();
 
-    if (!songId || !albumId) return;
+    if (!songId || albumIds.length === 0) return;
 
     this.isAddingToAlbum.set(true);
 
-    this.songService.addSongToAlbum(songId, albumId).subscribe({
+    forkJoin(
+      albumIds.map(albumId => this.songService.addSongToAlbum(songId, albumId))
+    ).subscribe({
       next: () => {
         this.isAddingToAlbum.set(false);
 
         this.currentTrack.update((track: any) => ({
           ...track,
-          albumIds: [...(track.albumIds ?? []), albumId]
+          albumIds: [...new Set([...(track.albumIds ?? []), ...albumIds])]
         }));
 
-        this.closeAddToAlbum();
+        this.showAddToAlbum.set(false);
+        this.selectedAlbumIds.set([]);
       },
       error: () => {
         this.isAddingToAlbum.set(false);

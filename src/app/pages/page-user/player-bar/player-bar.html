@@ -232,7 +232,7 @@
       <div (click)="player.selectAlbum(album)"
         class="flex items-center gap-3 p-3 rounded-xl transition-all duration-150 border" [class]="player.selectedSongAlbumIds().includes(album.id)
           ? 'opacity-40 cursor-not-allowed bg-white/3 border-white/5'
-          : player.selectedAlbumId() === album.id
+          : player.selectedAlbumIds().includes(album.id)
             ? 'bg-violet-600/20 border-violet-500/40 cursor-pointer'
             : 'bg-white/3 border-white/5 hover:bg-white/7 hover:border-white/10 cursor-pointer'">
         <div
@@ -250,10 +250,17 @@
         @if (player.selectedSongAlbumIds().includes(album.id)) {
         <span class="text-xs text-white/40 ml-auto shrink-0">Đã có</span>
         }
-        @else if (player.selectedAlbumId() === album.id) {
-        <svg class="w-5 h-5 text-violet-400 ml-auto shrink-0" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-        </svg>
+        @else {
+        <div class="ml-auto shrink-0 w-5 h-5 rounded-full border flex items-center justify-center transition"
+          [class.bg-violet-600]="player.selectedAlbumIds().includes(album.id)"
+          [class.border-violet-600]="player.selectedAlbumIds().includes(album.id)"
+          [class.border-white/20]="!player.selectedAlbumIds().includes(album.id)">
+          @if (player.selectedAlbumIds().includes(album.id)) {
+          <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+          </svg>
+          }
+        </div>
         }
       </div>
       }
@@ -266,14 +273,15 @@
     </div>
 
     <div class="flex gap-3 mt-6">
-      <button (click)="player.closeAddToAlbum()"
-        class="flex-1 h-11 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/30 text-sm font-medium transition-all cursor-pointer">
+      <button (click)="player.closeAddToAlbum()" [disabled]="player.isAddingToAlbum()"
+        class="flex-1 h-11 rounded-full border border-white/15 text-white/70 hover:text-white hover:border-white/30 text-sm font-medium transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
         Hủy
       </button>
 
-      <button (click)="player.confirmAddToAlbum()" [disabled]="!player.selectedAlbumId() || player.isAddingToAlbum()"
+      <button (click)="player.confirmAddToAlbum()"
+        [disabled]="player.selectedAlbumIds().length === 0 || player.isAddingToAlbum()"
         class="flex-1 h-11 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
-        {{ player.isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' }}
+        {{ player.isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' + (player.selectedAlbumIds().length ? ' (' + player.selectedAlbumIds().length + ')' : '') }}
       </button>
     </div>
   </div>

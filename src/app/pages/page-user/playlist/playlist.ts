@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { PlayerService } from '../../../core/services/player.service';
 import { SongService } from '../../../core/services/song.service';
 import { SongResponse } from '../../../core/models/song/res-song.model';
@@ -33,6 +34,8 @@ export class PlaylistComponent implements OnInit {
   songs = signal<any[]>([]);
   isLoading = signal(true);
   isLoadingMore = signal(false);
+  isSearching = signal(false);
+  keyword = signal('');
   page = signal(PAGINATION.DEFAULT_PAGE);
   totalPages = signal(0);
 
@@ -43,6 +46,19 @@ export class PlaylistComponent implements OnInit {
   currentTrackId = computed(() =>
     this.player.currentTrack()?.id
   );
+
+  private searchSubject = new Subject<string>();
+
+  constructor() {
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      this.keyword.set(value);
+      this.page.set(1);
+      this.loadSongs(false, true);
+    });
+  }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
@@ -91,17 +107,30 @@ export class PlaylistComponent implements OnInit {
     this.loadSongs(true);
   }
 
-  /** `append` distinguishes infinite-scroll loads (add to the list) from a fresh tab/page-1 load (replace it). */
-  private loadSongs(append = false) {
+  onSearch(value: string) {
+    this.searchSubject.next(value);
+  }
+
+  /**
+   * `append` distinguishes infinite-scroll loads (add to the list) from a
+   * fresh tab/page-1 load (replace it). `isSearch` is a search-debounced
+   * reload of an already-visible list - it dims the list instead of
+   * replacing it with the full-page spinner, so typing doesn't flash the
+   * whole page on every result.
+   */
+  private loadSongs(append = false, isSearch = false) {
     if (!this.isLoggedIn() && (this.activeTab() === 'recent' || this.activeTab() === 'most-played')) {
       this.songs.set([]);
       this.totalPages.set(0);
       this.isLoading.set(false);
+      this.isSearching.set(false);
       return;
     }
 
     if (append) {
       this.isLoadingMore.set(true);
+    } else if (isSearch) {
+      this.isSearching.set(true);
     } else {
       this.isLoading.set(true);
     }
@@ -111,7 +140,7 @@ export class PlaylistComponent implements OnInit {
       pageSize: PAGE_SIZE,
       asc: false,
       searchParams: {
-        keyword: ''
+        keyword: this.keyword()
       }
     };
 
@@ -183,6 +212,7 @@ export class PlaylistComponent implements OnInit {
       } else {
         this.songs.set(mapped);
         this.isLoading.set(false);
+        this.isSearching.set(false);
       }
     });
   }

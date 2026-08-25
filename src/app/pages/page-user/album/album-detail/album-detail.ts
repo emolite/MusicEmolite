@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { SongService } from '../../../../core/services/song.service';
+import { AlbumService } from '../../../../core/services/album.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import { PlayerService } from '../../../../core/services/player.service';
+import { PopupService } from '../../../../core/services/popup.service';
 
 import { SongResponse } from '../../../../core/models/song/res-song.model';
 import { PAGINATION_USER } from '../../../../core/constants/pagination.constants';
@@ -27,6 +31,9 @@ export class AlbumDetailComponent {
 
   private route = inject(ActivatedRoute);
   private songService = inject(SongService);
+  private albumService = inject(AlbumService);
+  private authService = inject(AuthService);
+  private popupService = inject(PopupService);
   player = inject(PlayerService);
 
   currentTrack = this.player.currentTrack;
@@ -36,17 +43,44 @@ export class AlbumDetailComponent {
   currentAlbum = signal<any>(null);
   isLoading = signal(false);
   isLoadingMore = signal(false);
+  isSearching = signal(false);
+  keyword = signal('');
   page = signal(PAGINATION_USER.DEFAULT_PAGE);
   totalPages = signal(0);
 
   hasMore = computed(() => this.page() < this.totalPages());
 
+  isOwner = computed(() => {
+    const userId = this.authService.user()?.userId;
+    return !!userId && this.currentAlbum()?.createdBy === userId;
+  });
+
+  private searchSubject = new Subject<string>();
+
+  constructor() {
+    this.searchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(value => {
+      this.keyword.set(value);
+      this.page.set(1);
+      this.loadSongs(false, true);
+    });
+  }
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       const id = Number(params['id']);
       this.albumId.set(id);
+      this.currentAlbum.set(null);
+      this.keyword.set('');
       this.page.set(1);
       this.loadSongs();
+
+      this.albumService.getAlbumById(id).subscribe({
+        next: res => this.currentAlbum.set(res.data ?? null),
+        error: () => {}
+      });
     });
   }
 
@@ -57,10 +91,20 @@ export class AlbumDetailComponent {
     this.loadSongs(true);
   }
 
-  /** `append` distinguishes infinite-scroll loads (add to the list) from a fresh page-1 load (replace it). */
-  loadSongs(append = false) {
+  onSearch(value: string) {
+    this.searchSubject.next(value);
+  }
+
+  /**
+   * `append` distinguishes infinite-scroll loads (add to the list) from a
+   * fresh page-1 load (replace it). `isSearch` is a search-debounced reload
+   * of an already-visible list - dims it instead of swapping content abruptly.
+   */
+  loadSongs(append = false, isSearch = false) {
     if (append) {
       this.isLoadingMore.set(true);
+    } else if (isSearch) {
+      this.isSearching.set(true);
     } else {
       this.isLoading.set(true);
     }
@@ -70,7 +114,7 @@ export class AlbumDetailComponent {
       pageSize: PAGE_SIZE,
       asc: false,
       searchParams: {
-        keyword: '',
+        keyword: this.keyword(),
         albumId: this.albumId()
       }
     }).subscribe(res => {
@@ -119,6 +163,25 @@ export class AlbumDetailComponent {
       } else {
         this.songs.set(songs);
         this.isLoading.set(false);
+        this.isSearching.set(false);
+      }
+    });
+  }
+
+  async removeSong(song: any, event: Event): Promise<void> {
+    event.stopPropagation();
+
+    const confirmed = await this.popupService.confirm({
+      message: `Bạn có muốn xoá "${song.name}" ra khỏi album này?`,
+      confirmText: 'Xoá',
+      danger: true,
+      imageUrl: song.imgUrl
+    });
+    if (!confirmed) return;
+
+    this.songService.removeSongFromAlbum(song.dbSongId, this.albumId()).subscribe({
+      next: () => {
+        this.songs.update(list => list.filter(s => s.id !== song.id));
       }
     });
   }

@@ -126,6 +126,12 @@ export class SongService {
     );
   }
 
+  removeSongFromAlbum(songId: number, albumId: number): Observable<BaseResponse<boolean>> {
+    return this.api.deleteData<BaseResponse<boolean>>(
+      `${API_END.SONG.SONG_TO_ALBUMS}?songId=${songId}&albumId=${albumId}`
+    );
+  }
+
   getSongDetail(id: number): Observable<BaseResponse<SongResponse>> {
     return this.api.getData<BaseResponse<SongResponse>>(API_END.SONG.DETAIL(id));
   }

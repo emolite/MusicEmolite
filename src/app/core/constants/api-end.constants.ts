@@ -74,7 +74,8 @@ export const API_END = {
   ALBUM: {
     BASE: `${BASE_URL}albums`,
     SEARCH: `${BASE_URL}albums/search`,
-    SEARCH_PUBLIC: `${BASE_URL}albums/public/search`
+    SEARCH_PUBLIC: `${BASE_URL}albums/public/search`,
+    DETAIL: (id: number) => `${BASE_URL}albums/${id}`
   },
 
   ARTIST: {

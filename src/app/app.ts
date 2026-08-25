@@ -2,12 +2,13 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router'
 import { AuthService } from './core/services/auth.service';
 import { ToastComponent } from './shared/components/toast/toast';
+import { PopupComponent } from './shared/components/popup/popup';
 import { UserService } from './core/services/user.service';
 import { ChatHubService } from './core/services/chat-hub.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ToastComponent],
+  imports: [RouterOutlet, ToastComponent, PopupComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
