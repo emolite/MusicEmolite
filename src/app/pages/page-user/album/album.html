@@ -16,6 +16,7 @@
 
     <div class="px-4 sm:px-8 py-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 sm:mb-8">
+            @if(authService.isLoggedIn()) {
             <div class="inline-flex p-1 rounded-xl bg-white/[0.03] border border-white/5 w-full sm:w-auto">
                 <button (click)="changeTab('public')" [class]="selectedTab() === 'public'
 ? 'bg-violet-600 text-white shadow-lg shadow-violet-600/20'
@@ -30,6 +31,7 @@
                     Của tôi
                 </button>
             </div>
+            }
 
             <div class="relative w-full sm:w-[320px]">
                 <input #searchInput type="text" placeholder="Tìm album..."
@@ -43,7 +45,8 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-5 transition-opacity duration-300"
+            [class.opacity-40]="isSearching()">
             @for(album of albums();track album.id){
             <div class="group cursor-pointer" [routerLink]="['/users/album',album.id]">
                 <div

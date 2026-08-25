@@ -30,6 +30,7 @@ interface SongRow {
   views: number;
   url: string;
   isLiked?: boolean;
+  albumIds?: number[];
   videoId: string;
 }
 
@@ -210,7 +211,8 @@ export class DiscoverComponent implements OnInit, OnDestroy {
         s.thumbnailMaxres,
       views: s.views ?? 0,
       url: '',
-      isLiked: s.isLiked ?? false
+      isLiked: s.isLiked ?? false,
+      albumIds: s.albumIds ?? []
     };
   }
 

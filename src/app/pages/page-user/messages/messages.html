@@ -319,8 +319,7 @@
         </div>
         } @else {
           @for(message of messages(); track message.id) {
-          <div [id]="'msg-' + message.id" class="group flex items-end gap-1.5 rounded-xl transition-colors duration-500"
-            [class.justify-end]="isMine(message)"
+          <div [id]="'msg-' + message.id" class="group flex items-end gap-1.5 justify-end rounded-xl transition-colors duration-500"
             [class.flex-row-reverse]="!isMine(message)"
             [class.bg-violet-500/15]="highlightedMessageId() === message.id">
 

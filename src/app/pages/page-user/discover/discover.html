@@ -6,7 +6,7 @@
   <div class="px-10 pt-10 pb-8">
 
     <p class="text-[11px] uppercase tracking-[5px] text-violet-400/50 mb-3">
-      Search
+      Kết quả
     </p>
 
     <h1 class="text-4xl font-black tracking-tight">
@@ -56,7 +56,7 @@
     @for(song of songs(); track song.id; let i = $index) {
 
     <div (click)="playSong(song.id)" class="group flex items-center gap-4 p-3 rounded-2xl
-               bg-white/[0.03] hover:bg-white/[0.06]
+               bg-white/3 hover:bg-white/6
                border border-transparent hover:border-white/5
                transition-all duration-200 cursor-pointer">
 
