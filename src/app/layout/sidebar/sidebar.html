@@ -147,7 +147,7 @@
   }
 
   @if (authService.user()) {
-  <a routerLink="/setting/profile" routerLinkActive="bg-violet-500/15 text-violet-300 rounded-sm"
+  <a routerLink="/setting" routerLinkActive="bg-violet-500/15 text-violet-300 rounded-sm"
     class="flex flex-col items-center justify-center gap-1 text-white/50 min-w-0 flex-1">
     @if(profileUri) {
     <img [src]="profileUri" class="w-6 h-6 rounded-full object-cover border border-white/10">

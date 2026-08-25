@@ -40,11 +40,11 @@
           Now Playing
         </p>
 
-        <h1 class="text-3xl lg:text-4xl font-black leading-tight text-white mb-2 tracking-tight">
+        <h1 class="text-xl md:text-2xl lg:text-4xl font-black leading-tight text-white mb-2 tracking-tight line-clamp-2">
           {{ songData.name }}
         </h1>
 
-        <div class="flex items-center justify-start gap-2 text-white/40 text-sm flex-wrap">
+        <div class="flex items-center justify-start gap-2 text-white/40 text-xs md:text-sm flex-wrap">
           <span class="text-white/60">{{ songData.artist }}</span>
           <span class="w-1 h-1 rounded-full bg-white/20"></span>
           <span>{{ songData.releaseDate }}</span>
@@ -58,7 +58,7 @@
           </p>
 
           @if(syncedLyrics().length > 0) {
-          <p class="text-lg font-black text-white leading-snug line-clamp-2">
+          <p class="text-base md:text-lg font-black text-white leading-snug line-clamp-2">
             {{ syncedLyrics()[activeLyricIndex() >= 0 ? activeLyricIndex() : 0]?.text }}
           </p>
           } @else {
@@ -66,6 +66,26 @@
             Không có lời bài hát
           </p>
           }
+        </button>
+      </div>
+
+      <div class="lg:hidden flex items-center justify-end gap-4">
+        <button class="text-white/30 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+          [disabled]="!songData.dbSongId" (click)="player.openAddToAlbum()">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="5" cy="12" r="2" />
+            <circle cx="12" cy="12" r="2" />
+            <circle cx="19" cy="12" r="2" />
+          </svg>
+        </button>
+
+        <button class="text-white/30 hover:text-white transition-colors cursor-pointer"
+          [class.text-violet-400]="player.showQueuePanel()" (click)="player.toggleQueuePanel()"
+          title="Danh sách phát">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h10" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 15l3 3-3 3" />
+          </svg>
         </button>
       </div>
 
@@ -127,12 +147,21 @@
           </svg>
         </button>
 
-        <button class="text-white/30 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+        <button class="hidden lg:block text-white/30 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           [disabled]="!songData.dbSongId" (click)="player.openAddToAlbum()">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
             <circle cx="5" cy="12" r="2" />
             <circle cx="12" cy="12" r="2" />
             <circle cx="19" cy="12" r="2" />
+          </svg>
+        </button>
+
+        <button class="hidden lg:block text-white/30 hover:text-white transition-colors cursor-pointer"
+          [class.text-violet-400]="player.showQueuePanel()" (click)="player.toggleQueuePanel()"
+          title="Danh sách phát">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h10" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 15l3 3-3 3" />
           </svg>
         </button>
       </div>

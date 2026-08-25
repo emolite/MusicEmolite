@@ -1,8 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { UserService } from '../../../../core/services/user.service';
+import { PlayerService } from '../../../../core/services/player.service';
+import { ChatHubService } from '../../../../core/services/chat-hub.service';
+import { ToastService } from '../../../../core/services/toast.service';
 import {
     DropdownComponent,
     DropdownOption
@@ -26,6 +30,10 @@ export class Profile {
 
     private authService = inject(AuthService);
     private userService = inject(UserService);
+    private playerService = inject(PlayerService);
+    private chatHubService = inject(ChatHubService);
+    private router = inject(Router);
+    private toastService = inject(ToastService);
 
     loading = false;
 
@@ -63,6 +71,15 @@ export class Profile {
 
     get user() {
         return this.authService.user();
+    }
+
+    logout(): void {
+        localStorage.removeItem('currentUser');
+
+        this.authService.logout();
+        this.chatHubService.stop();
+        this.playerService.stop();
+        this.router.navigate(['/auth/login']);
     }
 
     async onSelectImage(event: Event) {
@@ -141,6 +158,10 @@ export class Profile {
     }
 
     saveProfile() {
+        if (this.loading) return;
+
+        this.loading = true;
+
         const formData = new FormData();
         formData.append('fullName', this.form.fullName);
         formData.append('phone', this.form.phone);
@@ -153,20 +174,30 @@ export class Profile {
 
         this.userService.updateUser(formData).subscribe({
             next: () => {
+                this.loading = false;
+
                 const currentUser = this.authService.user();
-                if (!currentUser || !currentUser.profile) return;
-                this.authService.user.set({
-                    ...currentUser,
-                    profile: {
-                        ...currentUser.profile,
-                        fullName: this.form.fullName,
-                        phone: this.form.phone,
-                        dateOfBirth: this.form.dateOfBirth,
-                        gender: this.form.gender,
-                        bio: this.form.bio,
-                        uri: this.previewImage()
-                    }
-                });
+
+                if (currentUser?.profile) {
+                    this.authService.user.set({
+                        ...currentUser,
+                        profile: {
+                            ...currentUser.profile,
+                            fullName: this.form.fullName,
+                            phone: this.form.phone,
+                            dateOfBirth: this.form.dateOfBirth,
+                            gender: this.form.gender,
+                            bio: this.form.bio,
+                            uri: this.previewImage()
+                        }
+                    });
+                }
+
+                this.toastService.success('Cập nhật thông tin thành công');
+            },
+            error: (err) => {
+                this.loading = false;
+                this.toastService.error(err?.error?.message || 'Cập nhật thông tin thất bại');
             }
         });
     }
