@@ -11,6 +11,7 @@ import { BaseResponse } from '../models/base/base-res.model';
 import { SendOtpRequest } from '../models/auth/req-send-otp.model';
 import { VerifyOtpRequest } from '../models/auth/req-verify-otp.model';
 import { ResetPasswordRequest } from '../models/auth/req-reset-password.model';
+import { ChangePasswordRequest } from '../models/auth/req-change-password.model';
 import { RefreshTokenRequest } from '../models/auth/req-refresh-token.model';
 import { RefreshTokenResponse } from '../models/auth/res-refresh-token.model';
 import { LogoutRequest } from '../models/auth/req-logout.model';
@@ -203,6 +204,13 @@ export class AuthService {
   resetPassword(payload: ResetPasswordRequest) {
     return this.api.postData<BaseResponse<boolean>, ResetPasswordRequest>(
       API_END.AUTH.RESET_PASSWORD,
+      payload
+    );
+  }
+
+  changePassword(payload: ChangePasswordRequest) {
+    return this.api.postData<BaseResponse<boolean>, ChangePasswordRequest>(
+      API_END.AUTH.CHANGE_PASSWORD,
       payload
     );
   }

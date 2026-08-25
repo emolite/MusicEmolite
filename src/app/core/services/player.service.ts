@@ -56,6 +56,10 @@ export class PlayerService {
   youtubeVideoId = signal<string | null>(null);
   private autoAdvance = true;
 
+  queueList = signal<any[]>([]);
+  currentQueueIndex = signal(-1);
+  showQueuePanel = signal(false);
+
   showLoginMessage = signal(false);
 
   showAddToAlbum = signal(false);
@@ -252,7 +256,29 @@ export class PlayerService {
 
   setQueue(queue: any[], options?: { autoAdvance?: boolean }) {
     this.queue = queue;
+    this.queueList.set(queue);
     this.autoAdvance = options?.autoAdvance ?? true;
+  }
+
+  private setCurrentIndex(index: number) {
+    this.currentIndex = index;
+    this.currentQueueIndex.set(index);
+  }
+
+  toggleQueuePanel() {
+    this.showQueuePanel.update(v => !v);
+  }
+
+  closeQueuePanel() {
+    this.showQueuePanel.set(false);
+  }
+
+  playFromQueue(index: number) {
+    if (index < 0 || index >= this.queue.length) return;
+
+    this.setCurrentIndex(index);
+    this.playCurrentTrack();
+    this.closeQueuePanel();
   }
 
   stop() {
@@ -272,7 +298,8 @@ export class PlayerService {
 
     this.currentTrack.set(null);
     this.queue = [];
-    this.currentIndex = -1;
+    this.queueList.set([]);
+    this.setCurrentIndex(-1);
 
     this.isPlaying.set(false);
     this.currentTime.set('0:00');
@@ -292,7 +319,7 @@ export class PlayerService {
     const index = this.queue.findIndex(x => x.id === id);
     if (index === -1) return;
 
-    this.currentIndex = index;
+    this.setCurrentIndex(index);
     this.startTrack(this.queue[index]);
   }
 
@@ -307,7 +334,7 @@ export class PlayerService {
     const index = this.queue.findIndex(x => x.id === id);
     if (index === -1) return;
 
-    this.currentIndex = index;
+    this.setCurrentIndex(index);
 
     const track = this.queue[index];
 
@@ -554,11 +581,11 @@ export class PlayerService {
     if (!this.queue.length) return;
 
     if (this.isShuffle()) {
-      this.currentIndex = Math.floor(Math.random() * this.queue.length);
+      this.setCurrentIndex(Math.floor(Math.random() * this.queue.length));
     } else {
-      this.currentIndex = this.currentIndex + 1 >= this.queue.length
-        ? 0
-        : this.currentIndex + 1;
+      this.setCurrentIndex(
+        this.currentIndex + 1 >= this.queue.length ? 0 : this.currentIndex + 1
+      );
     }
 
     this.playCurrentTrack();
@@ -567,9 +594,9 @@ export class PlayerService {
   prevTrack() {
     if (!this.queue.length) return;
 
-    this.currentIndex = this.currentIndex - 1 < 0
-      ? this.queue.length - 1
-      : this.currentIndex - 1;
+    this.setCurrentIndex(
+      this.currentIndex - 1 < 0 ? this.queue.length - 1 : this.currentIndex - 1
+    );
 
     this.playCurrentTrack();
   }

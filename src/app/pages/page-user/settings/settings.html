@@ -1,5 +1,6 @@
 <div class="min-h-screen bg-[#0f0d1a] text-white flex flex-col md:flex-row">
-    <aside class="w-full md:w-72 shrink-0 border-b md:border-b-0 md:border-r border-white/5 bg-[#12101d] flex flex-col">
+    <aside class="w-full md:w-72 shrink-0 border-r border-white/5 bg-[#12101d] flex-col md:flex"
+        [class.hidden]="!!activeChild()" [class.flex]="!activeChild()">
         <div class="h-16 md:h-20 px-4 md:px-6 border-b border-white/5 flex items-center gap-4">
             <button routerLink="/users/home" class="w-10 h-10 rounded-lg
                        hover:bg-white/5
@@ -17,15 +18,15 @@
         </div>
 
         <div class="py-2 md:py-4">
-            <p class="hidden md:block px-6 mb-3 text-[11px]
+            <p class="px-6 mb-3 text-[11px]
                        uppercase tracking-[0.2em]
                        text-white/30 font-medium">
                 Tài khoản
             </p>
-            <ul class="flex md:block overflow-x-auto md:overflow-visible px-2 md:px-0 gap-1 md:gap-0 md:space-y-1 custom-scroll">
-                <li class="shrink-0">
+            <ul class="space-y-1">
+                <li>
                     <a routerLink="profile" routerLinkActive="bg-white/8 text-white md:border-l-2 border-violet-500"
-                       class="h-11 md:h-12 px-4 md:px-6 rounded-lg md:rounded-none
+                       class="h-12 px-6 rounded-lg md:rounded-none
                                flex items-center gap-3
                                text-white/60 hover:text-white
                                hover:bg-white/[0.03]
@@ -36,9 +37,9 @@
                         </span>
                     </a>
                 </li>
-                <li class="shrink-0">
+                <li>
                     <a routerLink="artists" routerLinkActive="bg-white/8 text-white md:border-l-2 border-violet-500"
-                       class="h-11 md:h-12 px-4 md:px-6 rounded-lg md:rounded-none
+                       class="h-12 px-6 rounded-lg md:rounded-none
                                flex items-center gap-3
                                text-white/60 hover:text-white
                                hover:bg-white/[0.03]
@@ -50,9 +51,47 @@
                     </a>
                 </li>
             </ul>
+
+            <p class="px-6 mb-3 mt-6 text-[11px]
+                       uppercase tracking-[0.2em]
+                       text-white/30 font-medium">
+                Quyền riêng tư
+            </p>
+            <ul class="space-y-1">
+                <li>
+                    <a routerLink="account" routerLinkActive="bg-white/8 text-white md:border-l-2 border-violet-500"
+                       class="h-12 px-6 rounded-lg md:rounded-none
+                               flex items-center gap-3
+                               text-white/60 hover:text-white
+                               hover:bg-white/[0.03]
+                               transition-all whitespace-nowrap">
+                        <lucide-icon [img]="ShieldIcon" class="w-4 h-4"></lucide-icon>
+                        <span class="text-sm font-medium">
+                            Tài khoản &amp; mật khẩu
+                        </span>
+                    </a>
+                </li>
+            </ul>
         </div>
     </aside>
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto md:h-screen pb-24 md:pb-8">
-        <router-outlet></router-outlet>
+    <main class="flex-1 md:block overflow-y-auto md:h-screen pb-24 md:pb-8"
+        [class.hidden]="!activeChild()" [class.block]="!!activeChild()">
+        @if (activeChild()) {
+        <div class="md:hidden h-16 px-4 border-b border-white/5 flex items-center gap-4 sticky top-0 bg-[#0f0d1a]/90 backdrop-blur-xl z-10">
+            <button routerLink="/setting" class="w-10 h-10 rounded-lg
+                       hover:bg-white/5
+                       flex items-center justify-center
+                       text-white/60 hover:text-white
+                       transition-all shrink-0">
+                <lucide-icon [img]="ArrowLeftIcon" class="w-5 h-5"></lucide-icon>
+            </button>
+            <h2 class="text-base font-bold tracking-tight">
+                {{ activeChildLabel() }}
+            </h2>
+        </div>
+        }
+        <div class="p-4 md:p-8">
+            <router-outlet></router-outlet>
+        </div>
     </main>
 </div>

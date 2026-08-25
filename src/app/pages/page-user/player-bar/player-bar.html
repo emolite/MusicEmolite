@@ -174,6 +174,19 @@
   </div>
 
   <div class="hidden md:flex items-center gap-3 w-48 justify-end shrink-0">
+    <button
+      class="text-white/40 hover:text-white transition-colors cursor-pointer"
+      [class.text-violet-400]="player.showQueuePanel()"
+      [class.opacity-40]="!player.currentTrack()"
+      [disabled]="!player.currentTrack()"
+      (click)="player.toggleQueuePanel()"
+      title="Danh sách phát">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h10" />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M18 15l3 3-3 3" />
+      </svg>
+    </button>
+
     <button class="text-white/40 hover:text-white transition-colors cursor-pointer" (click)="player.toggleMute()">
       @if (!player.isMuted()) {
       <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -283,6 +296,62 @@
         class="flex-1 h-11 rounded-full bg-violet-600 hover:bg-violet-500 text-white text-sm font-bold transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
         {{ player.isAddingToAlbum() ? 'Đang thêm...' : 'Xác nhận' + (player.selectedAlbumIds().length ? ' (' + player.selectedAlbumIds().length + ')' : '') }}
       </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (player.showQueuePanel()) {
+<div class="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-sm px-4"
+  (click)="player.closeQueuePanel()">
+  <div class="relative w-full md:w-[420px] max-w-[92%] rounded-[24px] bg-gradient-to-br from-[#1e1b2e] to-[#0f0d1a]
+  border border-white/10 p-5 md:p-6 shadow-2xl" (click)="$event.stopPropagation()">
+    <button (click)="player.closeQueuePanel()"
+      class="absolute top-4 right-5 text-white/50 hover:text-white text-xl transition cursor-pointer">
+      ✕
+    </button>
+
+    <h3 class="text-xl font-bold text-white mb-1">Danh sách phát</h3>
+    <p class="text-white/40 text-sm mb-5">Bài hát tiếp theo trong hàng đợi hiện tại</p>
+
+    <div class="max-h-[60vh] overflow-y-auto space-y-1.5 pr-1 custom-scroll">
+      @for (track of player.queueList(); track $index) {
+      <div (click)="player.playFromQueue($index)"
+        class="flex items-center gap-3 p-2.5 rounded-xl transition-all duration-150 border cursor-pointer"
+        [class]="$index === player.currentQueueIndex()
+          ? 'bg-violet-600/20 border-violet-500/40'
+          : 'bg-white/3 border-white/5 hover:bg-white/7 hover:border-white/10'">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-800 to-purple-900 shrink-0 flex items-center justify-center overflow-hidden">
+          @if (track.imgUrl) {
+          <img [src]="track.imgUrl" class="w-full h-full object-cover">
+          } @else {
+          <svg class="w-5 h-5 text-violet-300" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+          }
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold truncate" [class.text-violet-300]="$index === player.currentQueueIndex()"
+            [class.text-white]="$index !== player.currentQueueIndex()">
+            {{ track.name }}
+          </p>
+          <p class="text-xs text-white/40 truncate">{{ track.artist || '—' }}</p>
+        </div>
+
+        @if ($index === player.currentQueueIndex()) {
+        <svg class="w-4 h-4 text-violet-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z" />
+        </svg>
+        }
+      </div>
+      }
+
+      @empty {
+      <p class="text-center text-white/30 text-sm py-6">
+        Chưa có bài hát trong hàng đợi
+      </p>
+      }
     </div>
   </div>
 </div>

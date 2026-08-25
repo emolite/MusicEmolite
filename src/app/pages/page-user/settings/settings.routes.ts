@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { SettingsComponent } from './settings';
 import { Profile } from './profile/profile';
 import { SettingsArtists } from './artists/artists';
+import { AccountSecurity } from './account-security/account-security';
 
 export const SETTINGS_ROUTES: Routes = [
   {
@@ -17,9 +18,8 @@ export const SETTINGS_ROUTES: Routes = [
         component: SettingsArtists
       },
       {
-        path: '',
-        redirectTo: 'profile',
-        pathMatch: 'full'
+        path: 'account',
+        component: AccountSecurity
       }
     ]
   }

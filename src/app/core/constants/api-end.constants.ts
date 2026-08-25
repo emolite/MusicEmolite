@@ -13,6 +13,7 @@ export const API_END = {
     CHECK_IP: `${BASE_URL}auth/check-ip`,
     CURRENT_USER: `${BASE_URL}auth/current-user`,
     RESET_PASSWORD: `${BASE_URL}auth/reset-password`,
+    CHANGE_PASSWORD: `${BASE_URL}auth/change-password`,
     REFRESH_TOKEN: `${BASE_URL}auth/refresh-token`,
     LOGOUT: `${BASE_URL}auth/logout`
   },

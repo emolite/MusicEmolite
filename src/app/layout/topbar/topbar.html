@@ -85,7 +85,7 @@
 
       @if(openMenu()) {
       <ul (click)="$event.stopPropagation()"
-        class="absolute right-0 mt-50 w-56 bg-[#181622] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
+        class="absolute right-0 top-full mt-2 w-56 bg-[#181622] border border-white/10 rounded-2xl shadow-2xl overflow-hidden">
         <li>
           <button (click)="goProfile()"
             class="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/5 transition-all cursor-pointer">
@@ -99,14 +99,6 @@
             class="w-full flex items-center gap-3 px-4 py-3 text-sm text-white hover:bg-white/5 transition-all cursor-pointer">
             <lucide-icon [img]="SettingsIcon" class="w-4 h-4"></lucide-icon>
             Cài đặt
-          </button>
-        </li>
-
-        <li class="border-t border-white/5">
-          <button (click)="logout()"
-            class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-300 hover:bg-red-500/10 transition-all cursor-pointer">
-            <lucide-icon [img]="LogoutIcon" class="w-4 h-4"></lucide-icon>
-            Đăng xuất
           </button>
         </li>
       </ul>
