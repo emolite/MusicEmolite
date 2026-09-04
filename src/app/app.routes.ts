@@ -15,6 +15,9 @@ import { ArtistDetailComponent } from './pages/page-user/artist/artist-detail/ar
 import { WelcomeComponent } from './pages/page-login/welcome/welcome';
 import { ForgotPasswordComponent } from './pages/page-login/forgot-password/forgot-password';
 import { MessagesComponent } from './pages/page-user/messages/messages';
+import { NotFoundComponent } from './pages/page-default/not-found/not-found';
+import { UnauthorizedComponent } from './pages/page-default/unauthorized/unauthorized';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
     {
@@ -84,7 +87,20 @@ export const routes: Routes = [
     },
     {
         path: URL_END.ADMIN.BASE,
+        canActivate: [adminGuard],
         loadChildren: () => import('./pages/page-admin/admin.routes').then(m => m.ADMIN_ROUTES)
+    },
+    {
+        path: URL_END.DEFAULT.UNAUTHORIZED,
+        component: UnauthorizedComponent
+    },
+    {
+        path: URL_END.DEFAULT.NOT_FOUND,
+        component: NotFoundComponent
+    },
+    {
+        path: '**',
+        component: NotFoundComponent
     }
 
 ];

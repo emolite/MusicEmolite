@@ -9,6 +9,9 @@ import { PAGINATION } from '../../../core/constants/pagination.constants';
 import { FilterComponent } from '../../../shared/components/filter/filter';
 import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
 import { SongRequest } from '../../../core/models/song/req-song.model';
+import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
+
+const PAGE_SIZE = 20;
 
 @Component({
     selector: 'app-songs',
@@ -16,13 +19,16 @@ import { SongRequest } from '../../../core/models/song/req-song.model';
     imports: [
         CommonModule,
         AppTableComponent,
-        FilterComponent
+        FilterComponent,
+        DetailPanelComponent
     ],
     templateUrl: './songs.html'
 })
 export class Songs {
 
     private songService = inject(SongService);
+
+    selectedSong = signal<any | null>(null);
 
     loading = signal(false);
     sortBy = signal('createdAt');
@@ -121,9 +127,9 @@ export class Songs {
 
         this.loading.set(true);
 
-        this.songService.searchPublicSongs({
+        this.songService.searchSongsAdmin({
             page: this.currentPage(),
-            pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
+            pageSize: PAGE_SIZE,
             asc: this.asc(),
             searchParams: {
                 ...this.filter(),
@@ -136,7 +142,7 @@ export class Songs {
                     const mapped = data.map((item, index) => ({
                         ...item,
                         stt:
-                            ((this.currentPage() - 1) * PAGINATION.DEFAULT_PAGE_SIZE)
+                            ((this.currentPage() - 1) * PAGE_SIZE)
                             + index
                             + 1
                     }));
@@ -177,6 +183,14 @@ export class Songs {
 
     onRowClick(row: any) {
         console.log(row);
+    }
+
+    onRowDblClick(row: any) {
+        this.selectedSong.set(row);
+    }
+
+    closeDetail() {
+        this.selectedSong.set(null);
     }
 
     onSort(column: string) {

@@ -10,4 +10,5 @@ export interface AlbumResponse {
   isDeleted: boolean;
   createdAt?: string;
   createdBy?: number;
+  createdByName?: string;
 }

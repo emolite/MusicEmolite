@@ -24,5 +24,10 @@ export const URL_END = {
     REGISTER: 'register',
     WELCOME: 'welcome',
     FORGOT_PASSWORD: 'forgot-password'
+  },
+
+  DEFAULT: {
+    NOT_FOUND: '404',
+    UNAUTHORIZED: '401'
   }
 };

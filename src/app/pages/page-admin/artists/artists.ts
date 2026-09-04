@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 
 import { AppTableComponent } from '../../../shared/components/table/table';
 import { TableColumn } from '../../../core/models/front-end/table/table-column.model';
@@ -7,16 +7,17 @@ import { FilterComponent } from '../../../shared/components/filter/filter';
 
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-import { AlbumService } from '../../../core/services/album.service';
-import { AlbumResponse } from '../../../core/models/album/res-album.model';
-import { AlbumRequest } from '../../../core/models/album/req-album.model';
+import { ArtistService } from '../../../core/services/artist.service';
+import { ArtistResponse } from '../../../core/models/artist/res-artist.model';
+import { ArtistRequest } from '../../../core/models/artist/req-artist.model';
 import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
+import { SongService } from '../../../core/services/song.service';
 
 const PAGE_SIZE = 20;
 
 @Component({
-    selector: 'app-albums',
+    selector: 'app-artists',
     standalone: true,
     imports: [
         CommonModule,
@@ -24,13 +25,16 @@ const PAGE_SIZE = 20;
         FilterComponent,
         DetailPanelComponent
     ],
-    templateUrl: './albums.html'
+    templateUrl: './artists.html'
 })
-export class AlbumsComponent {
+export class ArtistsComponent {
 
-    private albumService = inject(AlbumService);
+    private artistService = inject(ArtistService);
+    private songService = inject(SongService);
 
-    selectedAlbum = signal<any | null>(null);
+    selectedArtist = signal<any | null>(null);
+    artistSongs = signal<any[]>([]);
+    loadingArtistSongs = signal(false);
 
     loading = signal(false);
 
@@ -44,7 +48,7 @@ export class AlbumsComponent {
 
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
 
-    filter = signal<AlbumRequest>({
+    filter = signal<ArtistRequest>({
         keyword: ''
     });
 
@@ -53,7 +57,13 @@ export class AlbumsComponent {
             key: 'keyword',
             label: 'Từ khóa',
             type: 'text',
-            placeholder: 'Nhập tên album...'
+            placeholder: 'Nhập tên nghệ sĩ...'
+        },
+        {
+            key: 'country',
+            label: 'Quốc gia',
+            type: 'text',
+            placeholder: 'Nhập quốc gia...'
         },
         {
             key: 'isActived',
@@ -80,12 +90,23 @@ export class AlbumsComponent {
             align: 'center'
         },
         {
-            key: 'title',
-            label: 'Tên album'
+            key: 'url',
+            label: 'Ảnh',
+            type: 'image',
+            width: '100px',
+            align: 'left'
         },
         {
-            key: 'albumTypeName',
-            label: 'Loại album',
+            key: 'name',
+            label: 'Tên nghệ sĩ'
+        },
+        {
+            key: 'stageName',
+            label: 'Nghệ danh'
+        },
+        {
+            key: 'country',
+            label: 'Quốc gia',
             align: 'center'
         },
         {
@@ -93,13 +114,6 @@ export class AlbumsComponent {
             label: 'Trạng thái',
             type: 'status',
             align: 'center'
-        },
-        {
-            key: 'releaseDate',
-            label: 'Ngày phát hành',
-            type: 'date',
-            align: 'center',
-            sortable: true
         },
         {
             key: 'createdAt',
@@ -110,14 +124,14 @@ export class AlbumsComponent {
     ];
 
     ngOnInit(): void {
-        this.loadAlbums();
+        this.loadArtists();
     }
 
-    loadAlbums() {
+    loadArtists() {
 
         this.loading.set(true);
 
-        this.albumService.searchAlbumsAdmin({
+        this.artistService.searchArtistsAdmin({
             page: this.currentPage(),
             pageSize: PAGE_SIZE,
             asc: this.asc(),
@@ -129,7 +143,7 @@ export class AlbumsComponent {
             .subscribe({
                 next: (res: any) => {
 
-                    const data: AlbumResponse[] = res?.data ?? [];
+                    const data: ArtistResponse[] = res?.data ?? [];
 
                     const mapped = data.map((item, index) => ({
                         ...item,
@@ -169,14 +183,14 @@ export class AlbumsComponent {
                     : data.isActived === 'true'
         });
 
-        this.loadAlbums();
+        this.loadArtists();
     }
 
     onPageChange(page: number) {
 
         this.currentPage.set(page);
 
-        this.loadAlbums();
+        this.loadArtists();
     }
 
     onRowClick(row: any) {
@@ -186,12 +200,34 @@ export class AlbumsComponent {
 
     onRowDblClick(row: any) {
 
-        this.selectedAlbum.set(row);
+        this.selectedArtist.set(row);
+        this.loadArtistSongs(row.id);
     }
 
     closeDetail() {
 
-        this.selectedAlbum.set(null);
+        this.selectedArtist.set(null);
+        this.artistSongs.set([]);
+    }
+
+    private loadArtistSongs(artistId: number) {
+
+        this.loadingArtistSongs.set(true);
+
+        this.songService.searchSongsAdmin({
+            page: 1,
+            pageSize: 50,
+            asc: false,
+            searchParams: { artistId }
+        }).subscribe({
+            next: (res) => {
+                this.artistSongs.set(res?.data ?? []);
+                this.loadingArtistSongs.set(false);
+            },
+            error: () => {
+                this.loadingArtistSongs.set(false);
+            }
+        });
     }
 
     onSort(column: string) {
@@ -207,6 +243,6 @@ export class AlbumsComponent {
             this.asc.set(false);
         }
 
-        this.loadAlbums();
+        this.loadArtists();
     }
 }

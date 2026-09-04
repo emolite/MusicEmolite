@@ -44,6 +44,19 @@ export class SongService {
     );
   }
 
+  /** Same listing as searchPublicSongs, but requires login - for admin management screens. */
+  searchSongsAdmin(data: BaseSearchDto<SongRequest>)
+    : Observable<BaseTableResponse<SongResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<SongResponse>,
+      BaseSearchDto<SongRequest>
+    >(
+      API_END.SONG.SEARCH_ADMIN,
+      data
+    );
+  }
+
   searchYoutube(data: BaseSearchDto<YoutubeSearchRequest>)
     : Observable<BaseTableResponse<YoutubeVideoResponse>> {
 
@@ -129,6 +142,19 @@ export class SongService {
   removeSongFromAlbum(songId: number, albumId: number): Observable<BaseResponse<boolean>> {
     return this.api.deleteData<BaseResponse<boolean>>(
       `${API_END.SONG.SONG_TO_ALBUMS}?songId=${songId}&albumId=${albumId}`
+    );
+  }
+
+  /** Admin-only: all songs a specific user has liked. */
+  getLikedSongsByUserAdmin(userId: number, data: BaseSearchDto<SongRequest>)
+    : Observable<BaseTableResponse<SongResponse>> {
+
+    return this.api.postData<
+      BaseTableResponse<SongResponse>,
+      BaseSearchDto<SongRequest>
+    >(
+      API_END.SONG.LIKED_BY_USER_ADMIN(userId),
+      data
     );
   }
 

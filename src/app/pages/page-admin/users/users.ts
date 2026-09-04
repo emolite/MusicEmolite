@@ -20,7 +20,11 @@ import { PAGINATION }
     from '../../../core/constants/pagination.constants';
 import { ReqUsers, ReqUsersFilter } from '../../../core/models/user/req-user-profile.model';
 import { ResUsers } from '../../../core/models/user/res-user-profile.model';
+import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
+import { AlbumService } from '../../../core/services/album.service';
+import { SongService } from '../../../core/services/song.service';
 
+const PAGE_SIZE = 20;
 
 @Component({
     selector: 'app-users',
@@ -29,7 +33,8 @@ import { ResUsers } from '../../../core/models/user/res-user-profile.model';
     imports: [
         CommonModule,
         AppTableComponent,
-        FilterComponent
+        FilterComponent,
+        DetailPanelComponent
     ],
 
     templateUrl: './users.html'
@@ -37,6 +42,14 @@ import { ResUsers } from '../../../core/models/user/res-user-profile.model';
 export class UsersComponent {
 
     private userService = inject(UserService);
+    private albumService = inject(AlbumService);
+    private songService = inject(SongService);
+
+    selectedUser = signal<ResUsers | null>(null);
+    userAlbums = signal<any[]>([]);
+    userLikedSongs = signal<any[]>([]);
+    loadingUserAlbums = signal(false);
+    loadingUserLikedSongs = signal(false);
 
     loading = signal(false);
 
@@ -172,7 +185,7 @@ export class UsersComponent {
             page: this.currentPage(),
 
             pageSize:
-                PAGINATION.DEFAULT_PAGE_SIZE,
+                PAGE_SIZE,
 
             asc: this.asc(),
 
@@ -201,7 +214,7 @@ export class UsersComponent {
                                     : item.gender,
                             stt:
                                 ((this.currentPage() - 1)
-                                    * PAGINATION.DEFAULT_PAGE_SIZE)
+                                    * PAGE_SIZE)
                                 + index
                                 + 1
                         }));
@@ -261,5 +274,59 @@ export class UsersComponent {
     onRowClick(row: ResUsers) {
 
         console.log(row);
+    }
+
+    onRowDblClick(row: ResUsers) {
+
+        this.selectedUser.set(row);
+        this.loadUserAlbums(row.id);
+        this.loadUserLikedSongs(row.id);
+    }
+
+    closeDetail() {
+
+        this.selectedUser.set(null);
+        this.userAlbums.set([]);
+        this.userLikedSongs.set([]);
+    }
+
+    private loadUserAlbums(userId: number) {
+
+        this.loadingUserAlbums.set(true);
+
+        this.albumService.getAlbumsByUserAdmin(userId, {
+            page: 1,
+            pageSize: 50,
+            asc: false,
+            searchParams: {}
+        }).subscribe({
+            next: (res) => {
+                this.userAlbums.set(res?.data ?? []);
+                this.loadingUserAlbums.set(false);
+            },
+            error: () => {
+                this.loadingUserAlbums.set(false);
+            }
+        });
+    }
+
+    private loadUserLikedSongs(userId: number) {
+
+        this.loadingUserLikedSongs.set(true);
+
+        this.songService.getLikedSongsByUserAdmin(userId, {
+            page: 1,
+            pageSize: 50,
+            asc: false,
+            searchParams: {}
+        }).subscribe({
+            next: (res) => {
+                this.userLikedSongs.set(res?.data ?? []);
+                this.loadingUserLikedSongs.set(false);
+            },
+            error: () => {
+                this.loadingUserLikedSongs.set(false);
+            }
+        });
     }
 }

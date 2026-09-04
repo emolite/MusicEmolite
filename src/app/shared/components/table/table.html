@@ -39,31 +39,14 @@
         </tr>
       </thead>
 
-      <tbody>
+      <tbody class="transition-opacity duration-200" [class.opacity-40]="loading">
 
-        @if (loading) {
-        <tr>
-          <td [attr.colspan]="columns.length" class="py-10 text-center text-gray-500">
-            Đang tải dữ liệu...
-          </td>
-        </tr>
-        }
-
-        @else {
-
-        @if (rows.length === 0) {
-        <tr>
-          <td [attr.colspan]="columns.length" class="py-10 text-center text-gray-400">
-            {{ emptyText }}
-          </td>
-        </tr>
-        }
-
-        @else {
+        @if (rows.length > 0) {
 
         @for (row of rows; track row.id || $index) {
 
-        <tr (click)="onRowClick(row)" class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+        <tr (click)="onRowClick(row)" (dblclick)="onRowDblClick(row)"
+          class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
           @for (column of columns; track trackByColumn($index, column)) {
           <td class="px-4 py-3 truncate" [class.text-left]="column.align !== 'center' && column.align !== 'right'"
             [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'">
@@ -122,7 +105,21 @@
 
         }
 
-        }
+        } @else if (loading) {
+
+        <tr>
+          <td [attr.colspan]="columns.length">
+            <app-page-table-loading></app-page-table-loading>
+          </td>
+        </tr>
+
+        } @else {
+
+        <tr>
+          <td [attr.colspan]="columns.length">
+            <app-page-table-empty [text]="emptyText"></app-page-table-empty>
+          </td>
+        </tr>
 
         }
 

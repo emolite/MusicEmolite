@@ -8,11 +8,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { TableColumn } from '../../../core/models/front-end/table/table-column.model';
 import { PaginationComponent } from '../pagination/pagination';
+import { PageTableLoadingComponent } from '../../../pages/page-default/page-table-loading/page-table-loading';
+import { PageTableEmptyComponent } from '../../../pages/page-default/page-table-empty/page-table-empty';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [CommonModule, PaginationComponent],
+  imports: [CommonModule, PaginationComponent, PageTableLoadingComponent, PageTableEmptyComponent],
   templateUrl: './table.html'
 })
 export class AppTableComponent {
@@ -28,6 +30,7 @@ export class AppTableComponent {
 
   @Output() sortChange = new EventEmitter<string>();
   @Output() rowClick = new EventEmitter<any>();
+  @Output() rowDblClick = new EventEmitter<any>();
   @Output() pageChange = new EventEmitter<number>();
 
   trackByColumn(_: number, item: TableColumn) {
@@ -40,6 +43,10 @@ export class AppTableComponent {
 
   onRowClick(row: any) {
     this.rowClick.emit(row);
+  }
+
+  onRowDblClick(row: any) {
+    this.rowDblClick.emit(row);
   }
 
   onPageChange(page: number) {

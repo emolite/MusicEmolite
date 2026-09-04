@@ -1,0 +1,15 @@
+@keyframes popup-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.popup-zoom-in {
+  animation: popup-zoom-in 0.15s ease-out;
+}

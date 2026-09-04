@@ -1,5 +1,8 @@
 export interface ArtistRequest {
   keyword?: string;
+  country?: string;
+  isActived?: boolean;
+  sortBy?: string;
 }
 
 export interface ArtistCreateRequest {
