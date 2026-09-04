@@ -16,6 +16,7 @@ import {
 import { DashboardService } from '../../../core/services/dashboard.service';
 import { DashboardSummaryResponse } from '../../../core/models/dashboard/dashboardsummary.model';
 import { DashboardTrendResponse } from '../../../core/models/dashboard/dashboardtrend.model';
+import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -29,10 +30,14 @@ import { DashboardTrendResponse } from '../../../core/models/dashboard/dashboard
 export class DashboardComponent {
 
     private dashboardService = inject(DashboardService);
+    private foodEmoliteService = inject(FoodEmoliteService);
 
     loading = signal(false);
 
     data = signal<DashboardSummaryResponse | null>(null);
+
+    loadingFood = signal(false);
+    foodData = signal<{ totalAgents: number; totalUsers: number; totalOrders: number; totalRevenue: number } | null>(null);
 
     lineChart: {
         series: ApexAxisChartSeries;
@@ -107,6 +112,22 @@ export class DashboardComponent {
     ngOnInit(): void {
         this.loadSummary();
         this.loadTrend();
+        this.loadFoodSummary();
+    }
+
+    loadFoodSummary() {
+        this.loadingFood.set(true);
+
+        this.foodEmoliteService.getRevenue().subscribe({
+            next: (res) => {
+                this.foodData.set(res?.data ?? null);
+                this.loadingFood.set(false);
+            },
+            error: (err) => {
+                console.log(err);
+                this.loadingFood.set(false);
+            }
+        });
     }
 
     loadSummary() {
