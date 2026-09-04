@@ -1,0 +1,19 @@
+<div class="p-1">
+    <div class="mb-6">
+        <h1 class="text-3xl text-gray-900 font-bold">
+            Danh sách món
+        </h1>
+        <p class="mt-1 text-gray-400">
+            Món ăn trên toàn hệ thống FoodEmolite
+        </p>
+    </div>
+
+    <app-table
+        [columns]="columns"
+        [rows]="rows()"
+        [loading]="loading()"
+        [currentPage]="currentPage()"
+        [totalPages]="totalPages()"
+        (pageChange)="onPageChange($event)">
+    </app-table>
+</div>

@@ -1,0 +1,48 @@
+<div class="p-1">
+    <div class="mb-6">
+        <h1 class="text-3xl text-gray-900 font-bold">
+            Thống kê
+        </h1>
+        <p class="mt-1 text-gray-400">
+            Top 10 sản phẩm bán chạy nhất và top 10 bài hát được nghe nhiều nhất
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div class="rounded-2xl bg-white p-5 shadow">
+            <h2 class="text-xl font-bold text-gray-900">Top 10 sản phẩm bán chạy (FoodEmolite)</h2>
+            <p class="text-sm text-gray-400 mb-2">Mỗi thanh đại diện cho 1 món, chiều dài theo số lượng bán</p>
+
+            @if (loadingFood()) {
+            <p class="text-sm text-gray-400 text-center py-16">Đang tải...</p>
+            } @else {
+            <apx-chart
+                [series]="foodChart.series"
+                [chart]="foodChart.chart"
+                [plotOptions]="foodChart.plotOptions"
+                [dataLabels]="foodChart.dataLabels"
+                [xaxis]="foodChart.xaxis"
+                [colors]="foodChart.colors">
+            </apx-chart>
+            }
+        </div>
+
+        <div class="rounded-2xl bg-white p-5 shadow">
+            <h2 class="text-xl font-bold text-gray-900">Top 10 bài hát nghe nhiều nhất</h2>
+            <p class="text-sm text-gray-400 mb-2">Mỗi thanh đại diện cho 1 bài hát, chiều dài theo lượt xem</p>
+
+            @if (loadingSongs()) {
+            <p class="text-sm text-gray-400 text-center py-16">Đang tải...</p>
+            } @else {
+            <apx-chart
+                [series]="songChart.series"
+                [chart]="songChart.chart"
+                [plotOptions]="songChart.plotOptions"
+                [dataLabels]="songChart.dataLabels"
+                [xaxis]="songChart.xaxis"
+                [colors]="songChart.colors">
+            </apx-chart>
+            }
+        </div>
+    </div>
+</div>
