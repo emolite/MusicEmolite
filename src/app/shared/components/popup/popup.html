@@ -4,8 +4,8 @@
 
   @if(state.options.imageUrl) {
   <!-- With image: two-column layout, matching the home page's login prompt -->
-  <div class="relative w-full max-w-md rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
-    p-5 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150" (click)="$event.stopPropagation()">
+  <div class="popup-zoom-in relative w-full max-w-md rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+    p-5 shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
     <button (click)="popupService.respond(false)"
       class="absolute top-4 right-4 text-white/60 hover:text-white text-lg transition cursor-pointer z-10">
       ✕
@@ -47,8 +47,8 @@
   </div>
   } @else {
   <!-- No image: simple single-column layout -->
-  <div class="relative w-full max-w-sm rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
-    p-6 md:p-8 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150" (click)="$event.stopPropagation()">
+  <div class="popup-zoom-in relative w-full max-w-sm rounded-[28px] bg-gradient-to-br from-[#4f4346] to-[#2d2b33]
+    p-6 md:p-8 shadow-2xl overflow-hidden" (click)="$event.stopPropagation()">
     <button (click)="popupService.respond(false)"
       class="absolute top-5 right-5 text-white/60 hover:text-white text-lg transition cursor-pointer">
       ✕

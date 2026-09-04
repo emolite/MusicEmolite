@@ -41,6 +41,9 @@ export class DropdownComponent
 
   @Input() options: DropdownOption[] = [];
 
+  /** When set (admin variant only), renders a floating label instead of showing `placeholder` inside the button. */
+  @Input() label?: string;
+
   @Input() placeholder = 'Chọn một giá trị';
 
   @Input() searchable = false;

@@ -19,6 +19,78 @@
     </div>
     <app-table [columns]="columns" [rows]="rows()" [loading]="loading()" [currentPage]="currentPage()"
         [totalPages]="totalPages()" [sortBy]="sortBy()" [asc]="asc()" (sortChange)="onSort($event)"
-        (rowClick)="onRowClick($event)" (pageChange)="onPageChange($event)">
+        (rowClick)="onRowClick($event)" (rowDblClick)="onRowDblClick($event)" (pageChange)="onPageChange($event)">
     </app-table>
+
+    <app-detail-panel [open]="!!selectedSong()" title="Chi tiết bài hát" (closed)="closeDetail()">
+        @if (selectedSong(); as song) {
+        <div class="flex items-center gap-4">
+            @if (song.imgUrl) {
+            <img [src]="song.imgUrl" class="w-20 h-20 rounded-xl object-cover border border-gray-200">
+            } @else {
+            <div class="w-20 h-20 rounded-xl border border-gray-200 bg-gray-100 flex items-center justify-center">
+                <svg class="w-7 h-7 text-gray-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6h.01M7 3h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7a4 4 0 014-4zm0 14l4-4a2 2 0 012.828 0L17 16" />
+                </svg>
+            </div>
+            }
+            <div class="min-w-0">
+                <p class="text-base font-bold text-gray-900 truncate">{{ song.title }}</p>
+                <p class="text-sm text-gray-500 truncate">{{ song.artistName || 'Không rõ nghệ sĩ' }}</p>
+            </div>
+        </div>
+
+        <div class="mt-6 space-y-4">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Nghệ sĩ</span>
+                <span class="font-medium text-gray-800">{{ song.artistName || '—' }}</span>
+            </div>
+
+            @if (song.albumName) {
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Album</span>
+                <span class="font-medium text-gray-800">{{ song.albumName }}</span>
+            </div>
+            }
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Loại</span>
+                <span class="font-medium text-gray-800">{{ song.typeSong }}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Lượt xem</span>
+                <span class="font-medium text-gray-800">{{ song.views }}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Lượt thích</span>
+                <span class="font-medium text-gray-800">{{ song.likes }}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Trạng thái</span>
+                <div class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+                    [class.bg-green-100]="song.isActived" [class.text-green-700]="song.isActived"
+                    [class.bg-red-100]="!song.isActived" [class.text-red-700]="!song.isActived">
+                    {{ song.isActived ? 'Hoạt động' : 'Ngừng hoạt động' }}
+                </div>
+            </div>
+
+            @if (song.youtubeVideoId) {
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Nguồn</span>
+                <a [href]="'https://www.youtube.com/watch?v=' + song.youtubeVideoId" target="_blank"
+                    class="font-medium text-blue-600 hover:underline">Xem trên YouTube</a>
+            </div>
+            }
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Ngày tạo</span>
+                <span class="font-medium text-gray-800">{{ song.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+        </div>
+        }
+    </app-detail-panel>
 </div>

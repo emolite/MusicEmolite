@@ -6,6 +6,7 @@ import { Songs } from './songs/song';
 import { PublishLyricsComponent } from './publish-lyrics/publish-lyrics';
 import { UsersComponent } from './users/users';
 import { AlbumsComponent } from './albums/albums';
+import { ArtistsComponent } from './artists/artists';
 import { DashboardComponent } from './dashboard/dashboard';
 
 export const ADMIN_ROUTES: Routes = [
@@ -37,6 +38,11 @@ export const ADMIN_ROUTES: Routes = [
         path: 'albums',
         component: AlbumsComponent,
         data: { title: 'Albums' }
+      },
+      {
+        path: 'artists',
+        component: ArtistsComponent,
+        data: { title: 'Nghệ sĩ' }
       },
       {
         path: 'add-music',
