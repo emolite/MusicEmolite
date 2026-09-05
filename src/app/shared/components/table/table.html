@@ -83,6 +83,15 @@
             </div>
             }
 
+            @case ('badge') {
+            <div [class]="'inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium ' +
+              (getValue(row, column.key)
+                ? (column.badgeConfig?.trueClass || 'bg-green-100 text-green-700')
+                : (column.badgeConfig?.falseClass || 'bg-gray-100 text-gray-600'))">
+              {{ getValue(row, column.key) ? column.badgeConfig?.trueLabel : column.badgeConfig?.falseLabel }}
+            </div>
+            }
+
             @case ('date') {
             <span class="text-gray-600">
               {{ getValue(row, column.key) | date:'dd/MM/yyyy HH:mm' }}

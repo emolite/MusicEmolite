@@ -4,6 +4,9 @@ import { FormsModule } from '@angular/forms';
 
 import { AppTableComponent } from '../../../shared/components/table/table';
 import { TableColumn } from '../../../core/models/front-end/table/table-column.model';
+import { FilterComponent } from '../../../shared/components/filter/filter';
+import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
+import { DropdownComponent, DropdownOption } from '../../../shared/components/dropdown/dropdown';
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
@@ -12,7 +15,7 @@ const PAGE_SIZE = 20;
 @Component({
     selector: 'app-food-stores',
     standalone: true,
-    imports: [CommonModule, FormsModule, AppTableComponent],
+    imports: [CommonModule, FormsModule, AppTableComponent, FilterComponent, DropdownComponent],
     templateUrl: './food-stores.html'
 })
 export class FoodStoresComponent {
@@ -23,6 +26,21 @@ export class FoodStoresComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+
+    filter = signal<{ keyword: string; isActive: string }>({ keyword: '', isActive: '' });
+
+    filterFields: FilterField[] = [
+        { key: 'keyword', label: 'Tìm kiếm', type: 'text', placeholder: 'Tên cửa hàng...' },
+        {
+            key: 'isActive',
+            label: 'Trạng thái',
+            type: 'select',
+            options: [
+                { label: 'Hoạt động', value: 'true' },
+                { label: 'Ngừng hoạt động', value: 'false' }
+            ]
+        }
+    ];
 
     columns: TableColumn[] = [
         { key: 'stt', label: 'STT', width: '80px', align: 'center' },
@@ -38,6 +56,8 @@ export class FoodStoresComponent {
     creating = signal(false);
     createError = signal<string | null>(null);
     agents = signal<any[]>([]);
+    agentOptions = signal<DropdownOption[]>([]);
+    thumbnailPreviewUrl = signal<string | null>(null);
 
     form = {
         storeName: '',
@@ -55,7 +75,9 @@ export class FoodStoresComponent {
     loadStores() {
         this.loading.set(true);
 
-        this.foodEmoliteService.getAllStores(this.currentPage(), PAGE_SIZE).subscribe({
+        const isActive = this.filter().isActive === '' ? null : this.filter().isActive === 'true';
+
+        this.foodEmoliteService.getAllStores(this.currentPage(), PAGE_SIZE, this.filter().keyword, isActive).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
@@ -80,15 +102,33 @@ export class FoodStoresComponent {
         this.loadStores();
     }
 
+    onFilterChange(data: any) {
+        this.currentPage.set(1);
+        this.filter.set({ keyword: data.keyword ?? '', isActive: data.isActive ?? '' });
+        this.loadStores();
+    }
+
     openCreateForm() {
         this.form = { storeName: '', ownerAccountId: null, phoneNumber: '', address: '', description: '', thumbnailFile: null };
+        this.thumbnailPreviewUrl.set(null);
         this.createError.set(null);
         this.showCreateForm.set(true);
 
         this.foodEmoliteService.getAgents(1, 100).subscribe({
-            next: (res) => this.agents.set(res?.items ?? []),
+            next: (res) => {
+                const items: any[] = res?.items ?? [];
+                this.agents.set(items);
+                this.agentOptions.set(items.map(agent => ({
+                    label: agent.profile?.fullName || agent.account?.username,
+                    value: agent.account?.id
+                })));
+            },
             error: () => {}
         });
+    }
+
+    onOwnerChange(option: DropdownOption | null) {
+        this.form.ownerAccountId = option?.value ?? null;
     }
 
     closeCreateForm() {
@@ -98,7 +138,21 @@ export class FoodStoresComponent {
 
     onFileSelected(event: Event) {
         const input = event.target as HTMLInputElement;
-        this.form.thumbnailFile = input.files?.[0] ?? null;
+        const file = input.files?.[0] ?? null;
+        this.form.thumbnailFile = file;
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => this.thumbnailPreviewUrl.set(reader.result as string);
+            reader.readAsDataURL(file);
+        } else {
+            this.thumbnailPreviewUrl.set(null);
+        }
+    }
+
+    removeThumbnail() {
+        this.form.thumbnailFile = null;
+        this.thumbnailPreviewUrl.set(null);
     }
 
     submitCreate() {

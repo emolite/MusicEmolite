@@ -10,9 +10,13 @@ import { ArtistsComponent } from './artists/artists';
 import { DashboardComponent } from './dashboard/dashboard';
 import { RevenueReportComponent } from './reports/revenue-report/revenue-report';
 import { StatisticsComponent } from './reports/statistics/statistics';
+import { FrequencyComponent } from './reports/frequency/frequency';
+import { ActivityLogComponent } from './activity-log/activity-log';
 import { FoodAgentsComponent } from './food-agents/food-agents';
 import { FoodStoresComponent } from './food-stores/food-stores';
 import { FoodDishesComponent } from './food-dishes/food-dishes';
+import { FoodCategoriesComponent } from './food-categories/food-categories';
+import { FoodCustomersComponent } from './food-customers/food-customers';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -60,6 +64,16 @@ export const ADMIN_ROUTES: Routes = [
         data: { title: 'Thống kê' }
       },
       {
+        path: 'reports/frequency',
+        component: FrequencyComponent,
+        data: { title: 'Tần Suất' }
+      },
+      {
+        path: 'privacy/activity-log',
+        component: ActivityLogComponent,
+        data: { title: 'Lịch Sử Hoạt Động' }
+      },
+      {
         path: 'food/agents',
         component: FoodAgentsComponent,
         data: { title: 'Đại lý (FoodEmolite)' }
@@ -73,6 +87,16 @@ export const ADMIN_ROUTES: Routes = [
         path: 'food/dishes',
         component: FoodDishesComponent,
         data: { title: 'Món ăn (FoodEmolite)' }
+      },
+      {
+        path: 'food/categories',
+        component: FoodCategoriesComponent,
+        data: { title: 'Danh mục (FoodEmolite)' }
+      },
+      {
+        path: 'food/customers',
+        component: FoodCustomersComponent,
+        data: { title: 'Khách hàng (FoodEmolite)' }
       },
       {
         path: 'add-music',

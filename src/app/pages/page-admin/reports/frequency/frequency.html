@@ -1,0 +1,62 @@
+<div class="p-1">
+    <div class="mb-6">
+        <h1 class="text-3xl text-gray-900 font-bold">
+            Tần Suất
+        </h1>
+        <p class="mt-1 text-gray-400">
+            Tần suất sử dụng nhạc - lượt xem, lượt thích và người dùng
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
+        <div class="rounded-2xl bg-white p-5 shadow">
+            <h2 class="mb-4 text-xl font-bold text-gray-900">Xu hướng 30 ngày qua</h2>
+
+            @if (loadingTrend()) {
+            <p class="text-sm text-gray-400 text-center py-32">Đang tải...</p>
+            } @else {
+            <apx-chart
+                [series]="lineChart.series"
+                [chart]="lineChart.chart"
+                [xaxis]="lineChart.xaxis"
+                [yaxis]="lineChart.yaxis"
+                [stroke]="lineChart.stroke"
+                [dataLabels]="lineChart.dataLabels"
+                [legend]="lineChart.legend">
+            </apx-chart>
+            }
+        </div>
+
+        <div class="rounded-2xl bg-white p-5 shadow">
+            <h2 class="mb-4 text-xl font-bold text-gray-900">Tỷ lệ tổng quan</h2>
+
+            @if (loadingSummary()) {
+            <p class="text-sm text-gray-400 text-center py-32">Đang tải...</p>
+            } @else {
+            <apx-chart
+                [series]="pieChart.series"
+                [chart]="pieChart.chart"
+                [labels]="pieChart.labels"
+                [legend]="pieChart.legend"
+                [responsive]="pieChart.responsive">
+            </apx-chart>
+            }
+        </div>
+    </div>
+
+    <div>
+        <h2 class="text-xl font-bold text-gray-900 mb-3">Tần suất sử dụng nhạc</h2>
+
+        <app-table
+            [columns]="songColumns"
+            [rows]="songs()"
+            [loading]="loadingSongList()"
+            [currentPage]="songsCurrentPage()"
+            [totalPages]="songsTotalPages()"
+            [sortBy]="songsSortBy()"
+            [asc]="songsAsc()"
+            (sortChange)="onSortSongs($event)"
+            (pageChange)="onSongsPageChange($event)">
+        </app-table>
+    </div>
+</div>

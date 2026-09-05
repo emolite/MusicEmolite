@@ -31,74 +31,73 @@
     </div>
     } @else {
 
+    <div class="rounded-2xl bg-white p-4 shadow mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+            <app-date-picker label="Từ ngày" [value]="fromDate" (changed)="fromDate = $event"></app-date-picker>
+
+            <app-date-picker label="Đến ngày" [value]="toDate" (changed)="toDate = $event"></app-date-picker>
+
+            <app-dropdown label="Hiển thị theo" [options]="groupByOptions" [value]="groupBy"
+                (changed)="onGroupByChange($event)">
+            </app-dropdown>
+
+            <div class="flex gap-3">
+                <button (click)="applyFilter()"
+                    class="flex-1 h-9 rounded-md bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold cursor-pointer">
+                    Lọc
+                </button>
+                <button (click)="resetFilter()"
+                    class="flex-1 h-9 rounded-md border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer">
+                    Đặt lại
+                </button>
+            </div>
+        </div>
+    </div>
+
     @if (loading()) {
     <p class="text-sm text-gray-400">Đang tải...</p>
     } @else {
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="rounded-2xl bg-white p-5 shadow">
-            <p class="text-gray-400">Doanh thu</p>
-            <h2 class="mt-2 text-2xl font-bold text-gray-900">{{ (revenue()?.totalRevenue || 0) | number }}₫</h2>
-        </div>
-        <div class="rounded-2xl bg-white p-5 shadow">
-            <p class="text-gray-400">Tổng đơn hàng</p>
+            <p class="text-gray-400">Tổng số đơn hàng</p>
             <h2 class="mt-2 text-2xl font-bold text-gray-900">{{ revenue()?.totalOrders || 0 }}</h2>
         </div>
         <div class="rounded-2xl bg-white p-5 shadow">
-            <p class="text-gray-400">Đại lý</p>
-            <h2 class="mt-2 text-2xl font-bold text-gray-900">{{ revenue()?.totalAgents || 0 }}</h2>
-        </div>
-        <div class="rounded-2xl bg-white p-5 shadow">
-            <p class="text-gray-400">Người dùng</p>
-            <h2 class="mt-2 text-2xl font-bold text-gray-900">{{ revenue()?.totalUsers || 0 }}</h2>
+            <p class="text-gray-400">Tổng doanh thu</p>
+            <h2 class="mt-2 text-2xl font-bold text-gray-900">{{ (revenue()?.totalRevenue || 0) | number }}₫</h2>
         </div>
     </div>
 
-    <div class="rounded-2xl bg-white p-5 shadow mb-6">
-        <h2 class="mb-4 text-xl font-bold text-gray-900">Doanh thu theo ngày</h2>
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div class="xl:col-span-2 rounded-2xl bg-white p-5 shadow">
+            <h2 class="mb-4 text-xl font-bold text-gray-900">Biểu đồ doanh thu</h2>
 
-        <apx-chart
-            [series]="lineChart.series"
-            [chart]="lineChart.chart"
-            [xaxis]="lineChart.xaxis"
-            [yaxis]="lineChart.yaxis"
-            [stroke]="lineChart.stroke"
-            [dataLabels]="lineChart.dataLabels">
-        </apx-chart>
+            <apx-chart
+                [series]="lineChart.series"
+                [chart]="lineChart.chart"
+                [xaxis]="lineChart.xaxis"
+                [yaxis]="lineChart.yaxis"
+                [stroke]="lineChart.stroke"
+                [dataLabels]="lineChart.dataLabels">
+            </apx-chart>
+        </div>
+
+        <div class="rounded-2xl bg-white p-5 shadow">
+            <h2 class="mb-4 text-xl font-bold text-gray-900">Tỷ trọng đơn hàng</h2>
+
+            @if (pieChart.series.length === 0) {
+            <p class="text-sm text-gray-400 text-center py-16">Chưa có dữ liệu</p>
+            } @else {
+            <apx-chart
+                [series]="pieChart.series"
+                [chart]="pieChart.chart"
+                [labels]="pieChart.labels"
+                [colors]="pieChart.colors"
+                [legend]="pieChart.legend">
+            </apx-chart>
+            }
+        </div>
     </div>
     }
-
-    <div class="rounded-2xl bg-white shadow overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100">
-            <h2 class="text-xl font-bold text-gray-900">Doanh thu theo sản phẩm</h2>
-        </div>
-
-        @if (loadingProducts()) {
-        <p class="text-sm text-gray-400 text-center py-8">Đang tải...</p>
-        } @else if (products().length === 0) {
-        <p class="text-sm text-gray-400 text-center py-8">Chưa có dữ liệu</p>
-        } @else {
-        <table class="w-full text-sm text-gray-700">
-            <thead class="bg-gray-50 text-left text-gray-500 uppercase text-xs">
-                <tr>
-                    <th class="px-5 py-3 font-semibold">Tên sản phẩm</th>
-                    <th class="px-5 py-3 font-semibold text-center">Số lượng bán</th>
-                    <th class="px-5 py-3 font-semibold text-right">Doanh thu</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (product of products(); track product.storeFoodId) {
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="px-5 py-3">
-                        <p class="font-medium text-gray-800">{{ product.foodName }}</p>
-                        <p class="text-xs text-gray-400">{{ product.storeName }}</p>
-                    </td>
-                    <td class="px-5 py-3 text-center text-blue-600 font-medium">{{ product.quantitySold }}</td>
-                    <td class="px-5 py-3 text-right">{{ product.revenue | number }}₫</td>
-                </tr>
-                }
-            </tbody>
-        </table>
-        }
-    </div>
     }
 </div>

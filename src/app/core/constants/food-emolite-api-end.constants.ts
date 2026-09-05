@@ -18,4 +18,8 @@ export const FOOD_EMOLITE_API_END = {
   TOP_PRODUCTS: `${BASE_URL}foodemolite/revenue/top-products`,
   PRODUCT_REVENUE_SEARCH: `${BASE_URL}foodemolite/revenue/products/search`,
   STORE_FOODS: `${BASE_URL}foodemolite/store-foods`,
+  CATEGORIES: `${BASE_URL}foodemolite/categories`,
+  CUSTOMERS_SEARCH: `${BASE_URL}foodemolite/customers/search`,
+  ORDERS_SEARCH: `${BASE_URL}foodemolite/orders/search`,
+  ACTIVITY_LOGS_SEARCH: `${BASE_URL}foodemolite/activity-logs/search`,
 };

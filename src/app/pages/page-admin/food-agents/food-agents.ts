@@ -5,6 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { AppTableComponent } from '../../../shared/components/table/table';
 import { TableColumn } from '../../../core/models/front-end/table/table-column.model';
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
+import { FilterComponent } from '../../../shared/components/filter/filter';
+import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
@@ -13,7 +15,7 @@ const PAGE_SIZE = 20;
 @Component({
     selector: 'app-food-agents',
     standalone: true,
-    imports: [CommonModule, FormsModule, AppTableComponent, DetailPanelComponent],
+    imports: [CommonModule, FormsModule, AppTableComponent, DetailPanelComponent, FilterComponent],
     templateUrl: './food-agents.html'
 })
 export class FoodAgentsComponent {
@@ -25,6 +27,21 @@ export class FoodAgentsComponent {
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
 
+    filter = signal<{ keyword: string; isActive: string }>({ keyword: '', isActive: '' });
+
+    filterFields: FilterField[] = [
+        { key: 'keyword', label: 'Tìm kiếm', type: 'text', placeholder: 'Tên đăng nhập hoặc email...' },
+        {
+            key: 'isActive',
+            label: 'Trạng thái',
+            type: 'select',
+            options: [
+                { label: 'Hoạt động', value: 'true' },
+                { label: 'Ngừng hoạt động', value: 'false' }
+            ]
+        }
+    ];
+
     selectedAgent = signal<any | null>(null);
     agentStores = signal<any[]>([]);
     loadingAgentStores = signal(false);
@@ -32,7 +49,9 @@ export class FoodAgentsComponent {
     showCreateForm = signal(false);
     creating = signal(false);
     createError = signal<string | null>(null);
-    form = { username: '', email: '', password: '' };
+    showPassword = signal(false);
+    showConfirmPassword = signal(false);
+    form = { username: '', email: '', password: '', confirmPassword: '' };
 
     columns: TableColumn[] = [
         { key: 'stt', label: 'STT', width: '80px', align: 'center' },
@@ -50,7 +69,9 @@ export class FoodAgentsComponent {
     loadAgents() {
         this.loading.set(true);
 
-        this.foodEmoliteService.getAgents(this.currentPage(), PAGE_SIZE).subscribe({
+        const isActive = this.filter().isActive === '' ? null : this.filter().isActive === 'true';
+
+        this.foodEmoliteService.getAgents(this.currentPage(), PAGE_SIZE, this.filter().keyword, isActive).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
@@ -63,6 +84,11 @@ export class FoodAgentsComponent {
                     isActived: item.account?.isActive,
                     fullName: item.profile?.fullName,
                     phone: item.profile?.phoneNumber,
+                    gender: item.profile?.gender,
+                    dateOfBirth: item.profile?.dateOfBirth,
+                    address: item.profile?.address,
+                    avatarUrl: item.profile?.avatarUrl,
+                    bankAccounts: item.bankAccounts ?? [],
                     store: item.store,
                     raw: item
                 }));
@@ -83,6 +109,12 @@ export class FoodAgentsComponent {
         this.loadAgents();
     }
 
+    onFilterChange(data: any) {
+        this.currentPage.set(1);
+        this.filter.set({ keyword: data.keyword ?? '', isActive: data.isActive ?? '' });
+        this.loadAgents();
+    }
+
     onRowDblClick(row: any) {
         this.selectedAgent.set(row);
         this.loadAgentStores(row.refCode);
@@ -94,7 +126,9 @@ export class FoodAgentsComponent {
     }
 
     openCreateForm() {
-        this.form = { username: '', email: '', password: '' };
+        this.form = { username: '', email: '', password: '', confirmPassword: '' };
+        this.showPassword.set(false);
+        this.showConfirmPassword.set(false);
         this.createError.set(null);
         this.showCreateForm.set(true);
     }
@@ -104,16 +138,33 @@ export class FoodAgentsComponent {
         this.showCreateForm.set(false);
     }
 
+    togglePasswordVisibility() {
+        this.showPassword.set(!this.showPassword());
+    }
+
+    toggleConfirmPasswordVisibility() {
+        this.showConfirmPassword.set(!this.showConfirmPassword());
+    }
+
     submitCreate() {
         if (!this.form.username.trim() || !this.form.email.trim() || !this.form.password.trim()) {
             this.createError.set('Vui lòng nhập đầy đủ tên đăng nhập, email và mật khẩu');
             return;
         }
 
+        if (this.form.password !== this.form.confirmPassword) {
+            this.createError.set('Mật khẩu xác nhận không khớp');
+            return;
+        }
+
         this.creating.set(true);
         this.createError.set(null);
 
-        this.foodEmoliteService.createAgent(this.form).subscribe({
+        this.foodEmoliteService.createAgent({
+            username: this.form.username,
+            email: this.form.email,
+            password: this.form.password
+        }).subscribe({
             next: (res) => {
                 this.creating.set(false);
 

@@ -4,6 +4,13 @@ import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexPlotOptions, ApexXA
 
 import { FoodEmoliteService } from '../../../../core/services/food-emolite.service';
 import { SongService } from '../../../../core/services/song.service';
+import { AppTableComponent } from '../../../../shared/components/table/table';
+import { TableColumn } from '../../../../core/models/front-end/table/table-column.model';
+import { FilterComponent } from '../../../../shared/components/filter/filter';
+import { FilterField } from '../../../../core/models/front-end/filter/filter-field.model';
+import { PAGINATION } from '../../../../core/constants/pagination.constants';
+
+const PAGE_SIZE = 10;
 
 type BarChart = {
     series: ApexAxisChartSeries;
@@ -26,7 +33,7 @@ const barChartBase = (color: string): BarChart => ({
 @Component({
     selector: 'app-statistics',
     standalone: true,
-    imports: [CommonModule, NgApexchartsModule],
+    imports: [CommonModule, NgApexchartsModule, AppTableComponent, FilterComponent],
     templateUrl: './statistics.html'
 })
 export class StatisticsComponent {
@@ -40,9 +47,57 @@ export class StatisticsComponent {
     foodChart: BarChart = barChartBase('#10b981');
     songChart: BarChart = barChartBase('#3b82f6');
 
+    /** Which table is shown under "Doanh thu theo" - product-level or order-level breakdown. */
+    revenueTab = signal<'product' | 'order'>('product');
+
+    loadingProducts = signal(false);
+    products = signal<any[]>([]);
+    sortBy = signal('quantitysold');
+    asc = signal(false);
+
+    productColumns: TableColumn[] = [
+        { key: 'foodName', label: 'Tên sản phẩm' },
+        { key: 'storeName', label: 'Cửa hàng' },
+        { key: 'quantitySold', label: 'Số lượng bán', align: 'center', sortable: true },
+        { key: 'revenue', label: 'Doanh thu', align: 'right', sortable: true }
+    ];
+
+    loadingOrders = signal(false);
+    orders = signal<any[]>([]);
+    ordersCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
+    ordersTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    ordersSortBy = signal('createdAt');
+    ordersAsc = signal(false);
+
+    orderFilter = signal<{ keyword: string }>({ keyword: '' });
+
+    orderFilterFields: FilterField[] = [
+        {
+            key: 'keyword',
+            label: 'Tìm kiếm',
+            type: 'text',
+            placeholder: 'Mã đơn hoặc tên khách hàng...'
+        }
+    ];
+
+    orderColumns: TableColumn[] = [
+        { key: 'stt', label: 'STT', width: '80px', align: 'center' },
+        { key: 'orderCode', label: 'Mã đơn' },
+        { key: 'customerName', label: 'Khách hàng' },
+        { key: 'itemCount', label: 'Số món', align: 'center' },
+        { key: 'totalAmount', label: 'Doanh thu', align: 'right', sortable: true },
+        { key: 'createdAt', label: 'Ngày tạo', type: 'date', sortable: true }
+    ];
+
     ngOnInit(): void {
         this.loadTopFoodProducts();
         this.loadTopSongs();
+        this.loadProductRevenue();
+        this.loadOrders();
+    }
+
+    setRevenueTab(tab: 'product' | 'order') {
+        this.revenueTab.set(tab);
     }
 
     loadTopFoodProducts() {
@@ -92,5 +147,99 @@ export class StatisticsComponent {
                 this.loadingSongs.set(false);
             }
         });
+    }
+
+    loadProductRevenue() {
+        this.loadingProducts.set(true);
+
+        this.foodEmoliteService.searchProductRevenue({
+            page: 1,
+            pageSize: 10,
+            asc: this.asc(),
+            sortBy: this.sortBy(),
+            searchParams: {}
+        }).subscribe({
+            next: (res) => {
+                const items: any[] = res?.items ?? [];
+
+                const mapped = items.map(item => ({
+                    ...item,
+                    revenue: `${(item.revenue ?? 0).toLocaleString('vi-VN')}₫`
+                }));
+
+                this.products.set(mapped);
+                this.loadingProducts.set(false);
+            },
+            error: (err) => {
+                console.log(err);
+                this.loadingProducts.set(false);
+            }
+        });
+    }
+
+    onSortProducts(column: string) {
+        if (this.sortBy() === column) {
+            this.asc.set(!this.asc());
+        } else {
+            this.sortBy.set(column);
+            this.asc.set(false);
+        }
+
+        this.loadProductRevenue();
+    }
+
+    loadOrders() {
+        this.loadingOrders.set(true);
+
+        this.foodEmoliteService.searchOrders({
+            page: this.ordersCurrentPage(),
+            pageSize: PAGE_SIZE,
+            asc: this.ordersAsc(),
+            sortBy: this.ordersSortBy(),
+            searchParams: {
+                keyword: this.orderFilter().keyword || null
+            }
+        }).subscribe({
+            next: (res) => {
+                const items: any[] = res?.items ?? [];
+
+                const mapped = items.map((item, index) => ({
+                    ...item,
+                    itemCount: item.items?.length ?? 0,
+                    totalAmount: `${(item.totalAmount ?? 0).toLocaleString('vi-VN')}₫`,
+                    stt: ((this.ordersCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                }));
+
+                this.orders.set(mapped);
+                this.ordersTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.loadingOrders.set(false);
+            },
+            error: (err) => {
+                console.log(err);
+                this.loadingOrders.set(false);
+            }
+        });
+    }
+
+    onOrderFilterChange(data: any) {
+        this.ordersCurrentPage.set(1);
+        this.orderFilter.set({ keyword: data.keyword ?? '' });
+        this.loadOrders();
+    }
+
+    onOrdersPageChange(page: number) {
+        this.ordersCurrentPage.set(page);
+        this.loadOrders();
+    }
+
+    onSortOrders(column: string) {
+        if (this.ordersSortBy() === column) {
+            this.ordersAsc.set(!this.ordersAsc());
+        } else {
+            this.ordersSortBy.set(column);
+            this.ordersAsc.set(false);
+        }
+
+        this.loadOrders();
     }
 }

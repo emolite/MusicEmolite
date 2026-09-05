@@ -23,6 +23,7 @@ import { ResUsers } from '../../../core/models/user/res-user-profile.model';
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
 import { AlbumService } from '../../../core/services/album.service';
 import { SongService } from '../../../core/services/song.service';
+import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 
 const PAGE_SIZE = 20;
 
@@ -44,6 +45,32 @@ export class UsersComponent {
     private userService = inject(UserService);
     private albumService = inject(AlbumService);
     private songService = inject(SongService);
+    private foodEmoliteService = inject(FoodEmoliteService);
+
+    /** MusicEmolite users vs FoodEmolite users - separate systems, separate tabs. */
+    usersTab = signal<'music' | 'food'>('music');
+
+    loadingFoodUsers = signal(false);
+    foodUsers = signal<any[]>([]);
+    foodUsersCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
+    foodUsersTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    selectedFoodUser = signal<any | null>(null);
+
+    foodUserFilter = signal<{ keyword: string }>({ keyword: '' });
+
+    foodUserFilterFields: FilterField[] = [
+        { key: 'keyword', label: 'Tìm kiếm', type: 'text', placeholder: 'Tên đăng nhập, họ tên hoặc email...' }
+    ];
+
+    foodUserColumns: TableColumn[] = [
+        { key: 'stt', label: 'STT', width: '80px', align: 'center' },
+        { key: 'avatarUrl', label: 'Ảnh', type: 'image', width: '100px', align: 'left' },
+        { key: 'username', label: 'Tên đăng nhập' },
+        { key: 'fullName', label: 'Họ tên' },
+        { key: 'email', label: 'Email' },
+        { key: 'phone', label: 'Số điện thoại' },
+        { key: 'isActived', label: 'Trạng thái', type: 'status', align: 'center' }
+    ];
 
     selectedUser = signal<ResUsers | null>(null);
     userAlbums = signal<any[]>([]);
@@ -174,6 +201,63 @@ export class UsersComponent {
     ngOnInit(): void {
 
         this.loadUsers();
+        this.loadFoodUsers();
+    }
+
+    setUsersTab(tab: 'music' | 'food') {
+        this.usersTab.set(tab);
+    }
+
+    loadFoodUsers() {
+        this.loadingFoodUsers.set(true);
+
+        this.foodEmoliteService.getUsers(this.foodUsersCurrentPage(), PAGE_SIZE, this.foodUserFilter().keyword).subscribe({
+            next: (res) => {
+                const items: any[] = res?.items ?? [];
+
+                const mapped = items.map((item, index) => ({
+                    id: item.account?.id,
+                    refCode: item.account?.refCode,
+                    username: item.account?.username,
+                    email: item.account?.email,
+                    isActived: item.account?.isActive,
+                    fullName: item.profile?.fullName,
+                    phone: item.profile?.phoneNumber,
+                    gender: item.profile?.gender,
+                    dateOfBirth: item.profile?.dateOfBirth,
+                    address: item.profile?.address,
+                    avatarUrl: item.profile?.avatarUrl,
+                    stt: ((this.foodUsersCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                }));
+
+                this.foodUsers.set(mapped);
+                this.foodUsersTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.loadingFoodUsers.set(false);
+            },
+            error: (err) => {
+                console.log(err);
+                this.loadingFoodUsers.set(false);
+            }
+        });
+    }
+
+    onFoodUsersPageChange(page: number) {
+        this.foodUsersCurrentPage.set(page);
+        this.loadFoodUsers();
+    }
+
+    onFoodUserFilterChange(data: any) {
+        this.foodUsersCurrentPage.set(1);
+        this.foodUserFilter.set({ keyword: data.keyword ?? '' });
+        this.loadFoodUsers();
+    }
+
+    onFoodUserRowDblClick(row: any) {
+        this.selectedFoodUser.set(row);
+    }
+
+    closeFoodUserDetail() {
+        this.selectedFoodUser.set(null);
     }
 
     loadUsers() {
