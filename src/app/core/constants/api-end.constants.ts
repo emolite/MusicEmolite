@@ -98,5 +98,9 @@ export const API_END = {
   DASHBOARD: {
     SUMMARY: `${BASE_URL}dashboard/summary`,
     TREND: `${BASE_URL}dashboard/trend`,
+  },
+
+  ACTIVITY_LOG: {
+    SEARCH: `${BASE_URL}activity-logs/search`,
   }
 };

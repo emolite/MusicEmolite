@@ -8,7 +8,24 @@
                 Danh sách tất cả người dùng trong hệ thống
             </p>
         </div>
+
+        <div class="inline-flex p-1 rounded-lg bg-gray-100">
+            <button (click)="setUsersTab('music')"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                [class.bg-white]="usersTab() === 'music'" [class.shadow]="usersTab() === 'music'"
+                [class.text-gray-900]="usersTab() === 'music'" [class.text-gray-500]="usersTab() !== 'music'">
+                MusicEmolite
+            </button>
+            <button (click)="setUsersTab('food')"
+                class="px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
+                [class.bg-white]="usersTab() === 'food'" [class.shadow]="usersTab() === 'food'"
+                [class.text-gray-900]="usersTab() === 'food'" [class.text-gray-500]="usersTab() !== 'food'">
+                FoodEmolite
+            </button>
+        </div>
     </div>
+
+    @if (usersTab() === 'music') {
 
     <div class="mb-5">
         <app-filter [fields]="filterFields" [initialValues]="filter()" (filterChange)="onFilterChange($event)">
@@ -19,6 +36,83 @@
         [totalPages]="totalPages()" [sortBy]="sortBy()" [asc]="asc()" (sortChange)="onSort($event)"
         (pageChange)="onPageChange($event)" (rowClick)="onRowClick($event)" (rowDblClick)="onRowDblClick($event)">
     </app-table>
+
+    } @else {
+
+    <div class="mb-5">
+        <app-filter [fields]="foodUserFilterFields" [initialValues]="foodUserFilter()"
+            (filterChange)="onFoodUserFilterChange($event)">
+        </app-filter>
+    </div>
+
+    <app-table [columns]="foodUserColumns" [rows]="foodUsers()" [loading]="loadingFoodUsers()"
+        [currentPage]="foodUsersCurrentPage()" [totalPages]="foodUsersTotalPages()"
+        (pageChange)="onFoodUsersPageChange($event)" (rowDblClick)="onFoodUserRowDblClick($event)">
+    </app-table>
+
+    <app-detail-panel [open]="!!selectedFoodUser()" title="Chi tiết người dùng (FoodEmolite)" (closed)="closeFoodUserDetail()">
+        @if (selectedFoodUser(); as user) {
+        <div class="flex items-center gap-4">
+            @if (user.avatarUrl) {
+            <img [src]="user.avatarUrl" class="w-16 h-16 rounded-xl object-cover border border-gray-200">
+            } @else {
+            <div class="w-16 h-16 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-bold text-gray-400">
+                {{ (user.fullName || user.username || '?').charAt(0) | uppercase }}
+            </div>
+            }
+            <div class="min-w-0">
+                <p class="text-base font-bold text-gray-900 truncate">{{ user.fullName || user.username }}</p>
+                <p class="text-sm text-gray-500 truncate">&#64;{{ user.username }}</p>
+            </div>
+        </div>
+
+        <div class="mt-6 space-y-4">
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Email</span>
+                <span class="font-medium text-gray-800 truncate">{{ user.email }}</span>
+            </div>
+
+            @if (user.phone) {
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Số điện thoại</span>
+                <span class="font-medium text-gray-800">{{ user.phone }}</span>
+            </div>
+            }
+
+            @if (user.gender) {
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Giới tính</span>
+                <span class="font-medium text-gray-800">{{ user.gender }}</span>
+            </div>
+            }
+
+            @if (user.dateOfBirth) {
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Ngày sinh</span>
+                <span class="font-medium text-gray-800">{{ user.dateOfBirth | date:'dd/MM/yyyy' }}</span>
+            </div>
+            }
+
+            @if (user.address) {
+            <div class="flex items-center justify-between gap-4 text-sm">
+                <span class="text-gray-400 shrink-0">Địa chỉ</span>
+                <span class="font-medium text-gray-800 text-right">{{ user.address }}</span>
+            </div>
+            }
+
+            <div class="flex items-center justify-between text-sm">
+                <span class="text-gray-400">Trạng thái</span>
+                <div class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+                    [class.bg-green-100]="user.isActived" [class.text-green-700]="user.isActived"
+                    [class.bg-red-100]="!user.isActived" [class.text-red-700]="!user.isActived">
+                    {{ user.isActived ? 'Hoạt động' : 'Ngừng hoạt động' }}
+                </div>
+            </div>
+        </div>
+        }
+    </app-detail-panel>
+
+    }
 
     <app-detail-panel [open]="!!selectedUser()" title="Chi tiết người dùng" (closed)="closeDetail()">
         @if (selectedUser(); as user) {

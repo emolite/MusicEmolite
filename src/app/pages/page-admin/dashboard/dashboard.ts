@@ -5,8 +5,6 @@ import {
     ApexChart,
     ApexDataLabels,
     ApexLegend,
-    ApexNonAxisChartSeries,
-    ApexResponsive,
     ApexStroke,
     ApexXAxis,
     ApexYAxis,
@@ -74,39 +72,36 @@ export class DashboardComponent {
         }
     };
 
-    pieChart: {
-        series: ApexNonAxisChartSeries;
+    foodLineChart: {
+        series: ApexAxisChartSeries;
         chart: ApexChart;
-        labels: string[];
-        legend: ApexLegend;
-        responsive: ApexResponsive[];
+        xaxis: ApexXAxis;
+        yaxis: ApexYAxis;
+        stroke: ApexStroke;
+        dataLabels: ApexDataLabels;
     } = {
         series: [],
         chart: {
-            type: 'pie',
-            height: 350
+            type: 'line',
+            height: 350,
+            toolbar: { show: false }
         },
-        labels: [
-            'Views',
-            'Likes',
-            'Users'
-        ],
-        legend: {
-            position: 'bottom'
+        xaxis: {
+            categories: []
         },
-        responsive: [
-            {
-                breakpoint: 768,
-                options: {
-                    chart: {
-                        height: 300
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
+        yaxis: {
+            labels: {
+                formatter: (val) => `${Math.round(val)}`
             }
-        ]
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 4,
+            colors: ['#10b981']
+        },
+        dataLabels: {
+            enabled: false
+        }
     };
 
     ngOnInit(): void {
@@ -120,7 +115,17 @@ export class DashboardComponent {
 
         this.foodEmoliteService.getRevenue().subscribe({
             next: (res) => {
-                this.foodData.set(res?.data ?? null);
+                const data = res?.data ?? null;
+                this.foodData.set(data);
+
+                const lineChartData = data?.lineChart ?? [];
+
+                this.foodLineChart = {
+                    ...this.foodLineChart,
+                    xaxis: { categories: lineChartData.map((x: any) => x.label) },
+                    series: [{ name: 'Doanh thu', data: lineChartData.map((x: any) => x.revenue) }]
+                };
+
                 this.loadingFood.set(false);
             },
             error: (err) => {
@@ -143,12 +148,6 @@ export class DashboardComponent {
                 }
 
                 this.data.set(summary);
-
-                this.pieChart.series = [
-                    summary.totalViews,
-                    summary.totalLikes,
-                    summary.totalUsers
-                ];
 
                 this.loading.set(false);
             },

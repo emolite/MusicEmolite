@@ -11,12 +11,12 @@ import { PAGINATION } from '../../../core/constants/pagination.constants';
 const PAGE_SIZE = 20;
 
 @Component({
-    selector: 'app-food-dishes',
+    selector: 'app-food-customers',
     standalone: true,
     imports: [CommonModule, AppTableComponent, FilterComponent],
-    templateUrl: './food-dishes.html'
+    templateUrl: './food-customers.html'
 })
-export class FoodDishesComponent {
+export class FoodCustomersComponent {
 
     private foodEmoliteService = inject(FoodEmoliteService);
 
@@ -25,6 +25,9 @@ export class FoodDishesComponent {
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
 
+    sortBy = signal('totalspent');
+    asc = signal(false);
+
     filter = signal<{ keyword: string; storeRefCode: string }>({ keyword: '', storeRefCode: '' });
 
     filterFields: FilterField[] = [
@@ -32,7 +35,7 @@ export class FoodDishesComponent {
             key: 'keyword',
             label: 'Từ khóa',
             type: 'text',
-            placeholder: 'Nhập tên món...'
+            placeholder: 'Tên, SĐT hoặc email...'
         },
         {
             key: 'storeRefCode',
@@ -44,16 +47,29 @@ export class FoodDishesComponent {
 
     columns: TableColumn[] = [
         { key: 'stt', label: 'STT', width: '80px', align: 'center' },
-        { key: 'thumbnailUrl', label: 'Ảnh', type: 'image', width: '100px', align: 'left' },
-        { key: 'foodName', label: 'Tên món' },
+        { key: 'customerName', label: 'Tên khách hàng' },
+        {
+            key: 'isGuest',
+            label: 'Loại',
+            type: 'badge',
+            align: 'center',
+            badgeConfig: {
+                trueLabel: 'Khách vãng lai',
+                falseLabel: 'Thành viên',
+                trueClass: 'bg-gray-100 text-gray-600',
+                falseClass: 'bg-green-100 text-green-700'
+            }
+        },
+        { key: 'phoneNumber', label: 'Số điện thoại' },
+        { key: 'email', label: 'Email' },
         { key: 'storeName', label: 'Cửa hàng' },
-        { key: 'price', label: 'Giá', align: 'right' },
-        { key: 'quantity', label: 'Số lượng', align: 'center' },
-        { key: 'isAvailable', label: 'Trạng thái', type: 'status', align: 'center' }
+        { key: 'totalOrders', label: 'Tổng đơn', align: 'center', sortable: true },
+        { key: 'totalSpent', label: 'Tổng chi tiêu', align: 'right', sortable: true },
+        { key: 'lastOrderAt', label: 'Đơn gần nhất', type: 'date' }
     ];
 
     ngOnInit(): void {
-        this.loadDishes();
+        this.loadCustomers();
         this.loadStoreOptions();
     }
 
@@ -70,16 +86,25 @@ export class FoodDishesComponent {
         });
     }
 
-    loadDishes() {
+    loadCustomers() {
         this.loading.set(true);
 
-        this.foodEmoliteService.getStoreFoods(this.currentPage(), PAGE_SIZE, this.filter().storeRefCode, this.filter().keyword).subscribe({
+        this.foodEmoliteService.searchCustomers({
+            page: this.currentPage(),
+            pageSize: PAGE_SIZE,
+            asc: this.asc(),
+            sortBy: this.sortBy(),
+            searchParams: {
+                keyword: this.filter().keyword || null,
+                storeRefCode: this.filter().storeRefCode || null
+            }
+        }).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
                 const mapped = items.map((item, index) => ({
                     ...item,
-                    price: `${(item.price ?? 0).toLocaleString('vi-VN')}₫`,
+                    totalSpent: `${(item.totalSpent ?? 0).toLocaleString('vi-VN')}₫`,
                     stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
                 }));
 
@@ -97,11 +122,22 @@ export class FoodDishesComponent {
     onFilterChange(data: any) {
         this.currentPage.set(1);
         this.filter.set({ keyword: data.keyword ?? '', storeRefCode: data.storeRefCode ?? '' });
-        this.loadDishes();
+        this.loadCustomers();
     }
 
     onPageChange(page: number) {
         this.currentPage.set(page);
-        this.loadDishes();
+        this.loadCustomers();
+    }
+
+    onSort(column: string) {
+        if (this.sortBy() === column) {
+            this.asc.set(!this.asc());
+        } else {
+            this.sortBy.set(column);
+            this.asc.set(false);
+        }
+
+        this.loadCustomers();
     }
 }

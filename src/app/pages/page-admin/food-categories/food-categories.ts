@@ -11,12 +11,12 @@ import { PAGINATION } from '../../../core/constants/pagination.constants';
 const PAGE_SIZE = 20;
 
 @Component({
-    selector: 'app-food-dishes',
+    selector: 'app-food-categories',
     standalone: true,
     imports: [CommonModule, AppTableComponent, FilterComponent],
-    templateUrl: './food-dishes.html'
+    templateUrl: './food-categories.html'
 })
-export class FoodDishesComponent {
+export class FoodCategoriesComponent {
 
     private foodEmoliteService = inject(FoodEmoliteService);
 
@@ -25,6 +25,9 @@ export class FoodDishesComponent {
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
 
+    sortBy = signal('createdAt');
+    asc = signal(false);
+
     filter = signal<{ keyword: string; storeRefCode: string }>({ keyword: '', storeRefCode: '' });
 
     filterFields: FilterField[] = [
@@ -32,7 +35,7 @@ export class FoodDishesComponent {
             key: 'keyword',
             label: 'Từ khóa',
             type: 'text',
-            placeholder: 'Nhập tên món...'
+            placeholder: 'Nhập tên danh mục...'
         },
         {
             key: 'storeRefCode',
@@ -44,16 +47,14 @@ export class FoodDishesComponent {
 
     columns: TableColumn[] = [
         { key: 'stt', label: 'STT', width: '80px', align: 'center' },
-        { key: 'thumbnailUrl', label: 'Ảnh', type: 'image', width: '100px', align: 'left' },
-        { key: 'foodName', label: 'Tên món' },
+        { key: 'categoryName', label: 'Tên danh mục' },
         { key: 'storeName', label: 'Cửa hàng' },
-        { key: 'price', label: 'Giá', align: 'right' },
-        { key: 'quantity', label: 'Số lượng', align: 'center' },
-        { key: 'isAvailable', label: 'Trạng thái', type: 'status', align: 'center' }
+        { key: 'description', label: 'Mô tả' },
+        { key: 'createdAt', label: 'Ngày tạo', type: 'date', sortable: true }
     ];
 
     ngOnInit(): void {
-        this.loadDishes();
+        this.loadCategories();
         this.loadStoreOptions();
     }
 
@@ -70,16 +71,22 @@ export class FoodDishesComponent {
         });
     }
 
-    loadDishes() {
+    loadCategories() {
         this.loading.set(true);
 
-        this.foodEmoliteService.getStoreFoods(this.currentPage(), PAGE_SIZE, this.filter().storeRefCode, this.filter().keyword).subscribe({
+        this.foodEmoliteService.getAllCategories(
+            this.currentPage(),
+            PAGE_SIZE,
+            this.filter().keyword,
+            this.filter().storeRefCode,
+            this.sortBy(),
+            this.asc()
+        ).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
                 const mapped = items.map((item, index) => ({
                     ...item,
-                    price: `${(item.price ?? 0).toLocaleString('vi-VN')}₫`,
                     stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
                 }));
 
@@ -97,11 +104,22 @@ export class FoodDishesComponent {
     onFilterChange(data: any) {
         this.currentPage.set(1);
         this.filter.set({ keyword: data.keyword ?? '', storeRefCode: data.storeRefCode ?? '' });
-        this.loadDishes();
+        this.loadCategories();
     }
 
     onPageChange(page: number) {
         this.currentPage.set(page);
-        this.loadDishes();
+        this.loadCategories();
+    }
+
+    onSort(column: string) {
+        if (this.sortBy() === column) {
+            this.asc.set(!this.asc());
+        } else {
+            this.sortBy.set(column);
+            this.asc.set(false);
+        }
+
+        this.loadCategories();
     }
 }
