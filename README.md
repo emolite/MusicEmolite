@@ -222,6 +222,31 @@ Lệnh này sẽ tự động mở **Xcode**. Từ đó bạn có thể:
 ## 🐞 Xử lý lỗi thường gặp
 
 <details>
+<summary><b>❌ Lỗi: Không chạy được lệnh (npm/ng) trong Terminal của VS Code (PowerShell báo lỗi đỏ)</b></summary>
+
+Đây là lỗi rất hay gặp trên **Windows**, do PowerShell **chặn chạy script** theo mặc định. Thường sẽ thấy dòng lỗi kiểu:
+
+```
+... cannot be loaded because running scripts is disabled on this system ...
+```
+
+**Cách khắc phục:**
+
+1. Mở **PowerShell với quyền Administrator** (nhấn phím Windows → gõ "PowerShell" → chuột phải chọn **"Run as administrator"**)
+2. Gõ lệnh sau rồi nhấn **Enter**:
+
+```powershell
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+3. Khi được hỏi xác nhận, gõ `Y` rồi nhấn **Enter**
+4. **Đóng và mở lại VS Code** (hoặc mở lại Terminal trong VS Code)
+5. Thử chạy lại `npm start` hoặc `ng serve` — lúc này sẽ chạy bình thường
+
+> 💡 Lệnh trên chỉ cho phép chạy các script đã được ký (hoặc script bạn tự tạo trên máy), an toàn hơn so với việc tắt hoàn toàn bảo mật bằng `Unrestricted`.
+</details>
+
+<details>
 <summary><b>❌ Lỗi: "ng: command not found"</b></summary>
 
 Bạn chưa cài Angular CLI toàn cục. Chạy lệnh:
@@ -257,7 +282,7 @@ ng serve --port 4300
 
 ---
 
-## 📁 Cấu trúc thư mục (rút gọn)
+## 📁 Cấu trúc thư mục
 
 ```
 ├── src/                    # Source code Angular
@@ -275,6 +300,6 @@ ng serve --port 4300
 
 <div align="center">
 
-Made with ❤️ using Angular
+Made with Emolite❤️
 
 </div>
