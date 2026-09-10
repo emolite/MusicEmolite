@@ -1,11 +1,11 @@
 <div class="p-1">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl text-gray-900 font-bold">
+            <h1 class="text-xl text-anm-title font-semibold leading-5">
                 Quản lý album
             </h1>
 
-            <p class="mt-1 text-gray-400">
+            <p class="text-sm text-anm-subtitle font-normal leading-5 mt-1">
                 Danh sách tất cả album trong hệ thống
             </p>
         </div>
@@ -25,12 +25,16 @@
         [loading]="loading()"
         [currentPage]="currentPage()"
         [totalPages]="totalPages()"
+        [totalRecords]="totalRecords()"
+        [pageSize]="pageSize()"
+        emptyText="Chưa có dữ liệu danh sách album"
         [sortBy]="sortBy()"
         [asc]="asc()"
         (sortChange)="onSort($event)"
         (rowClick)="onRowClick($event)"
         (rowDblClick)="onRowDblClick($event)"
-        (pageChange)="onPageChange($event)">
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)">
     </app-table>
 
     <app-detail-panel [open]="!!selectedAlbum()" title="Chi tiết album" (closed)="closeDetail()">

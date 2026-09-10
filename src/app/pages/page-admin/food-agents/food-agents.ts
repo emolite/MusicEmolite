@@ -10,8 +10,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-food-agents',
     standalone: true,
@@ -26,6 +24,8 @@ export class FoodAgentsComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     filter = signal<{ keyword: string; isActive: string }>({ keyword: '', isActive: '' });
 
@@ -71,12 +71,12 @@ export class FoodAgentsComponent {
 
         const isActive = this.filter().isActive === '' ? null : this.filter().isActive === 'true';
 
-        this.foodEmoliteService.getAgents(this.currentPage(), PAGE_SIZE, this.filter().keyword, isActive).subscribe({
+        this.foodEmoliteService.getAgents(this.currentPage(), this.pageSize(), this.filter().keyword, isActive).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
                 const mapped = items.map((item, index) => ({
-                    stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1,
+                    stt: ((this.currentPage() - 1) * this.pageSize()) + index + 1,
                     id: item.account?.id,
                     refCode: item.account?.refCode,
                     username: item.account?.username,
@@ -95,6 +95,7 @@ export class FoodAgentsComponent {
 
                 this.rows.set(mapped);
                 this.totalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.totalRecords.set(res?.totalRecords ?? 0);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -106,6 +107,12 @@ export class FoodAgentsComponent {
 
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadAgents();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadAgents();
     }
 

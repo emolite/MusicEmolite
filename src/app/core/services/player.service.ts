@@ -75,10 +75,41 @@ export class PlayerService {
     this.initAudioEvents();
     this.initYoutubePlayer();
     this.initMediaSession();
+    this.initVisibilityResume();
 
     this.albumSearch$
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe(keyword => this.fetchAlbums(keyword));
+  }
+
+  /**
+   * Mobile browsers can silently pause playback (especially the embedded
+   * YouTube iframe) while the tab is backgrounded, without ever calling our
+   * own pause handlers - so `isPlaying` stays true while the underlying
+   * player is actually stopped. When the tab becomes visible again, check
+   * for that mismatch and resume so the user doesn't come back to silence.
+   */
+  private initVisibilityResume() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState !== 'visible' || !this.isPlaying()) return;
+
+      this.zone.run(() => {
+        if (this.isYoutubeMode()) {
+          const state = this.youtubePlayer?.getPlayerState?.();
+
+          if (this.youtubePlayer && state !== window.YT?.PlayerState?.PLAYING) {
+            this.youtubePlayer.playVideo();
+            this.startYoutubeTimer();
+          }
+
+          return;
+        }
+
+        if (this.audio.src && this.audio.paused) {
+          this.audio.play();
+        }
+      });
+    });
   }
 
   private initMediaSession() {
@@ -749,8 +780,12 @@ export class PlayerService {
       host.style.height = '1px';
       host.style.opacity = '0';
       host.style.pointerEvents = 'none';
-      host.style.left = '-9999px';
-      host.style.top = '-9999px';
+      // Kept inside the real viewport (not off-screen at -9999px) - some
+      // mobile browsers treat an off-screen iframe as "not visible" and
+      // suspend its playback more aggressively in the background than one
+      // that's technically on-screen (just invisible via opacity).
+      host.style.left = '0';
+      host.style.top = '0';
 
       document.body.appendChild(host);
     }

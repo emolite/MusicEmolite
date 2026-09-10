@@ -1,8 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
 import { PlayerService } from '../../../core/services/player.service';
 import { ChatHubService } from '../../../core/services/chat-hub.service';
+import { ADMIN_MENU_SECTIONS, AdminMenuSection } from './layout-admin-data';
 
 @Component({
   selector: 'app-admin-sidebar',
@@ -12,10 +14,17 @@ import { ChatHubService } from '../../../core/services/chat-hub.service';
 })
 export class AdminSidebarComponent {
   private router = inject(Router);
+  private sanitizer = inject(DomSanitizer);
   public authService = inject(AuthService)
   private player = inject(PlayerService);
   private chatHubService = inject(ChatHubService);
   user = this.authService.user;
+
+  menuSections: AdminMenuSection[] = ADMIN_MENU_SECTIONS;
+
+  icon(svg: string): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(svg);
+  }
 
   get displayName(): string {
     const user = this.authService.user();

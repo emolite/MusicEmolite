@@ -1,10 +1,10 @@
 <div class="p-1">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">
+            <h1 class="text-xl text-anm-title font-semibold leading-5">
                 Quản lý người dùng
             </h1>
-            <p class="mt-1 text-gray-400">
+            <p class="text-sm text-anm-subtitle font-normal leading-5 mt-1">
                 Danh sách tất cả người dùng trong hệ thống
             </p>
         </div>
@@ -33,8 +33,11 @@
     </div>
 
     <app-table [columns]="columns" [rows]="rows()" [loading]="loading()" [currentPage]="currentPage()"
-        [totalPages]="totalPages()" [sortBy]="sortBy()" [asc]="asc()" (sortChange)="onSort($event)"
-        (pageChange)="onPageChange($event)" (rowClick)="onRowClick($event)" (rowDblClick)="onRowDblClick($event)">
+        [totalPages]="totalPages()" [totalRecords]="totalRecords()" [pageSize]="pageSize()"
+        emptyText="Chưa có dữ liệu danh sách người dùng" [sortBy]="sortBy()"
+        [asc]="asc()" (sortChange)="onSort($event)" (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)" (rowClick)="onRowClick($event)"
+        (rowDblClick)="onRowDblClick($event)">
     </app-table>
 
     } @else {
@@ -47,7 +50,10 @@
 
     <app-table [columns]="foodUserColumns" [rows]="foodUsers()" [loading]="loadingFoodUsers()"
         [currentPage]="foodUsersCurrentPage()" [totalPages]="foodUsersTotalPages()"
-        (pageChange)="onFoodUsersPageChange($event)" (rowDblClick)="onFoodUserRowDblClick($event)">
+        [totalRecords]="foodUsersTotalRecords()" [pageSize]="foodUsersPageSize()"
+        emptyText="Chưa có dữ liệu người dùng FoodEmolite"
+        (pageChange)="onFoodUsersPageChange($event)" (pageSizeChange)="onFoodUsersPageSizeChange($event)"
+        (rowDblClick)="onFoodUserRowDblClick($event)">
     </app-table>
 
     <app-detail-panel [open]="!!selectedFoodUser()" title="Chi tiết người dùng (FoodEmolite)" (closed)="closeFoodUserDetail()">

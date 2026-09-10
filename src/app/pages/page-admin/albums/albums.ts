@@ -13,8 +13,6 @@ import { AlbumRequest } from '../../../core/models/album/req-album.model';
 import { FilterField } from '../../../core/models/front-end/filter/filter-field.model';
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-albums',
     standalone: true,
@@ -43,6 +41,10 @@ export class AlbumsComponent {
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
 
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+
+    totalRecords = signal(0);
+
+    pageSize = signal(20);
 
     filter = signal<AlbumRequest>({
         keyword: ''
@@ -119,7 +121,7 @@ export class AlbumsComponent {
 
         this.albumService.searchAlbumsAdmin({
             page: this.currentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.pageSize(),
             asc: this.asc(),
             searchParams: {
                 ...this.filter(),
@@ -135,7 +137,7 @@ export class AlbumsComponent {
                         ...item,
                         stt:
                             ((this.currentPage() - 1)
-                                * PAGE_SIZE)
+                                * this.pageSize())
                             + index
                             + 1
                     }));
@@ -145,6 +147,8 @@ export class AlbumsComponent {
                     this.totalPages.set(
                         res?.totalPages ?? PAGINATION.DEFAULT_PAGE
                     );
+
+                    this.totalRecords.set(res?.totalRecords ?? 0);
 
                     this.loading.set(false);
                 },
@@ -175,6 +179,15 @@ export class AlbumsComponent {
     onPageChange(page: number) {
 
         this.currentPage.set(page);
+
+        this.loadAlbums();
+    }
+
+    onPageSizeChange(size: number) {
+
+        this.pageSize.set(size);
+
+        this.currentPage.set(1);
 
         this.loadAlbums();
     }

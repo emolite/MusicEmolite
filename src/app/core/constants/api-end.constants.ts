@@ -47,6 +47,7 @@ export const API_END = {
     BASE: `${BASE_URL}users`,
     PROFILE: `${BASE_URL}users/profile`,
     BANK_USER: `${BASE_URL}users/bank-user`,
+    BANK_USER_ADMIN: `${BASE_URL}users/bank-user/admin`,
     BANK_USER_ADD: `${BASE_URL}users/bank-user/add`,
     BANK_USER_EDIT: (id: number) => `${BASE_URL}users/${id}/bank-user`,
   },

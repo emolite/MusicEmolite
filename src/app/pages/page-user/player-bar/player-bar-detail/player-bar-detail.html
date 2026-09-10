@@ -12,11 +12,9 @@
     </svg>
   </button>
 
-  <div class="relative z-10 min-h-screen flex flex-col lg:flex-row">
+  <div #mobilePager class="relative z-10 min-h-screen flex overflow-x-auto snap-x snap-mandatory lg:overflow-visible lg:snap-none">
     <div
-      class="lg:w-[40%] min-h-screen lg:min-h-0 flex flex-col px-5 md:px-10 lg:px-14 pt-20 md:pt-16 lg:py-20 pb-24 md:pb-16 gap-5 md:gap-8 lg:justify-center lg:sticky lg:top-0 lg:h-screen"
-      [class.hidden]="activeMobileTab() === 'lyrics'"
-      [class.lg:flex]="activeMobileTab() === 'lyrics'">
+      class="w-full shrink-0 snap-center lg:w-[40%] min-h-screen lg:min-h-0 flex flex-col px-5 md:px-10 lg:px-14 pt-20 md:pt-16 lg:py-20 pb-10 md:pb-16 gap-5 md:gap-8 lg:justify-center lg:sticky lg:top-0 lg:h-screen">
 
       <div class="relative w-full max-w-[220px] md:max-w-[300px] mx-auto mt-6 md:mt-0">
         <div class="absolute inset-0 rounded-[28px] bg-violet-600/20 blur-3xl scale-110"></div>
@@ -52,7 +50,7 @@
 
         <button
           class="lg:hidden mt-5 w-full text-left rounded-2xl bg-white/[0.04] border border-white/[0.08] px-4 py-4 active:scale-[0.99] transition-all"
-          (click)="activeMobileTab.set('lyrics')">
+          (click)="scrollToLyrics()">
           <p class="text-[10px] uppercase tracking-[4px] text-white/30 mb-2 font-medium">
             Lời bài hát
           </p>
@@ -70,6 +68,18 @@
       </div>
 
       <div class="lg:hidden flex items-center justify-end gap-4">
+        <button class="transition-all cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
+          [class.text-violet-400]="player.isLiked()"
+          [class.text-white/30]="!player.isLiked()"
+          [disabled]="!player.currentTrack()" (click)="player.toggleLike()">
+          <svg class="w-5 h-5 transition-transform hover:scale-110"
+            [attr.fill]="player.isLiked() ? 'currentColor' : 'none'" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path
+              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+          </svg>
+        </button>
+
         <button class="text-white/30 hover:text-white transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
           [disabled]="!songData.dbSongId" (click)="player.openAddToAlbum()">
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -167,32 +177,8 @@
       </div>
     </div>
 
-    <div class="fixed left-0 right-0 bottom-0 z-50 lg:hidden px-4 pb-4 pointer-events-none">
-      <div class="pointer-events-auto grid grid-cols-2 gap-2 rounded-2xl bg-[#130f21]/95 backdrop-blur-xl border border-white/10 p-1">
-        <button
-          class="h-11 rounded-xl text-sm font-semibold transition-all"
-          [class.bg-violet-600]="activeMobileTab() === 'overview'"
-          [class.text-white]="activeMobileTab() === 'overview'"
-          [class.text-white/50]="activeMobileTab() !== 'overview'"
-          (click)="activeMobileTab.set('overview')">
-          Tổng quan
-        </button>
-
-        <button
-          class="h-11 rounded-xl text-sm font-semibold transition-all"
-          [class.bg-violet-600]="activeMobileTab() === 'lyrics'"
-          [class.text-white]="activeMobileTab() === 'lyrics'"
-          [class.text-white/50]="activeMobileTab() !== 'lyrics'"
-          (click)="activeMobileTab.set('lyrics')">
-          Lời bài hát
-        </button>
-      </div>
-    </div>
-
     <div
-      class="lg:w-[60%] flex flex-col justify-start lg:justify-center px-5 md:px-10 lg:px-14 pt-16 pb-24 md:py-16 lg:py-20 lg:h-screen overflow-hidden"
-      [class.hidden]="activeMobileTab() === 'overview'"
-      [class.lg:flex]="activeMobileTab() === 'overview'">
+      class="w-full shrink-0 snap-center lg:w-[60%] flex flex-col justify-start lg:justify-center px-5 md:px-10 lg:px-14 pt-16 pb-10 md:py-16 lg:py-20 lg:h-screen overflow-hidden">
 
       <p class="text-[11px] uppercase tracking-[4px] text-white/30 mb-5 md:mb-6 font-medium">Lời bài hát</p>
 

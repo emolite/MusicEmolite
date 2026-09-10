@@ -15,7 +15,7 @@ export class PlayerBarDetailComponent {
   player = inject(PlayerService);
   @ViewChild('lyricsContainer') lyricsContainer!: ElementRef<HTMLElement>;
   @ViewChildren('lyricLine') lyricLines!: QueryList<ElementRef<HTMLElement>>;
-  activeMobileTab = signal<'overview' | 'lyrics'>('overview');
+  @ViewChild('mobilePager') mobilePager!: ElementRef<HTMLElement>;
   loading = signal(true);
   song = computed(() => {
     const track = this.player.currentTrack();
@@ -54,5 +54,11 @@ export class PlayerBarDetailComponent {
         });
       }, 0);
     });
+  }
+
+  scrollToLyrics() {
+    const el = this.mobilePager?.nativeElement;
+    if (!el) return;
+    el.scrollTo({ left: el.clientWidth, behavior: 'smooth' });
   }
 }

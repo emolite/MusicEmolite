@@ -5,6 +5,7 @@ import { ApexAxisChartSeries, ApexChart, ApexDataLabels, ApexStroke, ApexXAxis, 
 import { FoodEmoliteService } from '../../../../core/services/food-emolite.service';
 import { DatePickerComponent } from '../../../../shared/components/date-picker/date-picker';
 import { DropdownComponent, DropdownOption } from '../../../../shared/components/dropdown/dropdown';
+import { PageTableEmptyComponent } from '../../../page-default/page-table-empty/page-table-empty';
 
 const STATUS_LABELS: Record<string, string> = {
     PENDING: 'Chờ xử lý',
@@ -23,7 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
 @Component({
     selector: 'app-revenue-report',
     standalone: true,
-    imports: [CommonModule, NgApexchartsModule, DatePickerComponent, DropdownComponent],
+    imports: [CommonModule, NgApexchartsModule, DatePickerComponent, DropdownComponent, PageTableEmptyComponent],
     templateUrl: './revenue-report.html'
 })
 export class RevenueReportComponent {

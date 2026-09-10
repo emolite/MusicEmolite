@@ -10,8 +10,6 @@ import { ActivityLogService } from '../../../core/services/activity-log.service'
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 const MUSIC_ACTION_LABELS: Record<string, string> = {
     PLAY: 'Nghe nhạc',
     LIKE: 'Thích bài hát'
@@ -55,6 +53,8 @@ export class ActivityLogComponent {
     musicLogs = signal<any[]>([]);
     musicCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
     musicTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    musicTotalRecords = signal(0);
+    musicPageSize = signal(20);
     musicAsc = signal(false);
 
     musicKeyword = '';
@@ -77,6 +77,8 @@ export class ActivityLogComponent {
     foodLogs = signal<any[]>([]);
     foodCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
     foodTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    foodTotalRecords = signal(0);
+    foodPageSize = signal(20);
     foodAsc = signal(false);
 
     foodKeyword = '';
@@ -109,7 +111,7 @@ export class ActivityLogComponent {
 
         this.activityLogService.search({
             page: this.musicCurrentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.musicPageSize(),
             asc: this.musicAsc(),
             searchParams: {
                 keyword: this.musicKeyword || null,
@@ -124,11 +126,12 @@ export class ActivityLogComponent {
                 const mapped = data.map((item, index) => ({
                     ...item,
                     actionLabel: MUSIC_ACTION_LABELS[item.actionType] || item.actionType,
-                    stt: ((this.musicCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.musicCurrentPage() - 1) * this.musicPageSize()) + index + 1
                 }));
 
                 this.musicLogs.set(mapped);
                 this.musicTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.musicTotalRecords.set(res?.totalRecords ?? 0);
                 this.loadingMusic.set(false);
             },
             error: (err) => {
@@ -175,6 +178,12 @@ export class ActivityLogComponent {
         this.loadMusicLogs();
     }
 
+    onMusicPageSizeChange(size: number) {
+        this.musicPageSize.set(size);
+        this.musicCurrentPage.set(1);
+        this.loadMusicLogs();
+    }
+
     onSortMusic(_column: string) {
         this.musicAsc.set(!this.musicAsc());
         this.loadMusicLogs();
@@ -185,7 +194,7 @@ export class ActivityLogComponent {
 
         this.foodEmoliteService.searchActivityLogs({
             page: this.foodCurrentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.foodPageSize(),
             asc: this.foodAsc(),
             searchParams: {
                 keyword: this.foodKeyword || null,
@@ -201,11 +210,12 @@ export class ActivityLogComponent {
                     ...item,
                     actionLabel: FOOD_ACTION_LABELS[item.action] || item.action,
                     actorTypeLabel: FOOD_ACTOR_LABELS[item.actorType] || item.actorType,
-                    stt: ((this.foodCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.foodCurrentPage() - 1) * this.foodPageSize()) + index + 1
                 }));
 
                 this.foodLogs.set(mapped);
                 this.foodTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.foodTotalRecords.set(res?.totalRecords ?? 0);
                 this.loadingFood.set(false);
             },
             error: (err) => {
@@ -249,6 +259,12 @@ export class ActivityLogComponent {
 
     onFoodPageChange(page: number) {
         this.foodCurrentPage.set(page);
+        this.loadFoodLogs();
+    }
+
+    onFoodPageSizeChange(size: number) {
+        this.foodPageSize.set(size);
+        this.foodCurrentPage.set(1);
         this.loadFoodLogs();
     }
 

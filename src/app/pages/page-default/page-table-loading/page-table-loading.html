@@ -1,4 +1,13 @@
-<div class="h-full min-h-50 flex flex-col items-center justify-center gap-3">
-  <div class="w-8 h-8 rounded-full border-2 border-blue-500 border-t-transparent animate-spin"></div>
-  <p class="text-sm text-gray-400">Đang tải dữ liệu...</p>
+<div class="w-full py-4 flex flex-col gap-1">
+  @for (row of skeletonRows; track $index) {
+  <div class="flex items-center gap-4 px-2 py-2.5">
+    <div class="w-9 h-9 rounded-lg skeleton-shimmer shrink-0"></div>
+    <div class="flex-1 min-w-0 flex flex-col gap-2">
+      <div class="h-3 rounded-full skeleton-shimmer" [style.width.%]="row.title"></div>
+      <div class="h-2.5 rounded-full skeleton-shimmer" [style.width.%]="row.subtitle"></div>
+    </div>
+    <div class="h-3 w-16 rounded-full skeleton-shimmer shrink-0"></div>
+    <div class="h-3 w-20 rounded-full skeleton-shimmer shrink-0"></div>
+  </div>
+  }
 </div>

@@ -10,8 +10,6 @@ import { DropdownComponent, DropdownOption } from '../../../shared/components/dr
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-food-stores',
     standalone: true,
@@ -26,6 +24,8 @@ export class FoodStoresComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     filter = signal<{ keyword: string; isActive: string }>({ keyword: '', isActive: '' });
 
@@ -77,17 +77,18 @@ export class FoodStoresComponent {
 
         const isActive = this.filter().isActive === '' ? null : this.filter().isActive === 'true';
 
-        this.foodEmoliteService.getAllStores(this.currentPage(), PAGE_SIZE, this.filter().keyword, isActive).subscribe({
+        this.foodEmoliteService.getAllStores(this.currentPage(), this.pageSize(), this.filter().keyword, isActive).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
                 const mapped = items.map((item, index) => ({
                     ...item,
-                    stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.currentPage() - 1) * this.pageSize()) + index + 1
                 }));
 
                 this.rows.set(mapped);
                 this.totalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.totalRecords.set(res?.totalRecords ?? 0);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -99,6 +100,12 @@ export class FoodStoresComponent {
 
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadStores();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadStores();
     }
 

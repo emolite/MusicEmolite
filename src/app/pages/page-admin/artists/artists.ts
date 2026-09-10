@@ -14,8 +14,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
 import { SongService } from '../../../core/services/song.service';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-artists',
     standalone: true,
@@ -47,6 +45,10 @@ export class ArtistsComponent {
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
 
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+
+    totalRecords = signal(0);
+
+    pageSize = signal(20);
 
     filter = signal<ArtistRequest>({
         keyword: ''
@@ -133,7 +135,7 @@ export class ArtistsComponent {
 
         this.artistService.searchArtistsAdmin({
             page: this.currentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.pageSize(),
             asc: this.asc(),
             searchParams: {
                 ...this.filter(),
@@ -149,7 +151,7 @@ export class ArtistsComponent {
                         ...item,
                         stt:
                             ((this.currentPage() - 1)
-                                * PAGE_SIZE)
+                                * this.pageSize())
                             + index
                             + 1
                     }));
@@ -159,6 +161,8 @@ export class ArtistsComponent {
                     this.totalPages.set(
                         res?.totalPages ?? PAGINATION.DEFAULT_PAGE
                     );
+
+                    this.totalRecords.set(res?.totalRecords ?? 0);
 
                     this.loading.set(false);
                 },
@@ -189,6 +193,15 @@ export class ArtistsComponent {
     onPageChange(page: number) {
 
         this.currentPage.set(page);
+
+        this.loadArtists();
+    }
+
+    onPageSizeChange(size: number) {
+
+        this.pageSize.set(size);
+
+        this.currentPage.set(1);
 
         this.loadArtists();
     }

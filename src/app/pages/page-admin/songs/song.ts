@@ -11,8 +11,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { SongRequest } from '../../../core/models/song/req-song.model';
 import { DetailPanelComponent } from '../../../shared/components/detail-panel/detail-panel';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-songs',
     standalone: true,
@@ -37,6 +35,8 @@ export class Songs {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
     filter = signal<SongRequest>({
         keyword: ''
     });
@@ -129,7 +129,7 @@ export class Songs {
 
         this.songService.searchSongsAdmin({
             page: this.currentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.pageSize(),
             asc: this.asc(),
             searchParams: {
                 ...this.filter(),
@@ -142,7 +142,7 @@ export class Songs {
                     const mapped = data.map((item, index) => ({
                         ...item,
                         stt:
-                            ((this.currentPage() - 1) * PAGE_SIZE)
+                            ((this.currentPage() - 1) * this.pageSize())
                             + index
                             + 1
                     }));
@@ -150,7 +150,7 @@ export class Songs {
                     this.totalPages.set(
                         res?.totalPages ?? PAGINATION.DEFAULT_PAGE
                     );
-                    console.log(this.totalPages());
+                    this.totalRecords.set(res?.totalRecords ?? 0);
                     this.loading.set(false);
                 },
 
@@ -178,6 +178,12 @@ export class Songs {
     }
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadSongs();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadSongs();
     }
 

@@ -8,8 +8,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-food-categories',
     standalone: true,
@@ -24,6 +22,8 @@ export class FoodCategoriesComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     sortBy = signal('createdAt');
     asc = signal(false);
@@ -76,7 +76,7 @@ export class FoodCategoriesComponent {
 
         this.foodEmoliteService.getAllCategories(
             this.currentPage(),
-            PAGE_SIZE,
+            this.pageSize(),
             this.filter().keyword,
             this.filter().storeRefCode,
             this.sortBy(),
@@ -87,11 +87,12 @@ export class FoodCategoriesComponent {
 
                 const mapped = items.map((item, index) => ({
                     ...item,
-                    stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.currentPage() - 1) * this.pageSize()) + index + 1
                 }));
 
                 this.rows.set(mapped);
                 this.totalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.totalRecords.set(res?.totalRecords ?? 0);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -109,6 +110,12 @@ export class FoodCategoriesComponent {
 
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadCategories();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadCategories();
     }
 
