@@ -6,5 +6,5 @@ import { Component, Input } from '@angular/core';
   templateUrl: './page-table-empty.html'
 })
 export class PageTableEmptyComponent {
-  @Input() text = 'Không có dữ liệu';
+  @Input() text = 'Chưa có dữ liệu';
 }

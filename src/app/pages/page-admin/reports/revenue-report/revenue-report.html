@@ -1,11 +1,11 @@
 <div class="p-1">
     <div class="mb-6 flex items-center justify-between">
         <div>
-            <h1 class="text-3xl text-gray-900 font-bold">
+            <h1 class="text-xl text-anm-title font-semibold leading-5">
                 Báo cáo doanh thu
             </h1>
-            <p class="mt-1 text-gray-400">
-                Doanh thu theo bài hát và theo FoodEmolite
+            <p class="text-sm text-anm-subtitle font-normal leading-5 mt-1">
+                Doanh thu theo bài hát và theo sản phẩm
             </p>
         </div>
 
@@ -14,20 +14,20 @@
                 class="px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
                 [class.bg-white]="activeTab() === 'song'" [class.shadow]="activeTab() === 'song'"
                 [class.text-gray-900]="activeTab() === 'song'" [class.text-gray-500]="activeTab() !== 'song'">
-                Bài hát
+                Bài Hát
             </button>
             <button (click)="setTab('food')"
                 class="px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer"
                 [class.bg-white]="activeTab() === 'food'" [class.shadow]="activeTab() === 'food'"
                 [class.text-gray-900]="activeTab() === 'food'" [class.text-gray-500]="activeTab() !== 'food'">
-                FoodEmolite
+                Sản Phẩm
             </button>
         </div>
     </div>
 
     @if (activeTab() === 'song') {
-    <div class="rounded-2xl bg-white p-10 shadow text-center">
-        <p class="text-gray-400">Chưa có dữ liệu doanh thu cho bài hát.</p>
+    <div class="rounded-2xl bg-white shadow">
+        <app-page-table-empty text="Chưa có dữ liệu doanh thu cho bài hát"></app-page-table-empty>
     </div>
     } @else {
 

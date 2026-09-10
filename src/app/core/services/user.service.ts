@@ -45,6 +45,13 @@ export class UserService {
     );
   }
 
+  /** Public - the site admin's bank account(s), no auth needed. Used for the donation QR on the public footer. */
+  getAdminBankUsers() {
+    return this.api.getData<BaseResponse<ResBankUser[]>>(
+      API_END.USER.BANK_USER_ADMIN
+    );
+  }
+
   createBankUser(data: ReqBankUser) {
     return this.api.postData<
       BaseResponse<ResBankUser>,

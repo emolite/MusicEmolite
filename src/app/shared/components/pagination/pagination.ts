@@ -1,5 +1,6 @@
 import { Component, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DropdownComponent, DropdownOption } from '../dropdown/dropdown';
 
 type PageItem = number | '...';
 type PaginationVariant = 'user' | 'admin';
@@ -7,7 +8,7 @@ type PaginationVariant = 'user' | 'admin';
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DropdownComponent],
   templateUrl: './pagination.html',
 })
 export class PaginationComponent {
@@ -15,7 +16,31 @@ export class PaginationComponent {
   totalPages = input.required<number>();
   variant = input<PaginationVariant>('user');
 
+  /** Optional - when > 0, shows "Hiển thị X-Y / Z bản ghi" + a page-size picker. */
+  totalRecords = input<number>(0);
+  pageSize = input<number>(0);
+  pageSizeOptions = input<number[]>([20, 50, 100]);
+
   pageChange = output<number>();
+  pageSizeChange = output<number>();
+
+  pageSizeDropdownOptions = computed<DropdownOption[]>(() =>
+    this.pageSizeOptions().map(size => ({ label: `${size} / trang`, value: size }))
+  );
+
+  rangeStart = computed(() => {
+    if (this.totalRecords() === 0) return 0;
+    return (this.currentPage() - 1) * this.pageSize() + 1;
+  });
+
+  rangeEnd = computed(() => {
+    return Math.min(this.currentPage() * this.pageSize(), this.totalRecords());
+  });
+
+  onPageSizeChange(option: DropdownOption | null) {
+    if (!option) return;
+    this.pageSizeChange.emit(option.value);
+  }
 
   pages = computed<PageItem[]>(() => {
     const total = this.totalPages();

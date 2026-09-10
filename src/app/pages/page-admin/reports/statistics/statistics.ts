@@ -10,8 +10,6 @@ import { FilterComponent } from '../../../../shared/components/filter/filter';
 import { FilterField } from '../../../../core/models/front-end/filter/filter-field.model';
 import { PAGINATION } from '../../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 10;
-
 type BarChart = {
     series: ApexAxisChartSeries;
     chart: ApexChart;
@@ -66,6 +64,8 @@ export class StatisticsComponent {
     orders = signal<any[]>([]);
     ordersCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
     ordersTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    ordersTotalRecords = signal(0);
+    ordersPageSize = signal(20);
     ordersSortBy = signal('createdAt');
     ordersAsc = signal(false);
 
@@ -193,7 +193,7 @@ export class StatisticsComponent {
 
         this.foodEmoliteService.searchOrders({
             page: this.ordersCurrentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.ordersPageSize(),
             asc: this.ordersAsc(),
             sortBy: this.ordersSortBy(),
             searchParams: {
@@ -207,11 +207,12 @@ export class StatisticsComponent {
                     ...item,
                     itemCount: item.items?.length ?? 0,
                     totalAmount: `${(item.totalAmount ?? 0).toLocaleString('vi-VN')}₫`,
-                    stt: ((this.ordersCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.ordersCurrentPage() - 1) * this.ordersPageSize()) + index + 1
                 }));
 
                 this.orders.set(mapped);
                 this.ordersTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.ordersTotalRecords.set(res?.totalRecords ?? 0);
                 this.loadingOrders.set(false);
             },
             error: (err) => {
@@ -229,6 +230,12 @@ export class StatisticsComponent {
 
     onOrdersPageChange(page: number) {
         this.ordersCurrentPage.set(page);
+        this.loadOrders();
+    }
+
+    onOrdersPageSizeChange(size: number) {
+        this.ordersPageSize.set(size);
+        this.ordersCurrentPage.set(1);
         this.loadOrders();
     }
 

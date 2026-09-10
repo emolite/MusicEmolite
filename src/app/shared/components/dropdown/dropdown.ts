@@ -54,6 +54,9 @@ export class DropdownComponent
 
   @Input() value: any = null;
 
+  /** Opens the options panel above the trigger instead of below - use near the bottom of the viewport. */
+  @Input() dropUp = false;
+
   @Output() changed =
     new EventEmitter<DropdownOption | null>();
 

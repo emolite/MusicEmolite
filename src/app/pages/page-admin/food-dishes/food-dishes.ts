@@ -8,8 +8,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-food-dishes',
     standalone: true,
@@ -24,6 +22,8 @@ export class FoodDishesComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     filter = signal<{ keyword: string; storeRefCode: string }>({ keyword: '', storeRefCode: '' });
 
@@ -73,18 +73,19 @@ export class FoodDishesComponent {
     loadDishes() {
         this.loading.set(true);
 
-        this.foodEmoliteService.getStoreFoods(this.currentPage(), PAGE_SIZE, this.filter().storeRefCode, this.filter().keyword).subscribe({
+        this.foodEmoliteService.getStoreFoods(this.currentPage(), this.pageSize(), this.filter().storeRefCode, this.filter().keyword).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
                 const mapped = items.map((item, index) => ({
                     ...item,
                     price: `${(item.price ?? 0).toLocaleString('vi-VN')}₫`,
-                    stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.currentPage() - 1) * this.pageSize()) + index + 1
                 }));
 
                 this.rows.set(mapped);
                 this.totalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.totalRecords.set(res?.totalRecords ?? 0);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -102,6 +103,12 @@ export class FoodDishesComponent {
 
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadDishes();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadDishes();
     }
 }

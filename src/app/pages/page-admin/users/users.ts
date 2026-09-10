@@ -25,8 +25,6 @@ import { AlbumService } from '../../../core/services/album.service';
 import { SongService } from '../../../core/services/song.service';
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-users',
     standalone: true,
@@ -54,6 +52,8 @@ export class UsersComponent {
     foodUsers = signal<any[]>([]);
     foodUsersCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
     foodUsersTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    foodUsersTotalRecords = signal(0);
+    foodUsersPageSize = signal(20);
     selectedFoodUser = signal<any | null>(null);
 
     foodUserFilter = signal<{ keyword: string }>({ keyword: '' });
@@ -90,6 +90,9 @@ export class UsersComponent {
     totalPages = signal(
         PAGINATION.DEFAULT_PAGE
     );
+
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     filter = signal<ReqUsersFilter>({
         keyword: '',
@@ -211,7 +214,7 @@ export class UsersComponent {
     loadFoodUsers() {
         this.loadingFoodUsers.set(true);
 
-        this.foodEmoliteService.getUsers(this.foodUsersCurrentPage(), PAGE_SIZE, this.foodUserFilter().keyword).subscribe({
+        this.foodEmoliteService.getUsers(this.foodUsersCurrentPage(), this.foodUsersPageSize(), this.foodUserFilter().keyword).subscribe({
             next: (res) => {
                 const items: any[] = res?.items ?? [];
 
@@ -227,11 +230,12 @@ export class UsersComponent {
                     dateOfBirth: item.profile?.dateOfBirth,
                     address: item.profile?.address,
                     avatarUrl: item.profile?.avatarUrl,
-                    stt: ((this.foodUsersCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.foodUsersCurrentPage() - 1) * this.foodUsersPageSize()) + index + 1
                 }));
 
                 this.foodUsers.set(mapped);
                 this.foodUsersTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.foodUsersTotalRecords.set(res?.totalRecords ?? 0);
                 this.loadingFoodUsers.set(false);
             },
             error: (err) => {
@@ -243,6 +247,12 @@ export class UsersComponent {
 
     onFoodUsersPageChange(page: number) {
         this.foodUsersCurrentPage.set(page);
+        this.loadFoodUsers();
+    }
+
+    onFoodUsersPageSizeChange(size: number) {
+        this.foodUsersPageSize.set(size);
+        this.foodUsersCurrentPage.set(1);
         this.loadFoodUsers();
     }
 
@@ -269,7 +279,7 @@ export class UsersComponent {
             page: this.currentPage(),
 
             pageSize:
-                PAGE_SIZE,
+                this.pageSize(),
 
             asc: this.asc(),
 
@@ -298,7 +308,7 @@ export class UsersComponent {
                                     : item.gender,
                             stt:
                                 ((this.currentPage() - 1)
-                                    * PAGE_SIZE)
+                                    * this.pageSize())
                                 + index
                                 + 1
                         }));
@@ -309,6 +319,8 @@ export class UsersComponent {
                         res?.totalPages
                         ?? PAGINATION.DEFAULT_PAGE
                     );
+
+                    this.totalRecords.set(res?.totalRecords ?? 0);
 
                     this.loading.set(false);
                 },
@@ -334,6 +346,15 @@ export class UsersComponent {
     onPageChange(page: number) {
 
         this.currentPage.set(page);
+
+        this.loadUsers();
+    }
+
+    onPageSizeChange(size: number) {
+
+        this.pageSize.set(size);
+
+        this.currentPage.set(1);
 
         this.loadUsers();
     }

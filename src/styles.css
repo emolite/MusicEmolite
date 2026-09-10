@@ -1,6 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 @import "tailwindcss";
 
+@theme {
+  --color-anm-main: #1179EA;
+  --color-anm-title: #252525;
+  --color-anm-subtitle: #70707B;
+  --color-anm-disable: #8B98A5;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #eef0f2 25%, #f7f8f9 50%, #eef0f2 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
 html, body {
   overflow-x: hidden;
 }

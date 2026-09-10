@@ -1,12 +1,17 @@
-<div class="rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-  <div class="max-h-[550px] overflow-auto admin-scroll">
+<div class="rounded-lg border border-gray-200 bg-white shadow-sm">
+  <div class="rounded-t-lg overflow-hidden bg-gray-50 border-b border-gray-200">
     <table class="w-full border-collapse text-sm text-gray-700 table-fixed">
-      <thead class="bg-gray-50 sticky top-0 z-10">
+      <colgroup>
+        @for (column of columns; track trackByColumn($index, column)) {
+        <col [style.width.px]="colWidths()[$index]">
+        }
+      </colgroup>
+      <thead class="bg-gray-50">
         <tr>
           @for (column of columns; track trackByColumn($index, column)) {
           <th (click)="onSort(column)"
-            class="border-b border-gray-200 bg-gray-50 px-4 py-3 font-semibold text-gray-600 transition-colors"
-            [style.width]="column.width || 'auto'" [class.cursor-pointer]="column.sortable"
+            class="bg-gray-50 px-4 py-3 font-semibold text-gray-600 transition-colors"
+            [class.cursor-pointer]="column.sortable"
             [class.hover:bg-gray-100]="column.sortable"
             [class.text-left]="column.align !== 'center' && column.align !== 'right'"
             [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'">
@@ -21,7 +26,7 @@
 
               @if (column.sortable) {
 
-              <svg xmlns="http://www.w3.org/2000/svg" class="mt-[1px] h-4 w-4 shrink-0 transition-all duration-200"
+              <svg xmlns="http://www.w3.org/2000/svg" class="mt-px h-4 w-4 shrink-0 transition-all duration-200"
                 [class.text-gray-300]="sortBy !== column.key" [class.text-gray-700]="sortBy === column.key"
                 [class.rotate-180]="sortBy === column.key && asc" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                 stroke-width="2">
@@ -38,7 +43,16 @@
           }
         </tr>
       </thead>
+    </table>
+  </div>
 
+  <div #scrollBody class="max-h-125 overflow-y-auto admin-scroll">
+    <table class="w-full border-collapse text-sm text-gray-700 table-fixed">
+      <colgroup>
+        @for (column of columns; track trackByColumn($index, column)) {
+        <col [style.width.px]="colWidths()[$index]">
+        }
+      </colgroup>
       <tbody class="transition-opacity duration-200" [class.opacity-40]="loading">
 
         @if (rows.length > 0) {
@@ -48,7 +62,7 @@
         <tr (click)="onRowClick(row)" (dblclick)="onRowDblClick(row)"
           class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
           @for (column of columns; track trackByColumn($index, column)) {
-          <td class="px-4 py-3 truncate" [class.text-left]="column.align !== 'center' && column.align !== 'right'"
+          <td class="px-4 py-3 max-w-0" [class.text-left]="column.align !== 'center' && column.align !== 'right'"
             [class.text-center]="column.align === 'center'" [class.text-right]="column.align === 'right'">
             @switch (column.type) {
             @case ('image') {
@@ -99,7 +113,7 @@
             }
 
             @default {
-            <span class="text-gray-700 truncate block">
+            <span class="block w-full min-w-0 truncate text-gray-700" [appTooltip]="getValue(row, column.key)">
               {{ getValue(row, column.key) }}
             </span>
             }
@@ -137,8 +151,9 @@
 
   </div>
 
-  <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" variant="admin"
-    (pageChange)="onPageChange($event)">
+  <app-pagination [currentPage]="currentPage" [totalPages]="totalPages" [totalRecords]="totalRecords"
+    [pageSize]="pageSize" [pageSizeOptions]="pageSizeOptions" variant="admin" (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)">
   </app-pagination>
 
 </div>

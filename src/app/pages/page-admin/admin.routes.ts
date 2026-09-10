@@ -76,27 +76,27 @@ export const ADMIN_ROUTES: Routes = [
       {
         path: 'food/agents',
         component: FoodAgentsComponent,
-        data: { title: 'Đại lý (FoodEmolite)' }
+        data: { title: 'Đại lý' }
       },
       {
         path: 'food/stores',
         component: FoodStoresComponent,
-        data: { title: 'Cửa hàng (FoodEmolite)' }
+        data: { title: 'Cửa hàng' }
       },
       {
         path: 'food/dishes',
         component: FoodDishesComponent,
-        data: { title: 'Món ăn (FoodEmolite)' }
+        data: { title: 'Món ăn' }
       },
       {
         path: 'food/categories',
         component: FoodCategoriesComponent,
-        data: { title: 'Danh mục (FoodEmolite)' }
+        data: { title: 'Danh mục' }
       },
       {
         path: 'food/customers',
         component: FoodCustomersComponent,
-        data: { title: 'Khách hàng (FoodEmolite)' }
+        data: { title: 'Khách hàng' }
       },
       {
         path: 'add-music',

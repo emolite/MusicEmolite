@@ -8,8 +8,6 @@ import { FilterField } from '../../../core/models/front-end/filter/filter-field.
 import { FoodEmoliteService } from '../../../core/services/food-emolite.service';
 import { PAGINATION } from '../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 20;
-
 @Component({
     selector: 'app-food-customers',
     standalone: true,
@@ -24,6 +22,8 @@ export class FoodCustomersComponent {
     rows = signal<any[]>([]);
     currentPage = signal(PAGINATION.DEFAULT_PAGE);
     totalPages = signal(PAGINATION.DEFAULT_PAGE);
+    totalRecords = signal(0);
+    pageSize = signal(20);
 
     sortBy = signal('totalspent');
     asc = signal(false);
@@ -91,7 +91,7 @@ export class FoodCustomersComponent {
 
         this.foodEmoliteService.searchCustomers({
             page: this.currentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.pageSize(),
             asc: this.asc(),
             sortBy: this.sortBy(),
             searchParams: {
@@ -105,11 +105,12 @@ export class FoodCustomersComponent {
                 const mapped = items.map((item, index) => ({
                     ...item,
                     totalSpent: `${(item.totalSpent ?? 0).toLocaleString('vi-VN')}₫`,
-                    stt: ((this.currentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.currentPage() - 1) * this.pageSize()) + index + 1
                 }));
 
                 this.rows.set(mapped);
                 this.totalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.totalRecords.set(res?.totalRecords ?? 0);
                 this.loading.set(false);
             },
             error: (err) => {
@@ -127,6 +128,12 @@ export class FoodCustomersComponent {
 
     onPageChange(page: number) {
         this.currentPage.set(page);
+        this.loadCustomers();
+    }
+
+    onPageSizeChange(size: number) {
+        this.pageSize.set(size);
+        this.currentPage.set(1);
         this.loadCustomers();
     }
 

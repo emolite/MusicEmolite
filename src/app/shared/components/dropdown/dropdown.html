@@ -35,7 +35,8 @@
   }
 
   @if (isOpen) {
-    <div class="absolute z-50 w-full mt-1 overflow-hidden shadow-lg"
+    <div class="absolute z-50 w-full overflow-hidden shadow-lg"
+      [class.mt-1]="!dropUp" [class.bottom-full]="dropUp" [class.mb-1]="dropUp"
       [class]="isAdmin()
         ? 'rounded-md bg-white border border-gray-200'
         : 'rounded-xl bg-[#1a1825] border border-white/10 shadow-xl'">
@@ -69,7 +70,7 @@
             class="px-4 py-2.5 text-sm flex items-center justify-between transition-colors"
             [class]="isAdmin()
               ? (option.value === value
-                  ? 'bg-gray-900 text-white'
+                  ? 'bg-blue-50 text-anm-main'
                   : 'text-gray-700 hover:bg-gray-50 cursor-pointer')
                 + (option.disabled ? ' opacity-40 cursor-not-allowed' : '')
               : (option.value === value

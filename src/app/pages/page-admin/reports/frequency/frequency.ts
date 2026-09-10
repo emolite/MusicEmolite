@@ -9,8 +9,6 @@ import { AppTableComponent } from '../../../../shared/components/table/table';
 import { TableColumn } from '../../../../core/models/front-end/table/table-column.model';
 import { PAGINATION } from '../../../../core/constants/pagination.constants';
 
-const PAGE_SIZE = 10;
-
 @Component({
     selector: 'app-frequency',
     standalone: true,
@@ -70,6 +68,8 @@ export class FrequencyComponent {
     songs = signal<any[]>([]);
     songsCurrentPage = signal(PAGINATION.DEFAULT_PAGE);
     songsTotalPages = signal(PAGINATION.DEFAULT_PAGE);
+    songsTotalRecords = signal(0);
+    songsPageSize = signal(20);
     songsSortBy = signal('views');
     songsAsc = signal(false);
 
@@ -149,7 +149,7 @@ export class FrequencyComponent {
 
         this.songService.searchSongsAdmin({
             page: this.songsCurrentPage(),
-            pageSize: PAGE_SIZE,
+            pageSize: this.songsPageSize(),
             asc: this.songsAsc(),
             searchParams: { sortBy: this.songsSortBy() }
         }).subscribe({
@@ -158,11 +158,12 @@ export class FrequencyComponent {
 
                 const mapped = data.map((item, index) => ({
                     ...item,
-                    stt: ((this.songsCurrentPage() - 1) * PAGE_SIZE) + index + 1
+                    stt: ((this.songsCurrentPage() - 1) * this.songsPageSize()) + index + 1
                 }));
 
                 this.songs.set(mapped);
                 this.songsTotalPages.set(res?.totalPages ?? PAGINATION.DEFAULT_PAGE);
+                this.songsTotalRecords.set(res?.totalRecords ?? 0);
                 this.loadingSongList.set(false);
             },
             error: (err) => {
@@ -174,6 +175,12 @@ export class FrequencyComponent {
 
     onSongsPageChange(page: number) {
         this.songsCurrentPage.set(page);
+        this.loadSongList();
+    }
+
+    onSongsPageSizeChange(size: number) {
+        this.songsPageSize.set(size);
+        this.songsCurrentPage.set(1);
         this.loadSongList();
     }
 
